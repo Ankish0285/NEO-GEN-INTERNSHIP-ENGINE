@@ -1,0 +1,81 @@
+/* Tailwind base/components/utilities are imported once in index.css */
+@layer base {
+  :root {
+    --color-primary: #16a34a; /* Green-600 */
+    --color-secondary: #f97316; /* Orange-500 */
+    --color-background: #f9fafb; /* Gray-50 */
+    --color-surface: #ffffff; /* White */
+    --color-border: #e5e7eb; /* Gray-200 */
+    --color-text-primary: #111827; /* Gray-900 */
+    --color-text-secondary: #6b7280; /* Gray-500 */
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  }
+
+  .btn-primary:hover {
+    background-color: #15803d; /* primary 700 */
+  }
+
+  .btn-secondary {
+    background-color: #ffffff;
+    color: #374151;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    transition: background-color 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
+  }
+
+  .btn-secondary:hover {
+    background-color: #f9fafb; /* gray-50 */
+  }
+
+  .btn-danger {
+    background-color: #dc2626; /* red-600 */
+    color: #ffffff;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  }
+
+  .btn-danger:hover {
+    background-color: #b91c1c; /* red-700 */
+  }
+
+  .input-field {
+    display: block;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.08);
+  }
+
+}
+

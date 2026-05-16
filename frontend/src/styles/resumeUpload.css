@@ -1,0 +1,323 @@
+/* Resume Upload Component Styles */
+
+.resume-upload-container {
+    width: 100%;
+    margin: 20px 0;
+    padding: 0 1rem;
+}
+
+@media (max-width: 480px) {
+    .resume-upload-container {
+        margin: 15px 0;
+        padding: 0 0.75rem;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .resume-upload-container {
+        margin: 18px 0;
+        padding: 0 1.25rem;
+    }
+}
+
+.upload-box {
+    background: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.drag-drop-area {
+    position: relative;
+    padding: 40px 20px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #fff;
+    margin: 20px;
+}
+
+@media (max-width: 480px) {
+    .drag-drop-area {
+        padding: 30px 15px;
+        margin: 15px;
+    }
+    
+    .drag-drop-area h3 {
+        font-size: 16px;
+    }
+    
+    .main-text {
+        font-size: 12px;
+    }
+    
+    .sub-text {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .drag-drop-area {
+        padding: 35px 18px;
+        margin: 18px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .drag-drop-area {
+        padding: 50px 30px;
+        margin: 25px;
+    }
+    
+    .drag-drop-area h3 {
+        font-size: 20px;
+    }
+    
+    .main-text {
+        font-size: 15px;
+    }
+}
+
+.drag-drop-area.active {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.file-input {
+    display: none;
+}
+
+.upload-label {
+    cursor: pointer;
+    display: block;
+    pointer-events: none;
+}
+
+.upload-icon {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #3b82f6;
+}
+
+.drag-drop-area h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.main-text {
+    margin: 8px 0;
+    color: #475569;
+    font-size: 14px;
+}
+
+.sub-text {
+    margin: 8px 0;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    z-index: 10;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    color: #3b82f6;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-overlay p {
+    margin: 0;
+    color: #475569;
+    font-weight: 500;
+}
+
+.resume-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+    .resume-list {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 15px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .resume-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .resume-list {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+.resume-item {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.resume-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+}
+
+@media (max-width: 480px) {
+    .resume-item {
+        padding: 12px;
+    }
+}
+
+.progress-bar {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    margin: 0 20px 20px 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+    transition: width 0.3s ease;
+}
+
+.alert {
+    padding: 12px 16px;
+    margin: 0 20px 20px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.alert-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.alert svg {
+    flex-shrink: 0;
+}
+
+.current-resume {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    margin: 0 20px 20px 20px;
+}
+
+.resume-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    color: #166534;
+}
+
+.resume-info svg {
+    flex-shrink: 0;
+}
+
+.resume-name {
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.resume-date {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: #22c55e;
+}
+
+.btn-update {
+    padding: 8px 16px;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.btn-update:hover:not(:disabled) {
+    background: #16a34a;
+}
+
+.btn-update:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .drag-drop-area {
+        padding: 30px 15px;
+        margin: 15px;
+    }
+
+    .drag-drop-area h3 {
+        font-size: 16px;
+    }
+
+    .current-resume {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .resume-info {
+        justify-content: center;
+    }
+}

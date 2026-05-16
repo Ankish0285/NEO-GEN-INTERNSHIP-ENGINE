@@ -1,0 +1,15 @@
+DON'T TOUCH/
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.env
+**/.env
+*.log
+**/*.log
+.cache
+**/.cache
+temp/
+**/temp/
+uploads/temp/
+**/uploads/temp/
