@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, User as UserIcon, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -20,6 +20,15 @@ const Navbar = () => {
     : defaultLogo;
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen);
@@ -53,7 +62,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className={`navbar ${scrolled ? 'neo-navbar--scrolled' : ''}`}>
         <div className="container flex justify-between items-center">
           <div className="navbar-brand">
             <Link to="/" style={{display: 'flex', alignItems: 'center', gap: '16px', minWidth: '220px', textDecoration: 'none'}}>
@@ -142,14 +151,8 @@ const Navbar = () => {
             {!isAuthenticated ? (
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <button 
-                  className="btn btn--primary" 
+                  className="neo-btn neo-btn-primary" 
                   id="loginBtn" 
-                  style={{ 
-                    backgroundImage: 'linear-gradient(135deg, #16a34a, #f97316)', 
-                    border: 'none',
-                    color: 'white',
-                    fontWeight: '600'
-                  }}
                   onClick={() => {
                     setModalInitialTab('login');
                     setIsLoginModalOpen(true);

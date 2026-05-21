@@ -34,8 +34,8 @@ export const roleConfig = {
         basePath: '/admin/dashboard',
         panelTitle: 'Super Admin',
         panelBadge: 'Super Admin',
-        accentClass: 'from-indigo-600 to-violet-700',
-        badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+        accentClass: 'from-[#FF9933] to-[#ffb347]',
+        badgeClass: 'admin-topbar__badge',
         loginPath: '/admin/login',
         menuItems: [
             { path: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },

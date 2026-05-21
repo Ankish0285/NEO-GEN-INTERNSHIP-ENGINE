@@ -9,7 +9,8 @@ const Card = ({
   title, 
   subtitle, 
   action,
-  onClick
+  onClick,
+  variant = 'default',
 }) => {
   return (
     <motion.div 
@@ -18,16 +19,16 @@ const Card = ({
       transition={{ duration: 0.3 }}
       onClick={onClick}
       className={clsx(
-        "glass-card overflow-hidden relative",
-        onClick && "cursor-pointer hover:shadow-lg transition-all duration-300",
+        'neo-glass overflow-hidden relative',
+        onClick && 'cursor-pointer hover:shadow-lg transition-all duration-300',
         className
       )}
     >
       {(title || action) && (
         <div className="px-6 py-4 border-b border-white/20 flex justify-between items-center">
           <div>
-            {title && <h3 className="heading-navy text-xl">{title}</h3>}
-            {subtitle && <p className="text-sub text-sm mt-1">{subtitle}</p>}
+            {title && <h3 className="text-xl font-bold text-[#111827]">{title}</h3>}
+            {subtitle && <p className="text-sm text-[#4B5563] mt-1">{subtitle}</p>}
           </div>
           {action && <div>{action}</div>}
         </div>

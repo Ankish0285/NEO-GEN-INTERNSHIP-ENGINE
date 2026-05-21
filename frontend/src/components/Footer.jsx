@@ -29,8 +29,8 @@ const Footer = () => {
     : defaultLogo;
 
   return (
-    <footer className="footer" style={{ backgroundColor: '#111827', color: '#fff', padding: '80px 0 30px' }}>
-        <div className="container">
+    <footer className="footer neo-footer">
+        <div className="neo-container">
             <div className="footer-content" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '60px' }}>
                 <div className="footer-section">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>

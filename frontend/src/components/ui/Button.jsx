@@ -2,41 +2,35 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { Loader2 } from 'lucide-react';
 
-const Button = ({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
-  className, 
-  isLoading, 
-  disabled, 
+const Button = ({
+  children,
+  variant = 'primary',
+  size = 'md',
+  className,
+  isLoading,
+  disabled,
   type = 'button',
-  ...props 
+  ...props
 }) => {
-  const baseStyles = "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
-  
   const variants = {
-    primary: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
-    secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500",
-    outline: "border border-gray-300 bg-transparent hover:bg-gray-50 text-gray-700 focus:ring-gray-500",
-    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-    ghost: "bg-transparent hover:bg-gray-100 text-gray-700"
+    primary: 'neo-btn neo-btn-primary',
+    secondary: 'neo-btn neo-btn-ghost',
+    success: 'neo-btn neo-btn-success',
+    outline: 'neo-btn neo-btn-ghost border border-[#111827]/10',
+    danger: 'neo-btn bg-red-600 text-white hover:bg-red-700 shadow-md',
+    ghost: 'neo-btn neo-btn-ghost !min-h-0 !px-3 !py-2',
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-sm",
-    lg: "px-6 py-3 text-base"
+    sm: '!min-h-[36px] !px-3 !py-1.5 text-sm',
+    md: '',
+    lg: '!min-h-[52px] !px-8 text-base',
   };
 
   return (
     <button
       type={type}
-      className={clsx(
-        baseStyles,
-        variants[variant],
-        sizes[size],
-        className
-      )}
+      className={clsx(variants[variant] || variants.primary, sizes[size], className)}
       disabled={disabled || isLoading}
       {...props}
     >

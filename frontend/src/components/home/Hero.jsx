@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 import { resolveStoryImageUrl } from '../../utils/resolveStoryImageUrl';
 import { DEFAULT_HERO_IMAGE } from '../../utils/defaultSiteSettings';
@@ -10,68 +12,75 @@ const Hero = () => {
   const { branding, hero } = settings;
   const bg =
     resolveStoryImageUrl(hero.backgroundImage) || hero.backgroundImage || DEFAULT_HERO_IMAGE;
-  const overlay = hero.overlayOpacity ?? 0.7;
+  const overlay = hero.overlayOpacity ?? 0.72;
 
   return (
-    <section
-      className="hero"
-      style={{
-        background: `linear-gradient(rgba(0, 0, 0, ${overlay}), rgba(0, 0, 0, ${overlay})), url("${bg}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        color: 'white',
-        padding: '120px 0',
-        textAlign: 'left',
-      }}
-    >
-      <div className="container">
-        <div className="hero-content" style={{ maxWidth: '600px', margin: '0' }}>
-          <h1 style={{ fontSize: '3.5rem', fontWeight: '700', marginBottom: '20px', color: 'white' }}>
+    <section className="neo-hero" id="hero-section">
+      <div
+        className="neo-hero__bg"
+        style={{ backgroundImage: `url("${bg}")` }}
+        aria-hidden="true"
+      />
+      <div
+        className="neo-hero__overlay"
+        style={{
+          background: `linear-gradient(135deg, rgba(17,24,39,${overlay}), rgba(17,24,39,${overlay * 0.65}))`,
+        }}
+        aria-hidden="true"
+      />
+      <div className="neo-hero__glow neo-hero__glow--saffron" aria-hidden="true" />
+      <div className="neo-hero__glow neo-hero__glow--green" aria-hidden="true" />
+
+      <div className="neo-container">
+        <motion.div
+          className="neo-hero__content"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.span
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.15 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
+            style={{
+              background: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: 'rgba(255,255,255,0.95)',
+            }}
+          >
+            <Sparkles size={16} style={{ color: branding.primaryColor || '#FF9933' }} />
+            India&apos;s internship platform
+          </motion.span>
+
+          <h1 className="neo-hero__title">
             {hero.titleBefore}{' '}
-            <span style={{ color: branding.primaryColor }}>{hero.titleHighlight1}</span>{' '}
-            <span style={{ color: branding.secondaryColor }}>{hero.titleHighlight2}</span>
+            <span style={{ color: branding.primaryColor || '#FF9933' }}>{hero.titleHighlight1}</span>{' '}
+            <span style={{ color: branding.secondaryColor || '#138808' }}>{hero.titleHighlight2}</span>
           </h1>
-          <p className="hero-subtitle" style={{ color: '#e5e7eb', fontSize: '1.25rem', marginBottom: '40px' }}>
-            {hero.subtitle}
-          </p>
-          <div className="hero-actions" style={{ justifyContent: 'flex-start', gap: '20px' }}>
+          <p className="neo-hero__subtitle">{hero.subtitle}</p>
+
+          <div className="neo-hero__actions">
             <button
               type="button"
-              className="btn"
-              style={{
-                backgroundColor: branding.primaryColor,
-                color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
+              className="neo-btn neo-btn-primary"
               onClick={() => {
-                const element = document.getElementById('internships-section');
-                if (element) element.scrollIntoView({ behavior: 'smooth' });
+                const el = document.getElementById('internships-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
             >
               {hero.primaryButtonText}
+              <ArrowRight size={18} />
             </button>
             <button
               type="button"
-              className="btn"
-              style={{
-                backgroundColor: branding.secondaryColor,
-                color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
+              className="neo-btn neo-btn-success"
               onClick={() => navigate('/partner/login')}
             >
               {hero.secondaryButtonText}
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

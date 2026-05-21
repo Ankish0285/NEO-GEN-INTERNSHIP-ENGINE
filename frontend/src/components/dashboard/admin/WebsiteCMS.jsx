@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Save, Upload, Globe, Image, FileText, Mail, Share2, Scale } from 'lucide-react';
 import Card from '../../ui/Card';
-import Button from '../../ui/Button';
 import SiteSettingsService from '../../../services/siteSettingsService';
 import { useSiteSettings } from '../../../context/SiteSettingsContext';
 import { resolveStoryImageUrl } from '../../../utils/resolveStoryImageUrl';
@@ -20,16 +19,16 @@ const TABS = [
 ];
 
 const Field = ({ label, children, hint }) => (
-  <div className="space-y-1">
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
+  <div className="space-y-2">
+    <label className="admin-label">{label}</label>
     {children}
-    {hint && <p className="text-xs text-gray-500">{hint}</p>}
+    {hint && <p className="admin-hint">{hint}</p>}
   </div>
 );
 
 const TextInput = ({ value, onChange, ...props }) => (
   <input
-    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+    className="admin-input"
     value={value ?? ''}
     onChange={(e) => onChange(e.target.value)}
     {...props}
@@ -38,7 +37,7 @@ const TextInput = ({ value, onChange, ...props }) => (
 
 const TextArea = ({ value, onChange, rows = 3, ...props }) => (
   <textarea
-    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+    className="admin-input"
     rows={rows}
     value={value ?? ''}
     onChange={(e) => onChange(e.target.value)}
@@ -137,31 +136,27 @@ const WebsiteCMS = () => {
     : null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Website Control</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Only Super Admin can edit the public website — logo, home, about, contact, social links, and policies.
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+        <div className="neo-page-header mb-0">
+          <h1>Website Control</h1>
+          <p>
+            Manage the public website — logo, home, about, contact, social links, and policies.
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2">
+        <button type="button" onClick={handleSave} disabled={saving} className="admin-btn-primary shrink-0">
           <Save size={18} />
           {saving ? 'Publishing...' : 'Publish changes'}
-        </Button>
+        </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
+      <div className="neo-tabs admin-tabs">
         {TABS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             type="button"
             onClick={() => setActiveTab(id)}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition ${
-              activeTab === id
-                ? 'bg-indigo-100 text-indigo-800'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={activeTab === id ? 'neo-tab neo-tab--active admin-tab admin-tab--active' : 'neo-tab admin-tab'}
           >
             <Icon size={16} />
             {label}
@@ -169,7 +164,7 @@ const WebsiteCMS = () => {
         ))}
       </div>
 
-      <Card className="p-6">
+      <Card variant="admin" className="p-6 md:p-8">
         {activeTab === 'branding' && (
           <div className="grid gap-6 max-w-2xl">
             <Field label="Logo image">
@@ -177,7 +172,7 @@ const WebsiteCMS = () => {
                 {logoPreview && (
                   <img src={logoPreview} alt="Logo preview" className="w-16 h-16 object-contain rounded border" />
                 )}
-                <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">
+                <label className="admin-btn-ghost cursor-pointer inline-flex items-center gap-2">
                   <Upload size={16} />
                   {uploading ? 'Uploading...' : 'Upload logo'}
                   <input
@@ -295,7 +290,7 @@ const WebsiteCMS = () => {
             </Field>
             <h3 className="font-semibold text-gray-800">Feature cards (4)</h3>
             {(draft.about.features || []).map((f, i) => (
-              <div key={i} className="p-4 border rounded-lg space-y-3 bg-gray-50">
+              <div key={i} className="admin-form-section space-y-3">
                 <p className="text-xs font-bold text-gray-500">Feature {i + 1}</p>
                 <TextInput value={f.title} onChange={(v) => patchArrayItem('about', 'features', i, 'title', v)} placeholder="Title" />
                 <TextArea value={f.description} onChange={(v) => patchArrayItem('about', 'features', i, 'description', v)} rows={2} />
@@ -313,7 +308,7 @@ const WebsiteCMS = () => {
               <TextArea value={draft.howItWorks.subtitle} onChange={(v) => patch('howItWorks', 'subtitle', v)} />
             </Field>
             {(draft.howItWorks.steps || []).map((step, i) => (
-              <div key={i} className="p-4 border rounded-lg space-y-3 bg-gray-50">
+              <div key={i} className="admin-form-section space-y-3">
                 <p className="text-xs font-bold text-gray-500">Step {i + 1}</p>
                 <TextInput value={step.title} onChange={(v) => patchArrayItem('howItWorks', 'steps', i, 'title', v)} />
                 <TextArea value={step.description} onChange={(v) => patchArrayItem('howItWorks', 'steps', i, 'description', v)} rows={2} />
@@ -366,7 +361,7 @@ const WebsiteCMS = () => {
         {activeTab === 'policies' && (
           <div className="grid gap-8 max-w-3xl">
             {['privacy', 'terms', 'cookies'].map((key) => (
-              <div key={key} className="space-y-3 p-4 border rounded-lg">
+              <div key={key} className="admin-form-section space-y-3">
                 <h3 className="font-semibold capitalize">{key} policy</h3>
                 <Field label="Title">
                   <TextInput

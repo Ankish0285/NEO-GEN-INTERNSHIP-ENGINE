@@ -7,9 +7,11 @@ const portalMeta = {
     title: 'Super Admin Portal',
     subtitle: 'Platform management — users, internships, and system settings',
     icon: Shield,
-    gradient: 'from-indigo-600 to-violet-700',
-    ring: 'focus:ring-indigo-500',
-    button: 'bg-gradient-to-r from-indigo-600 to-violet-700 hover:from-indigo-700 hover:to-violet-800 focus:ring-indigo-500',
+    gradient: 'from-[#FF9933] to-[#ffb347]',
+    ring: 'focus:ring-[#FF9933]',
+    button: 'admin-btn-primary w-full',
+    pageClass: 'admin-login-page',
+    cardClass: 'neo-admin-card',
     otherPortal: { label: 'Partner Portal', path: '/partner/login' },
     homeHint: 'Student login',
     homePath: '/login',
@@ -62,14 +64,16 @@ const PortalLogin = ({ portal, onLogin, redirectPath }) => {
     }
   };
 
+  const isAdminPortal = portal === 'admin';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white/90 backdrop-blur p-8 rounded-2xl border border-slate-200 shadow-xl">
+    <div className={meta.pageClass || 'neo-auth-page'}>
+      <div className={`${meta.cardClass || 'neo-auth-card neo-glass max-w-md w-full space-y-8'}`}>
         <div className="text-center">
           <div className={`mx-auto h-16 w-16 bg-gradient-to-br ${meta.gradient} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
             <Icon className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">{meta.title}</h2>
+          <h2 className="text-2xl font-bold text-[#111827]">{meta.title}</h2>
           <p className="mt-2 text-sm text-slate-600">{meta.subtitle}</p>
         </div>
 
@@ -81,7 +85,7 @@ const PortalLogin = ({ portal, onLogin, redirectPath }) => {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="email" className={isAdminPortal ? 'admin-label' : 'block text-sm font-medium text-slate-700 mb-1'}>
               Email
             </label>
             <input
@@ -91,13 +95,13 @@ const PortalLogin = ({ portal, onLogin, redirectPath }) => {
               required
               value={formData.email}
               onChange={handleChange}
-              className={`block w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 ${meta.ring}`}
+              className={isAdminPortal ? 'admin-input' : `block w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 ${meta.ring}`}
               placeholder="you@organization.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="password" className={isAdminPortal ? 'admin-label' : 'block text-sm font-medium text-slate-700 mb-1'}>
               Password
             </label>
             <div className="relative">
@@ -108,7 +112,7 @@ const PortalLogin = ({ portal, onLogin, redirectPath }) => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className={`block w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 ${meta.ring} pr-10`}
+                className={isAdminPortal ? 'admin-input pr-12' : `block w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 ${meta.ring} pr-10`}
                 placeholder="Enter password"
               />
               <button

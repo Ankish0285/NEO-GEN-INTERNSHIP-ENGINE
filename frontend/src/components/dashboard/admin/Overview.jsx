@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import Card from '../../ui/Card';
+import { Users, Briefcase, FileText } from 'lucide-react';
 import { api } from '../../../services/api';
 
 const Overview = () => {
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeInternships: 0,
-    pendingApplications: 0
+    pendingApplications: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -14,12 +14,11 @@ const Overview = () => {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        // Using the endpoint seen in AdminDashboard.jsx
         const data = await api.get('/dashboard/admin-summary');
         setStats({
-          totalUsers: data.totalStudents || 0, // Mapping fields based on typical response
+          totalUsers: data.totalStudents || 0,
           activeInternships: data.totalInternships || 0,
-          pendingApplications: data.activeApplications || 0 // or pendingReviews
+          pendingApplications: data.totalApplications || 0,
         });
       } catch (error) {
         console.error('Error fetching admin stats:', error);
@@ -31,29 +30,44 @@ const Overview = () => {
     fetchStats();
   }, []);
 
+  const cards = [
+    {
+      label: 'Total Students',
+      value: stats.totalUsers,
+      icon: Users,
+      tone: 'saffron',
+    },
+    {
+      label: 'Active Internships',
+      value: stats.activeInternships,
+      icon: Briefcase,
+      tone: 'green',
+    },
+    {
+      label: 'Total Applications',
+      value: stats.pendingApplications,
+      icon: FileText,
+      tone: 'navy',
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Super Admin Overview</h1>
-      <p className="text-sm text-gray-500">Platform-wide statistics and management</p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-gray-700">Total Users</h3>
-          <p className="text-3xl font-bold text-blue-600 mt-2">
-            {loading ? '...' : stats.totalUsers}
-          </p>
-        </Card>
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-gray-700">Active Internships</h3>
-          <p className="text-3xl font-bold text-green-600 mt-2">
-            {loading ? '...' : stats.activeInternships}
-          </p>
-        </Card>
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-gray-700">Pending Applications</h3>
-          <p className="text-3xl font-bold text-purple-600 mt-2">
-            {loading ? '...' : stats.pendingApplications}
-          </p>
-        </Card>
+    <div className="space-y-8">
+      <div className="neo-page-header mb-6">
+        <h1>Super Admin Overview</h1>
+        <p>Platform-wide statistics and management at a glance.</p>
+      </div>
+
+      <div className="neo-dash-stat-grid">
+        {cards.map(({ label, value, icon: Icon, tone }) => (
+          <div key={label} className={`neo-dash-stat neo-glass admin-stat-card admin-stat-card--${tone}`}>
+            <div className="admin-stat-card__icon">
+              <Icon size={24} />
+            </div>
+            <p className="admin-stat-card__label">{label}</p>
+            <p className="admin-stat-card__value">{loading ? '—' : value.toLocaleString()}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
