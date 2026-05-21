@@ -16,6 +16,7 @@ import {
 export const roleConfig = {
     student: {
         basePath: '/dashboard',
+        loginPath: '/login',
         panelTitle: 'Student Dashboard',
         panelBadge: 'Student',
         accentClass: 'from-saffron to-[#ffad5c]',
@@ -38,7 +39,7 @@ export const roleConfig = {
         panelBadge: 'Super Admin',
         accentClass: 'from-[#FF9933] to-[#ffb347]',
         badgeClass: 'admin-topbar__badge',
-        loginPath: '/admin/login',
+        loginPath: '/login',
         menuItems: [
             { path: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/admin/dashboard/profile', label: 'Profile', icon: User },
@@ -57,7 +58,7 @@ export const roleConfig = {
         panelBadge: 'Partner',
         accentClass: 'from-amber-500 to-orange-600',
         badgeClass: 'bg-amber-100 text-amber-900 border-amber-200',
-        loginPath: '/partner/login',
+        loginPath: '/login',
         menuItems: [
             { path: '/partner/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/partner/dashboard/profile', label: 'Profile', icon: User },

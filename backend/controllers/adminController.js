@@ -22,6 +22,10 @@ const updateUserRole = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) throw new Error('User not found');
     user.role = role;
+    if (role === 'partner') {
+        user.partnerStatus = 'pending';
+        user.isVerified = true;
+    }
     await user.save();
 
     await ActivityLog.create({
@@ -75,10 +79,24 @@ const toggleBlockUser = asyncHandler(async (req, res) => {
 // @route   PUT /api/admin/partners/:id/status
 // @access  Private/Admin
 const updatePartnerStatus = asyncHandler(async (req, res) => {
-    const { status } = req.body; // 'approved' or 'rejected'
+    const { status } = req.body;
+    const allowed = ['approved', 'rejected', 'pending'];
+    if (!allowed.includes(status)) {
+        res.status(400);
+        throw new Error('Status must be approved, rejected, or pending');
+    }
+
     const user = await User.findById(req.params.id);
     if (!user) throw new Error('User not found');
+    if (user.role !== 'partner') {
+        res.status(400);
+        throw new Error('User is not a partner account');
+    }
+
     user.partnerStatus = status;
+    if (status === 'approved') {
+        user.isVerified = true;
+    }
     await user.save();
 
     await ActivityLog.create({
@@ -106,15 +124,50 @@ const getSystemAnalytics = asyncHandler(async (req, res) => {
     const totalUsers = await User.countDocuments();
     const totalInternships = await Internship.countDocuments();
     const totalApplications = await Application.countDocuments();
-    
-    // Aggregate users by role
+
     const usersByRole = await User.aggregate([
-        { $group: { _id: '$role', count: { $sum: 1 } } }
+        { $group: { _id: '$role', count: { $sum: 1 } } },
     ]);
+
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
+
+    const appsByMonth = await Application.aggregate([
+        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        {
+            $group: {
+                _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
+                applications: { $sum: 1 },
+            },
+        },
+        { $sort: { '_id.year': 1, '_id.month': 1 } },
+    ]);
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const applicationTrends = appsByMonth.map((row) => ({
+        name: monthNames[row._id.month - 1] || '—',
+        applications: row.applications,
+    }));
+
+    const statusAgg = await Application.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]);
+    const statusDistribution = statusAgg
+        .filter((s) => s.count > 0)
+        .map((s) => ({ name: s._id || 'Unknown', value: s.count }));
 
     res.status(200).json({
         success: true,
-        data: { totalUsers, totalInternships, totalApplications, usersByRole }
+        data: {
+            totalUsers,
+            totalInternships,
+            totalApplications,
+            usersByRole,
+            applicationTrends,
+            statusDistribution,
+        },
     });
 });
 

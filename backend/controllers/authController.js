@@ -394,26 +394,34 @@ const loginUser = asyncHandler(async (req, res) => {
         });
     }
 
-    if (user.role === 'admin') {
-        return res.status(403).json({
-            success: false,
-            message: 'Super Admin accounts must sign in via the Super Admin portal (/admin/login).'
-        });
-    }
-
     if (user.role === 'partner') {
-        return res.status(403).json({
-            success: false,
-            message: 'Partner accounts must sign in via the Partner portal (/partner/login).'
-        });
+        if (user.partnerStatus === 'pending') {
+            return res.status(403).json({
+                success: false,
+                message: 'Your partner account is pending approval. Please contact the Super Admin.'
+            });
+        }
+        if (user.partnerStatus === 'rejected') {
+            return res.status(403).json({
+                success: false,
+                message: 'Your partner application was rejected. Please contact support.'
+            });
+        }
     }
 
-    // Log Activity
+    const activityByRole = {
+        admin: 'Super Admin Logged In',
+        partner: 'Partner Logged In',
+        student: 'Logged In',
+    };
+
     try {
         await ActivityLog.create({
             user: user._id,
-            action: 'Logged In',
-            details: {},
+            action: activityByRole[user.role] || 'Logged In',
+            details: user.role === 'partner'
+                ? { email: user.email, organization: user.partnerInfo?.organization }
+                : { email: user.email },
             ip: req.ip,
             userAgent: req.get('User-Agent')
         });
@@ -421,9 +429,9 @@ const loginUser = asyncHandler(async (req, res) => {
         console.error('Activity log error:', err);
     }
 
-    console.log(`[Auth] User ${email} logged in successfully`);
+    console.log(`[Auth] User ${email} (${user.role}) logged in successfully`);
 
-    res.status(200).json({
+    const payload = {
         success: true,
         token: generateToken(user._id),
         _id: user.id,
@@ -435,8 +443,15 @@ const loginUser = asyncHandler(async (req, res) => {
         university: user.university || '',
         course: user.course || '',
         profileCompletionPercentage: user.profileCompletionPercentage ?? 0,
-        message: 'Login successful'
-    });
+        message: 'Login successful',
+    };
+
+    if (user.role === 'partner') {
+        payload.partnerStatus = user.partnerStatus;
+        payload.partnerInfo = user.partnerInfo;
+    }
+
+    res.status(200).json(payload);
 });
 
 // @desc    Authenticate super admin only

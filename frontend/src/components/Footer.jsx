@@ -69,7 +69,7 @@ const Footer = () => {
                 <div className="footer-section">
                     <h4 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '25px', color: '#fff' }}>For Employers</h4>
                     <ul className="footer-links" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <li><Link to="/partner/login" style={{ color: '#d1d5db', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}><ArrowRight size={14} color={branding.primaryColor} /> Partner Login</Link></li>
+                        <li><Link to="/login" style={{ color: '#d1d5db', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}><ArrowRight size={14} color={branding.primaryColor} /> Login</Link></li>
                         <li><Link to="/partner/dashboard" style={{ color: '#d1d5db', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}><ArrowRight size={14} color={branding.primaryColor} /> Employer Dashboard</Link></li>
                         <li><Link to="/success-stories" style={{ color: '#d1d5db', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}><ArrowRight size={14} color={branding.primaryColor} /> Success Stories</Link></li>
                     </ul>
@@ -101,8 +101,7 @@ const Footer = () => {
             <div className="footer-bottom" style={{ borderTop: '1px solid #374151', paddingTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
                 <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.875rem' }}>&copy; {new Date().getFullYear()} {footer.copyright}</p>
                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                    <Link to="/admin/login" style={{ color: '#9ca3af', fontSize: '0.875rem', textDecoration: 'none' }}>Super Admin</Link>
-                    <Link to="/partner/login" style={{ color: '#9ca3af', fontSize: '0.875rem', textDecoration: 'none' }}>Partner Login</Link>
+                    <Link to="/login" style={{ color: '#9ca3af', fontSize: '0.875rem', textDecoration: 'none' }}>Login</Link>
                     <a href="#privacy-policy" style={{ color: '#9ca3af', fontSize: '0.875rem', textDecoration: 'none' }}>Privacy Policy</a>
                     <a href="#terms-of-service" style={{ color: '#9ca3af', fontSize: '0.875rem', textDecoration: 'none' }}>Terms of Service</a>
                 </div>

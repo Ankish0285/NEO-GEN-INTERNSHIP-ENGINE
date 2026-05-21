@@ -11,11 +11,9 @@ const Sidebar = ({ isOpen, onClose, role = 'student' }) => {
 
   const config = roleConfig[role] || roleConfig.student;
   const menuItems = config.menuItems;
-  const isAdmin = role === 'admin';
-
   const handleLogout = () => {
     logout();
-    navigate(isAdmin ? '/admin/login' : '/');
+    navigate('/login');
   };
 
   const sidebarInner = (

@@ -17,15 +17,8 @@ const Notifications = () => {
       }
     } catch (error) {
       console.error("Failed to fetch notifications", error);
-      // Fallback mock data if API fails (for demo purposes)
-      const mockData = [
-          { id: 1, type: 'urgent', title: 'Application Deadline Extended', message: 'NITI Aayog internship deadline extended by 2 days.', date: '2025-01-10', isRead: false },
-          { id: 2, type: 'new', title: 'New Opportunity: MEA', message: 'Ministry of External Affairs is now accepting applications.', date: '2025-01-09', isRead: false },
-          { id: 3, type: 'new', title: 'ISRO Internship', message: 'ISRO technical internship for summer 2025 open.', date: '2025-01-08', isRead: false },
-          { id: 4, type: 'recurring', title: 'Weekly Webinar', message: 'Join us for a session on resume building.', date: '2025-01-07', isRead: true },
-      ];
-      setNotifications(mockData);
-      updateCounts(mockData);
+      setNotifications([]);
+      updateCounts([]);
     }
   };
 

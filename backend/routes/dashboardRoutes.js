@@ -4,10 +4,12 @@ const {
     getDashboardSummary, 
     getRecentActivity,
     getAdminDashboardSummary,
-    getPartnerDashboardSummary
+    getPartnerDashboardSummary,
+    getPublicStats,
 } = require('../controllers/dashboardController');
 const { protect, admin, partner } = require('../middleware/authMiddleware');
 
+router.get('/public-stats', getPublicStats);
 router.get('/summary', protect, getDashboardSummary);
 router.get('/activity', protect, getRecentActivity);
 router.get('/admin-summary', protect, admin, getAdminDashboardSummary);

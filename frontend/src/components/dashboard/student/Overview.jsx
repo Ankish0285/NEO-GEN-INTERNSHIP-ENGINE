@@ -71,9 +71,24 @@ const ActivityItem = ({ title, company, time, status }) => (
 import { useNavigate } from 'react-router-dom';
 import { useStudentDashboard } from '../../../context/StudentDashboardContext';
 
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days < 1) return 'Today';
+  if (days === 1) return '1 day ago';
+  return `${days} days ago`;
+};
+
 const Overview = () => {
-  const { dashboardData, profileData, loading } = useStudentDashboard();
+  const { dashboardData, profileData, applications, loading } = useStudentDashboard();
   const navigate = useNavigate();
+
+  const recentApplications = [...(applications || [])]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
+
+  const recommendations = dashboardData?.recommendedInternships || [];
 
   const onNavigate = (path) => {
     if (path === 'find-internship') {
@@ -131,7 +146,7 @@ const Overview = () => {
             icon={Briefcase}
             color="text-green-primary"
             bgClass="bg-green-light/40"
-            trend="+12%"
+            label={`${dashboardData?.pendingReviews ?? 0} pending review`}
             loading={loading}
             />
         </motion.div>
@@ -139,11 +154,11 @@ const Overview = () => {
             <StatCard 
             title="ATS Score" 
             value={dashboardData?.atsScore || 0}
-            label="Resume strength"
+            label={dashboardData?.atsScore > 0 ? 'From your latest resume' : 'Upload resume to score'}
             icon={FileText}
             color="text-saffron-hover"
             bgClass="bg-saffron-light/50"
-            trend={dashboardData?.atsScore > 70 ? "Good" : "Needs Work"}
+            trend={dashboardData?.atsScore > 70 ? 'Good' : dashboardData?.atsScore > 0 ? 'Needs Work' : null}
             loading={loading}
             />
         </motion.div>
@@ -155,7 +170,7 @@ const Overview = () => {
             icon={UserCheck}
             color="text-blue-600"
             bgClass="bg-blue-light/50"
-            trend={profileData?.profileCompletionPercentage < 100 ? "Incomplete" : "Complete"}
+            trend={profileData?.profileCompletionPercentage === 100 ? 'Complete' : null}
             loading={loading}
             />
         </motion.div>
@@ -163,11 +178,11 @@ const Overview = () => {
             <StatCard 
             title="Interviews" 
             value={dashboardData?.interviews || 0}
-            label="Scheduled"
+            label="Shortlisted / interview stage"
             icon={CheckCircle}
             color="text-teal-600"
             bgClass="bg-mint-light/50"
-            trend="Active"
+            trend={dashboardData?.accepted > 0 ? `${dashboardData.accepted} accepted` : null}
             loading={loading}
             />
         </motion.div>
@@ -189,36 +204,63 @@ const Overview = () => {
                 }
             >
                 <div className="flex flex-col">
-                    {[1, 2, 3].map((i) => (
-                        <ActivityItem 
-                            key={i}
-                            title={`Frontend Developer Intern #${i}`}
-                            company="Tech Corp Inc."
-                            time={`${i} day${i > 1 ? 's' : ''} ago`}
-                            status={i === 1 ? 'Interview' : 'Applied'}
+                    {recentApplications.length === 0 ? (
+                      <p className="text-sub text-sm py-6 text-center">No applications yet. Browse internships to get started.</p>
+                    ) : (
+                      recentApplications.map((app) => (
+                        <ActivityItem
+                          key={app._id}
+                          title={app.internship?.title || 'Internship'}
+                          company={app.internship?.organization || 'Organization'}
+                          time={formatTimeAgo(app.createdAt)}
+                          status={app.status || 'Applied'}
                         />
-                    ))}
+                      ))
+                    )}
                 </div>
             </Card>
 
             <Card title="Recommended for You" subtitle="Based on your skills and profile">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
-                    {[1, 2].map((i) => (
-                        <div key={i} className="border border-saffron/10 bg-gradient-to-br from-saffron/5 to-green-primary/5 rounded-xl p-5 hover:bg-white/60 transition-all duration-300 shadow-sm cursor-pointer hover:-translate-y-1">
+                    {recommendations.length === 0 ? (
+                      <p className="text-sub text-sm col-span-2 py-6 text-center">
+                        No recommendations yet. Complete your profile and upload a resume.
+                      </p>
+                    ) : (
+                      recommendations.slice(0, 4).map((job) => (
+                        <div
+                          key={job.id || job._id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => onNavigate('find-internship')}
+                          onKeyDown={(e) => e.key === 'Enter' && onNavigate('find-internship')}
+                          className="border border-saffron/10 bg-gradient-to-br from-saffron/5 to-green-primary/5 rounded-xl p-5 hover:bg-white/60 transition-all duration-300 shadow-sm cursor-pointer hover:-translate-y-1"
+                        >
                             <div className="flex justify-between items-start mb-4">
                                 <div className="w-12 h-12 bg-white/80 rounded-xl flex items-center justify-center text-2xl shadow-sm border border-navy/5">
                                     🚀
                                 </div>
-                                <span className="bg-green-light text-green-primary text-xs px-3 py-1 rounded-full font-bold shadow-sm">New</span>
+                                {job.matchScore != null && (
+                                  <span className="bg-green-light text-green-primary text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                    {Math.round(job.matchScore)}% match
+                                  </span>
+                                )}
                             </div>
-                            <h4 className="font-semibold text-navy text-lg transition-colors">React Developer</h4>
-                            <p className="text-sm text-sub mb-4 mt-1">Startup Inc. • Remote</p>
-                            <div className="flex items-center gap-3 text-sm text-navy/60 font-medium">
-                                <span className="flex items-center"><Clock size={16} className="mr-1.5 text-saffron"/> 2d ago</span>
-                                <span className="flex items-center"><Award size={16} className="mr-1.5 text-green-primary"/> ₹40k/mo</span>
+                            <h4 className="font-semibold text-navy text-lg">{job.title}</h4>
+                            <p className="text-sm text-sub mb-4 mt-1">
+                              {job.company || job.organization} • {job.location || '—'}
+                            </p>
+                            <div className="flex items-center gap-3 text-sm text-navy/60 font-medium flex-wrap">
+                                {job.postedAt && (
+                                  <span className="flex items-center"><Clock size={16} className="mr-1.5 text-saffron"/> {job.postedAt}</span>
+                                )}
+                                {job.stipend && (
+                                  <span className="flex items-center"><Award size={16} className="mr-1.5 text-green-primary"/> {job.stipend}</span>
+                                )}
                             </div>
                         </div>
-                    ))}
+                      ))
+                    )}
                 </div>
             </Card>
         </motion.div>

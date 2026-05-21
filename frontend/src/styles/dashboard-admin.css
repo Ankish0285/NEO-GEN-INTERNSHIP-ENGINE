@@ -350,6 +350,10 @@
   color: var(--neo-navy);
 }
 
+.admin-stat-card--amber .admin-stat-card__value {
+  color: #d97706;
+}
+
 .admin-stat-card__icon {
   width: 48px;
   height: 48px;
@@ -373,6 +377,11 @@
 .admin-stat-card--navy .admin-stat-card__icon {
   background: #e2e8f0;
   color: var(--neo-navy);
+}
+
+.admin-stat-card--amber .admin-stat-card__icon {
+  background: #fef3c7;
+  color: #d97706;
 }
 
 /* —— Buttons —— */

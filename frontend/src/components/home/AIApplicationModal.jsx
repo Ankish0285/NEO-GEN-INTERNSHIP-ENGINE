@@ -35,13 +35,6 @@ const AIApplicationModal = ({ internship, onClose, onSuccess }) => {
     return null;
   }
 
-  // Mock recommendations if API fails or returns empty
-  const mockRecommendations = [
-    { id: 'mock1', title: 'Senior ' + internship.title, match: 92, reason: 'Strong technical alignment' },
-    { id: 'mock2', title: internship.title + ' Lead', match: 88, reason: 'Leadership potential detected' },
-    { id: 'mock3', title: 'Product Manager', match: 85, reason: 'Good communication skills' },
-  ];
-
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -53,43 +46,31 @@ const AIApplicationModal = ({ internship, onClose, onSuccess }) => {
     
     setIsAnalyzing(true);
     try {
-      // Try to call actual service, fallback to mock if it fails
-      let result;
-      try {
-        result = await resumeService.uploadResume(file, internship.description);
-        setAtsResult(result);
-        if (result.fileUrl) {
-            setUploadedResumeUrl(result.fileUrl);
-        }
-        
-        // Pre-fill form from extracted data if available
-        if (result.extractedData) {
-          setApplyFormData(prev => ({
-            ...prev,
-            fullName: result.extractedData.name || prev.fullName,
-            email: result.extractedData.email || prev.email,
-            phone: result.extractedData.phone || prev.phone,
-            skills: result.extractedSkills?.join(', ') || prev.skills,
-          }));
-        }
-      } catch (err) {
-        console.warn("API failed, using mock data", err);
-        // Mock success for demo purposes
-        result = {
-          score: 78,
-          breakdown: { technical: 85, softSkills: 70, experience: 60, education: 90, completeness: 100, formatting: 80 },
-          suggestions: ["Add more quantitative results", "Include keywords", "Fix formatting"],
-          matchedKeywords: internship.skills || ["React", "JavaScript"],
-          missingKeywords: ["Agile", "Testing"],
-          extractedSkills: ["JavaScript", "React", "Node.js"]
-        };
-        setAtsResult(result);
+      const result = await resumeService.uploadResume(file, internship.description);
+      setAtsResult(result);
+      if (result.fileUrl || result.secure_url) {
+        setUploadedResumeUrl(result.fileUrl || result.secure_url);
       }
-      
-      setStep(2); // Go to Personal Details
+
+      if (result.extractedData) {
+        setApplyFormData((prev) => ({
+          ...prev,
+          fullName: result.extractedData.name || prev.fullName,
+          email: result.extractedData.email || prev.email,
+          phone: result.extractedData.phone || prev.phone,
+          skills: result.extractedSkills?.join(', ') || prev.skills,
+        }));
+      } else if (result.extractedSkills?.length) {
+        setApplyFormData((prev) => ({
+          ...prev,
+          skills: result.extractedSkills.join(', '),
+        }));
+      }
+
+      setStep(2);
     } catch (error) {
       console.error("Analysis error", error);
-      alert("Something went wrong analyzing your resume. Please try again.");
+      alert(error.message || 'Failed to analyze resume. Please try again.');
     } finally {
       setIsAnalyzing(false);
     }

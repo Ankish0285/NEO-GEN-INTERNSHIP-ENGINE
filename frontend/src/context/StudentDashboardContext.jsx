@@ -3,6 +3,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { api } from '../services/api';
 import ApplicationService from '../services/applicationService';
+import {
+    getResumeFromStorage,
+    normalizeAtsPayload,
+    saveResumeToStorage,
+} from '../utils/storageUtils';
 
 const StudentDashboardContext = createContext();
 
@@ -38,22 +43,9 @@ export const StudentDashboardProvider = ({ children }) => {
         profileCompletionPercentage: user?.profileCompletionPercentage || 0
     });
 
-    // ATS State
+    // ATS State — null until a real resume is analyzed
     const [atsScoreData, setAtsScoreData] = useState(null);
     const [loadingAtsScore, setLoadingAtsScore] = useState(false);
-
-    // Demo ATS data
-    const demoAtsData = {
-        score: 0,
-        breakdown: {
-            technical: 0, softSkills: 0, experience: 0, education: 0, completeness: 0, formatting: 0, contact: 0
-        },
-        suggestions: [
-            'Upload your resume to get detailed ATS analysis',
-            'Our analyzer checks technical skills, experience, education, and soft skills'
-        ],
-        isDemoData: true
-    };
 
     const loadDashboardData = async () => {
         if (!isAuthenticated) return;
@@ -116,57 +108,27 @@ export const StudentDashboardProvider = ({ children }) => {
     const loadAtsScore = async () => {
         try {
             setLoadingAtsScore(true);
-            
-            // Check local storage first
-            const storedResume = localStorage.getItem('resumeData');
-            let scoreData;
 
-            if (storedResume) {
-                try {
-                    scoreData = JSON.parse(storedResume);
-                } catch (e) {
-                    console.error("Error parsing stored resume", e);
-                }
+            let scoreData = null;
+            try {
+                scoreData = await api.get('/resume/score');
+            } catch {
+                /* no resume on server yet */
             }
 
-            // If not in local storage, try API
-            if (!scoreData) {
-                 try {
-                    scoreData = await api.get('/resume/score');
-                 } catch (e) {
-                     // Ignore
-                 }
+            if (!scoreData?.resumeUploaded && scoreData?.score === 0) {
+                scoreData = getResumeFromStorage();
             }
-            
-            if (!scoreData || (!scoreData.resumeUploaded && scoreData.score === 0)) {
-                 setAtsScoreData(demoAtsData);
-                 return;
+
+            if (!scoreData || (!scoreData.resumeUploaded && (scoreData.score ?? scoreData.atsScore ?? 0) === 0)) {
+                setAtsScoreData(null);
+                return;
             }
-            
-            // Normalize data
-            const safeScoreData = {
-                ...scoreData,
-                score: scoreData.score ?? scoreData.overallScore ?? 0,
-                breakdown: {
-                    technical: scoreData.breakdown?.technical ?? scoreData.technical ?? 0,
-                    softSkills: scoreData.breakdown?.softSkills ?? scoreData.softSkills ?? 0,
-                    experience: scoreData.breakdown?.experience ?? scoreData.experience ?? 0,
-                    education: scoreData.breakdown?.education ?? scoreData.education ?? 0,
-                    completeness: scoreData.breakdown?.completeness ?? scoreData.completeness ?? 0,
-                    formatting: scoreData.breakdown?.formatting ?? scoreData.formatting ?? 0,
-                    contact: scoreData.breakdown?.contact ?? scoreData.contact ?? 0
-                },
-                suggestions: scoreData.suggestions || [],
-                matchedKeywords: scoreData.matchedKeywords || [],
-                missingKeywords: scoreData.missingKeywords || [],
-                isDemoData: false
-            };
-            
-            setAtsScoreData(safeScoreData);
-            
+
+            setAtsScoreData(normalizeAtsPayload(scoreData));
         } catch (error) {
-            console.log('No resume score available yet, showing demo');
-            setAtsScoreData(demoAtsData);
+            console.log('No resume score available yet');
+            setAtsScoreData(null);
         } finally {
             setLoadingAtsScore(false);
         }
@@ -179,38 +141,18 @@ export const StudentDashboardProvider = ({ children }) => {
     }, [isAuthenticated]);
 
     const handleResumeUploadSuccess = (data) => {
-        console.log('Upload success data:', data);
-        
-        // Handle potential nested data structure from API response
-        const responseData = data?.data || data;
-        console.log('Processed response data:', responseData);
-        
-        // Update atsScoreData directly from upload response to avoid delay
-        const safeScoreData = {
-            score: responseData?.atsScore || responseData?.overallScore || responseData?.score || 0,
-            breakdown: responseData?.breakdown || {
-                technical: responseData?.technical || 0,
-                softSkills: responseData?.softSkills || 0,
-                experience: responseData?.experience || 0,
-                education: responseData?.education || 0,
-                formatting: responseData?.formatting || 0,
-                contact: responseData?.contact || 0,
-                completeness: responseData?.completeness || 0
-            },
-            suggestions: responseData?.suggestions || [],
-            matchedKeywords: responseData?.matchedKeywords || [],
-            missingKeywords: responseData?.missingKeywords || [],
-            isDemoData: false
-        };
-        
-        console.log('Setting atsScoreData:', safeScoreData);
+        if (!data) return;
+
+        const raw = data?.data || data;
+        const safeScoreData = normalizeAtsPayload(raw);
+        saveResumeToStorage({ ...raw, ...safeScoreData }, raw?.fileName);
+
         setAtsScoreData(safeScoreData);
-        
-        // Also update dashboard summary if needed
-        api.get('/dashboard/summary').then(summary => {
-            console.log('Updated dashboard summary:', summary);
-            setDashboardData(summary);
-        }).catch(err => console.error('Error updating summary:', err));
+        setDashboardData((prev) => ({ ...prev, atsScore: safeScoreData.score }));
+
+        api.get('/dashboard/summary')
+            .then((summary) => setDashboardData(summary))
+            .catch((err) => console.error('Error updating summary:', err));
     };
 
     const value = {
@@ -222,7 +164,8 @@ export const StudentDashboardProvider = ({ children }) => {
         loading,
         loadingAtsScore,
         onResumeUploadSuccess: handleResumeUploadSuccess,
-        refreshDashboard: loadDashboardData
+        refreshDashboard: loadDashboardData,
+        refreshAtsScore: loadAtsScore,
     };
 
     return (

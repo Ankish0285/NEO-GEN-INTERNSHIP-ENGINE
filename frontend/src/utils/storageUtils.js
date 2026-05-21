@@ -1,5 +1,29 @@
 // Storage utilities for managing Resume and Profile data
 
+/** Normalize ATS payload from upload API or GET /resume/score */
+export const normalizeAtsPayload = (raw) => {
+    const data = raw?.data || raw || {};
+    const breakdown = data.breakdown || {};
+    return {
+        score: data.atsScore ?? data.overallScore ?? data.score ?? 0,
+        breakdown: {
+            technical: breakdown.technical ?? data.technical ?? 0,
+            softSkills: breakdown.softSkills ?? data.softSkills ?? 0,
+            experience: breakdown.experience ?? data.experience ?? 0,
+            education: breakdown.education ?? data.education ?? 0,
+            completeness: breakdown.completeness ?? data.completeness ?? 0,
+            formatting: breakdown.formatting ?? data.formatting ?? 0,
+            contact: breakdown.contact ?? data.contact ?? 0,
+        },
+        suggestions: data.suggestions || [],
+        matchedKeywords: data.matchedKeywords || [],
+        missingKeywords: data.missingKeywords || [],
+        resumeUploaded: data.resumeUploaded !== false,
+        fileName: data.fileName,
+        uploadedAt: data.uploadedAt,
+    };
+};
+
 export const saveResumeToStorage = (resumeData, fileName = null) => {
     try {
         const resumeStorage = {

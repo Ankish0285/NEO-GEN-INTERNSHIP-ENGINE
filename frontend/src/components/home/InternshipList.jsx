@@ -39,33 +39,8 @@ const InternshipList = () => {
       }
     } catch (error) {
       console.error("Failed to fetch internships", error);
-      // Fallback mock data
-      const mockData = [
-        { 
-          _id: '1', 
-          title: 'Policy Research Intern', 
-          organization: 'NITI Aayog', 
-          location: 'New Delhi', 
-          duration: '3 months', 
-          stipend: '₹10,000/month',
-          deadline: '2025-02-15',
-          skills: ['Policy', 'Research', 'Economics'],
-          description: 'Work on policy research projects related to economic development'
-        },
-        { 
-          _id: '2', 
-          title: 'Web Development Intern', 
-          organization: 'Ministry of Electronics & IT', 
-          location: 'Remote', 
-          duration: '6 months', 
-          stipend: '₹15,000/month',
-          deadline: '2025-02-20',
-          skills: ['Web Dev', 'React', 'GovTech'],
-          description: 'Develop web applications for government transparency initiatives'
-        },
-      ];
-      setInternships(mockData);
-      setFilteredInternships(mockData);
+      setInternships([]);
+      setFilteredInternships([]);
     }
   };
 

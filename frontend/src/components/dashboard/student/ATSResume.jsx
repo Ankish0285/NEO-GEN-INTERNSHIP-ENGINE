@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, FileText, CheckCircle, AlertCircle, Download, Loader2, XCircle, Award, Target, Zap } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { api } from '../../../services/api';
+import resumeService from '../../../services/resumeService';
 import { clsx } from 'clsx';
 import { toast } from 'react-hot-toast';
 import { Skeleton } from '../../ui/Skeleton';
@@ -33,8 +33,6 @@ const ATSResume = () => {
   }
 
   const score = atsScoreData?.score || 0;
-  console.log('Current atsScoreData:', atsScoreData);
-  console.log('Displayed score:', score);
   
   const getScoreColor = (score) => {
     if (score >= 80) return '#10b981'; // emerald-500
@@ -84,20 +82,10 @@ const ATSResume = () => {
     const toastId = toast.loading('Uploading and analyzing resume...');
 
     try {
-        const formData = new FormData();
-        formData.append('resume', file);
-        if (jobDescription.trim()) {
-            formData.append('jobDescription', jobDescription);
-        }
-        
-        console.log('Uploading resume with jobDescription:', jobDescription || 'none');
-        const response = await api.post('/resume/upload', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        const response = await resumeService.uploadResume(file, jobDescription.trim());
 
-        console.log('Upload response:', response.data);
         if (onUploadSuccess) {
-            onUploadSuccess(response.data);
+            onUploadSuccess(response);
         }
         toast.success('Resume analyzed successfully!', { id: toastId });
     } catch (err) {
@@ -127,6 +115,7 @@ const ATSResume = () => {
 
   return (
     <motion.div 
+      key={`ats-view-${score}-${atsScoreData?.matchedKeywords?.length ?? 0}`}
       className="space-y-8"
       initial="hidden"
       animate="visible"
@@ -138,9 +127,13 @@ const ATSResume = () => {
               <FileText className="w-8 h-8 text-saffron" />
               ATS Resume Checker
             </h1>
-            <p className="text-sub mt-2 text-lg">Optimize your resume to pass Applicant Tracking Systems.</p>
+            <p className="text-sub mt-2 text-lg">
+              {atsScoreData?.score > 0
+                ? 'Your latest ATS analysis — upload again to refresh scores.'
+                : 'Upload your resume to get a real ATS score and keyword analysis.'}
+            </p>
         </div>
-        {atsScoreData && !atsScoreData.isDemoData && (
+        {atsScoreData?.score > 0 && (
              <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -236,9 +229,10 @@ const ATSResume = () => {
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <motion.span 
+                            key={`score-num-${score}`}
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
+                            transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
                             className="text-5xl font-black text-gray-900 tracking-tighter"
                         >
                             {score}
@@ -271,9 +265,10 @@ const ATSResume = () => {
                     </div>
                     <div className="w-full bg-navy/5 rounded-full h-2.5 overflow-hidden shadow-inner">
                         <motion.div 
+                            key={`tech-bar-${atsScoreData?.breakdown?.technical}`}
                             initial={{ width: 0 }}
                             animate={{ width: `${atsScoreData?.breakdown?.technical || 0}%` }}
-                            transition={{ duration: 1, delay: 0.5 }}
+                            transition={{ duration: 0.6 }}
                             className="bg-green-primary h-2.5 rounded-full" 
                         />
                     </div>
@@ -286,9 +281,10 @@ const ATSResume = () => {
                     </div>
                     <div className="w-full bg-navy/5 rounded-full h-2.5 overflow-hidden shadow-inner">
                         <motion.div 
+                            key={`fmt-bar-${atsScoreData?.breakdown?.formatting}`}
                             initial={{ width: 0 }}
                             animate={{ width: `${atsScoreData?.breakdown?.formatting || 0}%` }}
-                            transition={{ duration: 1, delay: 0.7 }}
+                            transition={{ duration: 0.6, delay: 0.1 }}
                             className="bg-saffron h-2.5 rounded-full" 
                         />
                     </div>

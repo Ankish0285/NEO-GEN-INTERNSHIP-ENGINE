@@ -23,7 +23,7 @@ const TABS = [
 ];
 
 const AIIntelligenceHub = () => {
-  const { atsScoreData, refreshDashboard } = useStudentDashboard();
+  const { atsScoreData, refreshDashboard, refreshAtsScore } = useStudentDashboard();
   const [profile, setProfile] = useState(null);
   const [intel, setIntel] = useState(null);
   const [groups, setGroups] = useState({});
@@ -64,6 +64,7 @@ const AIIntelligenceHub = () => {
     try {
       await analyzeResumeAI();
       toast.success('AI analysis complete');
+      await refreshAtsScore?.();
       await load();
       refreshDashboard?.();
     } catch (e) {

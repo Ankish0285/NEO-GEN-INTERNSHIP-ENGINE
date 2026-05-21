@@ -26,7 +26,7 @@ const LandingCTA = () => {
               Browse Internships
               <ArrowRight size={18} />
             </button>
-            <button type="button" className="neo-btn neo-btn-success" onClick={() => navigate('/partner/login')}>
+            <button type="button" className="neo-btn neo-btn-success" onClick={() => navigate('/login')}>
               Become a Partner
             </button>
           </div>

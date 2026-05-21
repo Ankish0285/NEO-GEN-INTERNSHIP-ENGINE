@@ -6,10 +6,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  const requiredLoginPath =
-    allowedRoles?.includes('admin') ? '/admin/login'
-    : allowedRoles?.includes('partner') ? '/partner/login'
-    : '/login';
+  const requiredLoginPath = '/login';
 
   if (loading) {
     return (

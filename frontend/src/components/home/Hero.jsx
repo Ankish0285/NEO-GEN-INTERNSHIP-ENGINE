@@ -75,7 +75,7 @@ const Hero = () => {
             <button
               type="button"
               className="neo-btn neo-btn-success"
-              onClick={() => navigate('/partner/login')}
+              onClick={() => navigate('/login')}
             >
               {hero.secondaryButtonText}
             </button>

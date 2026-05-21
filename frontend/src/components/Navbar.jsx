@@ -4,13 +4,10 @@ import { Menu, X, ChevronDown, User as UserIcon, LogOut, LayoutDashboard } from 
 import { useAuth } from '../context/AuthContext';
 import { resolveStoryImageUrl } from '../utils/resolveStoryImageUrl';
 import defaultLogo from '../assets/images/logo.png';
-import LoginModal from './LoginModal';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [modalInitialTab, setModalInitialTab] = useState('login');
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { settings } = useSiteSettings();
@@ -153,10 +150,7 @@ const Navbar = () => {
                 <button 
                   className="neo-btn neo-btn-primary" 
                   id="loginBtn" 
-                  onClick={() => {
-                    setModalInitialTab('login');
-                    setIsLoginModalOpen(true);
-                  }}
+                  onClick={() => navigate('/login')}
                 >
                   Sign Up / Login
                 </button>
@@ -316,7 +310,6 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} initialTab={modalInitialTab} />
     </>
   );
 };

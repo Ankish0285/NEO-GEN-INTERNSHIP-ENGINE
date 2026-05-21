@@ -119,7 +119,7 @@ const WebsiteCMS = () => {
       if (err.status === 404 || String(msg).includes('404')) {
         toast.error('API not found. Restart the backend server (npm start in backend folder), then try again.');
       } else if (msg.includes('Admin') || msg.includes('authorized') || err.status === 401 || err.status === 403) {
-        toast.error('Super Admin login required. Sign in at /admin/login and try again.');
+        toast.error('Super Admin login required. Sign in at /login and try again.');
       } else {
         toast.error(msg);
       }

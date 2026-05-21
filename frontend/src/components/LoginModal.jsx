@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import AuthService from '../services/authService';
 import logo from '../assets/images/logo.png';
 
-const LoginModal = ({ isOpen, onClose, initialTab = 'login' }) => {
+const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [formData, setFormData] = useState({
     email: '',
@@ -77,14 +77,7 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login' }) => {
             }
           }, 1000);
         } else {
-          const msg = result.message || 'Invalid email or password. Please try again.';
-          if (msg.includes('Super Admin portal')) {
-            setError(`${msg} Use Admin Login from the footer.`);
-          } else if (msg.includes('Partner portal')) {
-            setError(`${msg} Use Partner Login from the footer.`);
-          } else {
-            setError(msg);
-          }
+          setError(result.message || 'Invalid email or password. Please try again.');
         }
       } else {
         // SIGNUP FLOW
@@ -210,11 +203,19 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login' }) => {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  const wrapperStyle = embedded
+    ? { display: 'flex', justifyContent: 'center', width: '100%' }
+    : { display: isOpen ? 'flex' : 'none' };
+
   return (
-    <div id="loginModal" className={`modal ${isOpen ? '' : 'hidden'}`} style={{display: isOpen ? 'flex' : 'none'}}>
+    <div
+      id="loginModal"
+      className={embedded ? '' : `modal ${isOpen ? '' : 'hidden'}`}
+      style={wrapperStyle}
+    >
       <div className="modal-content" style={{ maxWidth: '450px', width: '90%' }}>
         <div className="modal-header">
-          <h2>Welcome to NEO GEN</h2>
+          <h2>Sign in to NEO GEN</h2>
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
         <div className="modal-body">

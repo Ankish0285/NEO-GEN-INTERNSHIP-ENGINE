@@ -15,6 +15,10 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
   const totalApplications = await Application.countDocuments({ student: userId });
   const pendingReviews = await Application.countDocuments({ student: userId, status: 'Applied' });
   const accepted = await Application.countDocuments({ student: userId, status: 'Accepted' });
+  const interviews = await Application.countDocuments({
+    student: userId,
+    status: { $in: ['Interview', 'Shortlisted'] },
+  });
 
   // Get latest resume score
   const latestResume = await Resume.findOne({ user: userId }).sort({ createdAt: -1 });
@@ -32,6 +36,7 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
       totalApplications,
       pendingReviews,
       accepted,
+      interviews,
       atsScore,
       recommendedInternships: [],
     });
@@ -84,6 +89,7 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
         totalApplications,
         pendingReviews,
         accepted,
+        interviews,
         atsScore,
         recommendedInternships,
         aiPowered: true,
@@ -215,8 +221,36 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
     totalApplications,
     pendingReviews,
     accepted,
+    interviews,
     atsScore,
-    recommendedInternships
+    recommendedInternships,
+  });
+});
+
+// @desc    Public platform stats (landing page)
+// @route   GET /api/dashboard/public-stats
+// @access  Public
+const getPublicStats = asyncHandler(async (req, res) => {
+  const activeOpportunities = await Internship.countDocuments({
+    status: { $in: ['active', 'published'] },
+  });
+  const studentsRegistered = await User.countDocuments({ role: 'student' });
+  const partnersCount = await User.countDocuments({ role: 'partner', partnerStatus: 'approved' });
+  const totalApplications = await Application.countDocuments();
+  const acceptedPlacements = await Application.countDocuments({ status: 'Accepted' });
+  const successRate =
+    totalApplications > 0 ? Math.round((acceptedPlacements / totalApplications) * 100) : 0;
+  const locations = await Internship.distinct('location');
+  const districtsCovered = locations.filter((l) => l && String(l).trim()).length;
+
+  res.json({
+    activeOpportunities,
+    studentsRegistered,
+    partnersCount,
+    districtsCovered,
+    successRate,
+    totalApplications,
+    acceptedPlacements,
   });
 });
 
@@ -237,6 +271,7 @@ const getAdminDashboardSummary = asyncHandler(async (req, res) => {
   const totalStudents = await User.countDocuments({ role: 'student' });
   const totalInternships = await Internship.countDocuments();
   const totalApplications = await Application.countDocuments();
+  const pendingPartners = await User.countDocuments({ role: 'partner', partnerStatus: 'pending' });
 
   // Recent applications
   const recentApplications = await Application.find()
@@ -255,6 +290,7 @@ const getAdminDashboardSummary = asyncHandler(async (req, res) => {
     totalStudents,
     totalInternships,
     totalApplications,
+    pendingPartners,
     recentApplications,
     recentActivity
   });
@@ -290,5 +326,6 @@ module.exports = {
   getDashboardSummary,
   getRecentActivity,
   getAdminDashboardSummary,
-  getPartnerDashboardSummary
+  getPartnerDashboardSummary,
+  getPublicStats,
 };

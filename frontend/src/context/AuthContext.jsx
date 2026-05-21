@@ -46,29 +46,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginAdmin = async (email, password) => {
-    try {
-      const data = await AuthService.loginAdmin(email, password);
-      if (data.success && data.token) {
-        return persistSession(data);
-      }
-      return { success: false, message: data.message || 'Login failed' };
-    } catch (error) {
-      return { success: false, message: error.data?.message || error.message || 'Login failed' };
-    }
-  };
+  const loginAdmin = (email, password) => login(email, password);
 
-  const loginPartner = async (email, password) => {
-    try {
-      const data = await AuthService.loginPartner(email, password);
-      if (data.success && data.token) {
-        return persistSession(data);
-      }
-      return { success: false, message: data.message || 'Login failed' };
-    } catch (error) {
-      return { success: false, message: error.data?.message || error.message || 'Login failed' };
-    }
-  };
+  const loginPartner = (email, password) => login(email, password);
 
   const register = async (formData) => {
     try {

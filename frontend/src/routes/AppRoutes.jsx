@@ -4,8 +4,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Pages
 import Home from '../pages/Home';
 import Login from '../pages/auth/Login';
-import AdminLogin from '../pages/auth/AdminLogin';
-import PartnerLogin from '../pages/auth/PartnerLogin';
 import FindInternship from '../pages/FindInternship';
 import ResumeTemplates from '../pages/ResumeTemplates';
 import SuccessStoriesPublic from '../pages/SuccessStoriesPublic';
@@ -51,8 +49,8 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/partner/login" element={<PartnerLogin />} />
+      <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+      <Route path="/partner/login" element={<Navigate to="/login" replace />} />
       <Route path="/find-internship" element={<FindInternship />} />
       <Route path="/resources/resume-templates" element={<ResumeTemplates />} />
       <Route path="/success-stories" element={<SuccessStoriesPublic />} />
