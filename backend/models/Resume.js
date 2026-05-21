@@ -46,7 +46,14 @@ const resumeSchema = mongoose.Schema(
     suggestions: [String],
     // Extracted information for matching
     extractedSkills: [String],
-    wordCount: { type: Number, default: 0 }
+    wordCount: { type: Number, default: 0 },
+    aiAnalysis: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    matchPercentage: { type: Number, default: 0 },
+    selectionProbability: { type: Number, default: 0 },
+    aiConfidenceScore: { type: Number, default: 0 },
   },
   {
     timestamps: true,

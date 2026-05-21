@@ -21,6 +21,7 @@ import StudentProfile from '../components/dashboard/student/Profile';
 import ATSResume from '../components/dashboard/student/ATSResume';
 import StudentApplications from '../components/dashboard/student/Applications';
 import StudentRecommendations from '../components/dashboard/student/Recommendations';
+import AIIntelligenceHub from '../components/ai/AIIntelligenceHub';
 import StudentAnalytics from '../components/dashboard/student/Analytics';
 import StudentSettings from '../components/dashboard/student/Settings';
 import SuccessStories from '../components/dashboard/student/SuccessStories';
@@ -61,6 +62,7 @@ const AppRoutes = () => {
         <Route index element={<StudentOverview />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="ats-resume" element={<ATSResume />} />
+        <Route path="ai-intelligence" element={<AIIntelligenceHub />} />
         <Route path="applications" element={<StudentApplications />} />
         <Route path="recommendations" element={<StudentRecommendations />} />
         <Route path="analytics" element={<StudentAnalytics />} />

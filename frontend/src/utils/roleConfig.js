@@ -9,7 +9,8 @@ import {
     Users, 
     PlusCircle,
     Star,
-    Globe2
+    Globe2,
+    Brain
 } from 'lucide-react';
 
 export const roleConfig = {
@@ -23,6 +24,7 @@ export const roleConfig = {
             { path: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/dashboard/profile', label: 'Profile', icon: User },
             { path: '/dashboard/ats-resume', label: 'ATS Resume', icon: FileText },
+            { path: '/dashboard/ai-intelligence', label: 'AI Intelligence', icon: Brain },
             { path: '/dashboard/applications', label: 'Applications', icon: Briefcase },
             { path: '/dashboard/recommendations', label: 'Recommendations', icon: ThumbsUp },
             { path: '/dashboard/success-stories', label: 'Success Stories', icon: Star },

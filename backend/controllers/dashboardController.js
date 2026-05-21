@@ -4,6 +4,7 @@ const Application = require('../models/Application');
 const Internship = require('../models/Internship');
 const ActivityLog = require('../models/ActivityLog');
 const Resume = require('../models/Resume');
+const aiClient = require('../services/aiServiceClient');
 
 // @desc    Get dashboard summary
 // @route   GET /api/dashboard/summary
@@ -19,12 +20,12 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
   const latestResume = await Resume.findOne({ user: userId }).sort({ createdAt: -1 });
   const atsScore = latestResume ? latestResume.atsScore : 0;
 
-  // Advanced Recommendation Algorithm
   const user = await User.findById(userId);
   let recommendedInternships = [];
 
-  // Fetch all active internships
-  const allInternships = await Internship.find({ status: 'active' }).lean();
+  const allInternships = await Internship.find({
+    status: { $in: ['active', 'published'] },
+  }).lean();
 
   if (allInternships.length === 0) {
     return res.json({
@@ -32,8 +33,64 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
       pendingReviews,
       accepted,
       atsScore,
-      recommendedInternships: []
+      recommendedInternships: [],
     });
+  }
+
+  if (latestResume?.parsedText && (await aiClient.isAvailable())) {
+    try {
+      const apps = await Application.find({ student: userId }).lean();
+      const aiRecs = await aiClient.getRecommendations({
+        resumeText: latestResume.parsedText,
+        internships: allInternships.map((j) => ({
+          _id: j._id,
+          title: j.title,
+          organization: j.organization,
+          description: j.description,
+          skills: j.skills || [],
+          location: j.location,
+          stipend: j.stipend,
+          duration: j.duration,
+          eligibility: j.eligibility,
+        })),
+        userData: {
+          skills: user.skills,
+          course: user.course,
+          preferredLocation: user.preferredLocation,
+          atsScore,
+        },
+        applications: apps.map((a) => ({
+          internshipId: a.internship?.toString(),
+          status: a.status,
+        })),
+        topK: 8,
+      });
+      recommendedInternships = (aiRecs.recommendations || []).map((r) => ({
+        id: r.internship_id,
+        title: r.title,
+        company: r.company || r.organization,
+        location: r.location,
+        stipend: r.stipend,
+        duration: r.duration,
+        matchScore: r.match_percentage,
+        selectionProbability: r.selection_probability,
+        matchedSkills: r.matched_skills,
+        missingSkills: r.missing_skills,
+        aiExplanation: r.ai_explanation,
+        type: 'Internship',
+        postedAt: 'AI matched',
+      }));
+      return res.json({
+        totalApplications,
+        pendingReviews,
+        accepted,
+        atsScore,
+        recommendedInternships,
+        aiPowered: true,
+      });
+    } catch (e) {
+      console.warn('AI recommendations fallback:', e.message);
+    }
   }
 
   // Combine user profile skills and resume extracted skills
@@ -56,15 +113,15 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
 
     // 1. Skills Match (45% weight)
     let skillScore = 0;
-    if (userSkillsLower.length > 0 && internship.fields && internship.fields.length > 0) {
-      const internshipFieldsLower = internship.fields.map(f => f.toLowerCase());
+    const jobSkills = internship.skills || [];
+    if (userSkillsLower.length > 0 && jobSkills.length > 0) {
+      const internshipFieldsLower = jobSkills.map((f) => f.toLowerCase());
 
-      // Check for partial matches too
-      const matchingSkills = internshipFieldsLower.filter(field =>
-        userSkillsLower.some(us => us.includes(field) || field.includes(us))
+      const matchingSkills = internshipFieldsLower.filter((field) =>
+        userSkillsLower.some((us) => us.includes(field) || field.includes(us))
       );
 
-      skillScore = (matchingSkills.length / internship.fields.length) * 100;
+      skillScore = (matchingSkills.length / jobSkills.length) * 100;
       if (matchingSkills.length > 0) {
         matchReasons.push(`${matchingSkills.length} skill match${matchingSkills.length > 1 ? 'es' : ''}`);
       }

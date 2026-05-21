@@ -9,6 +9,8 @@ const axios = require('axios');
 const { extractResumeText } = require('../utils/parseResume');
 const { calculateATSScore, generateSuggestions, extractResumeInfo } = require('../utils/atsScoring');
 const cloudinary = require('../config/cloudinary');
+const aiClient = require('../services/aiServiceClient');
+const { runAIPipelineForUser } = require('./aiController');
 
 // @desc    Upload resume and analyze with ATS
 // @route   POST /api/resume/upload
@@ -61,12 +63,11 @@ const uploadResume = asyncHandler(async (req, res) => {
         // Calculate ATS score (ML-based with Rule-based fallback)
         let scoreData;
         let suggestions = [];
-        
+        const jobDesc = req.body.jobDescription && req.body.jobDescription.trim() !== ''
+            ? req.body.jobDescription
+            : 'software engineer job requiring technical skills programming experience project management';
+
         try {
-            // Provide default job description if not provided
-            const jobDesc = req.body.jobDescription && req.body.jobDescription.trim() !== '' 
-                ? req.body.jobDescription 
-                : 'software engineer job requiring technical skills programming experience project management';
 
             console.log('Calling ML service with jobDesc length:', jobDesc.length);
             
@@ -132,6 +133,26 @@ const uploadResume = asyncHandler(async (req, res) => {
             });
         }
 
+        let aiAnalysis = null;
+        let matchPercentage = scoreData.score;
+        let aiConfidenceScore = 70;
+
+        if (await aiClient.isAvailable()) {
+            try {
+                const aiAts = await aiClient.analyzeATS(parsedText, jobDesc);
+                scoreData.score = Math.round(aiAts.ats_score ?? scoreData.score);
+                scoreData.matched = aiAts.matched_skills || scoreData.matched;
+                scoreData.missing = aiAts.missing_skills || scoreData.missing;
+                scoreData.breakdown = { ...scoreData.breakdown, ...(aiAts.breakdown || {}) };
+                suggestions = aiAts.improvement_tips || suggestions;
+                aiAnalysis = aiAts;
+                matchPercentage = aiAts.match_percentage || scoreData.score;
+                aiConfidenceScore = aiAts.ai_confidence_score || 75;
+            } catch (aiErr) {
+                console.warn('AI ATS enhance failed:', aiErr.message);
+            }
+        }
+
         // Save resume to database
         const resume = await Resume.create({
             user: req.user.id,
@@ -139,14 +160,21 @@ const uploadResume = asyncHandler(async (req, res) => {
             fileUrl: secureUrl,
             parsedText: parsedText,
             atsScore: scoreData.score,
-            keywordsMatched: scoreData.matched.slice(0, 20), // Store top 20
+            keywordsMatched: scoreData.matched.slice(0, 20),
             missingKeywords: scoreData.missing,
             breakdown: scoreData.breakdown,
             sections: scoreData.sections,
             suggestions,
             extractedSkills: resumeInfo.skills,
-            wordCount: scoreData.wordCount
+            wordCount: scoreData.wordCount,
+            aiAnalysis,
+            matchPercentage,
+            aiConfidenceScore,
         });
+
+        runAIPipelineForUser(req.user.id, parsedText, req).catch((e) =>
+            console.warn('AI pipeline async:', e.message)
+        );
 
         // Update user with resume status and ATS score
         await User.findByIdAndUpdate(req.user.id, {
@@ -291,7 +319,7 @@ const getRecommendations = asyncHandler(async (req, res) => {
         // Search internships where required skills match extracted resume skills
         const matchedInternships = await Internship.find({
             $and: [
-                { requiredSkills: { $in: resume.extractedSkills } },
+                { skills: { $in: resume.extractedSkills } },
                 { status: 'active' },
                 { $or: [
                     { 'applicationDeadline': { $gte: new Date() } },
@@ -302,14 +330,15 @@ const getRecommendations = asyncHandler(async (req, res) => {
 
         // Score each internship based on skill match and ATS score
         recommendations = matchedInternships.map(internship => {
-            const matchedSkills = internship.requiredSkills.filter(skill =>
+            const jobSkills = internship.skills || [];
+            const matchedSkills = jobSkills.filter(skill =>
                 resume.extractedSkills.some(resSkill => 
                     resSkill.toLowerCase().includes(skill.toLowerCase()) ||
                     skill.toLowerCase().includes(resSkill.toLowerCase())
                 )
             );
 
-            const matchPercentage = (matchedSkills.length / (internship.requiredSkills.length || 1)) * 100;
+            const matchPercentage = (matchedSkills.length / (internship.skills.length || 1)) * 100;
             const relevanceScore = Math.round((matchPercentage * 0.6) + (resume.atsScore * 0.4));
 
             return {
@@ -321,7 +350,7 @@ const getRecommendations = asyncHandler(async (req, res) => {
                 stipend: internship.stipend,
                 duration: internship.duration,
                 description: internship.description,
-                requiredSkills: internship.requiredSkills,
+                skills: internship.skills,
                 matchedSkills,
                 matchPercentage: Math.round(matchPercentage),
                 relevanceScore,
@@ -332,7 +361,7 @@ const getRecommendations = asyncHandler(async (req, res) => {
         // Fallback: use user profile skills if resume not available
         const matchedInternships = await Internship.find({
             $and: [
-                { requiredSkills: { $in: user.skills } },
+                { skills: { $in: user.skills } },
                 { status: 'active' },
                 { $or: [
                     { 'applicationDeadline': { $gte: new Date() } },
@@ -342,14 +371,15 @@ const getRecommendations = asyncHandler(async (req, res) => {
         }).limit(10);
 
         recommendations = matchedInternships.map(internship => {
-            const matchedSkills = internship.requiredSkills.filter(skill =>
+            const jobSkills = internship.skills || [];
+            const matchedSkills = jobSkills.filter(skill =>
                 user.skills.some(userSkill => 
                     userSkill.toLowerCase().includes(skill.toLowerCase()) ||
                     skill.toLowerCase().includes(userSkill.toLowerCase())
                 )
             );
 
-            const matchPercentage = (matchedSkills.length / (internship.requiredSkills.length || 1)) * 100;
+            const matchPercentage = (matchedSkills.length / (internship.skills.length || 1)) * 100;
             const relevanceScore = Math.round(matchPercentage);
 
             return {
@@ -361,7 +391,7 @@ const getRecommendations = asyncHandler(async (req, res) => {
                 stipend: internship.stipend,
                 duration: internship.duration,
                 description: internship.description,
-                requiredSkills: internship.requiredSkills,
+                skills: internship.skills,
                 matchedSkills,
                 matchPercentage: Math.round(matchPercentage),
                 relevanceScore

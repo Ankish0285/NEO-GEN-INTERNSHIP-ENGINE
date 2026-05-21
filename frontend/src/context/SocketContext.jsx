@@ -35,6 +35,16 @@ export const SocketProvider = ({ children }) => {
 
     // Listen for personal notifications if authenticated
     if (isAuthenticated && user?._id) {
+      socket.emit('joinUser', user._id);
+
+      socket.on('ai:analysis:complete', (payload) => {
+        toast.success(`AI analysis complete — ATS ${payload?.atsScore ?? ''}%`);
+        window.dispatchEvent(new CustomEvent('ai:refresh'));
+      });
+      socket.on('ai:recommendations:updated', () => {
+        window.dispatchEvent(new CustomEvent('ai:refresh'));
+      });
+
       const personalEvent = `newNotification:${user._id}`;
       socket.on(personalEvent, (notification) => {
         console.log('[Socket] New personal notification received:', notification);
@@ -46,6 +56,8 @@ export const SocketProvider = ({ children }) => {
       });
 
       return () => {
+        socket.off('ai:analysis:complete');
+        socket.off('ai:recommendations:updated');
         socket.off(personalEvent);
       };
     }

@@ -50,6 +50,10 @@ io.on('connection', (socket) => {
     console.log(`User joined room: ${roomId}`);
   });
 
+  socket.on('joinUser', (userId) => {
+    if (userId) socket.join(`user:${userId}`);
+  });
+
   socket.on('sendMessage', (data) => {
     io.to(data.roomId).emit('newMessage', data);
   });
@@ -84,6 +88,7 @@ app.use('/api/resume', require('./routes/atsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/stories', require('./routes/successStoryRoutes'));
 app.use('/api/site-settings', require('./routes/siteSettingsRoutes'));
+app.use('/api/ai', require('./routes/aiRoutes'));
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

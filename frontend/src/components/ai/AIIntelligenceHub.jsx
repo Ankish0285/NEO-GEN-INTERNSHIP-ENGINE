@@ -1,0 +1,214 @@
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Brain, Target, TrendingUp, AlertTriangle, Sparkles, RefreshCw, Zap,
+} from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart,
+  PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+} from 'recharts';
+import { toast } from 'react-hot-toast';
+import { getAIProfile, analyzeResumeAI, getAIRecommendations } from '../../services/aiService';
+import { useStudentDashboard } from '../../context/StudentDashboardContext';
+import AIChatAssistant from './AIChatAssistant';
+
+const AIIntelligenceHub = () => {
+  const { atsScoreData, refreshDashboard } = useStudentDashboard();
+  const [profile, setProfile] = useState(null);
+  const [recs, setRecs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [profRes, recRes] = await Promise.all([
+        getAIProfile(),
+        getAIRecommendations(6),
+      ]);
+      setProfile(profRes.profile);
+      setRecs(recRes.recommendations || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const runAnalysis = async () => {
+    setAnalyzing(true);
+    try {
+      await analyzeResumeAI();
+      toast.success('AI analysis complete');
+      await load();
+      refreshDashboard?.();
+    } catch (e) {
+      toast.error(e.message || 'Analysis failed');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const breakdown = atsScoreData?.breakdown || profile?.rawAnalysis?.ats?.breakdown || {};
+  const radarData = [
+    { subject: 'Technical', value: breakdown.technical || 0 },
+    { subject: 'Experience', value: breakdown.experience || 0 },
+    { subject: 'Education', value: breakdown.education || 0 },
+    { subject: 'Soft Skills', value: breakdown.soft_skills || 0 },
+    { subject: 'Format', value: breakdown.formatting || 0 },
+    { subject: 'Complete', value: breakdown.completeness || 0 },
+  ];
+
+  const atsScore = profile?.latestAtsScore || atsScoreData?.score || 0;
+  const employability = profile?.employabilityScore || 0;
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="neo-skeleton h-32 rounded-3xl" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="neo-skeleton h-40 rounded-3xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="neo-h2 flex items-center gap-2">
+            <Brain className="text-[#FF9933]" />
+            AI Intelligence Hub
+          </h1>
+          <p className="neo-lead mt-1">Real-time ATS, career insights, and smart internship matching.</p>
+        </div>
+        <button
+          type="button"
+          className="neo-btn neo-btn-primary"
+          onClick={runAnalysis}
+          disabled={analyzing}
+        >
+          <RefreshCw size={18} className={analyzing ? 'animate-spin' : ''} />
+          {analyzing ? 'Analyzing...' : 'Run AI Analysis'}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'ATS Score', value: `${Math.round(atsScore)}%`, icon: Target, color: '#FF9933' },
+          { label: 'Employability', value: `${Math.round(employability)}%`, icon: TrendingUp, color: '#138808' },
+          { label: 'AI Confidence', value: `${profile?.aiConfidenceScore || 75}%`, icon: Zap, color: '#FF9933' },
+          {
+            label: 'Career Domain',
+            value: profile?.careerDomain?.label || 'Analyzing...',
+            icon: Sparkles,
+            color: '#138808',
+          },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            className="neo-dash-stat neo-glass p-5"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+          >
+            <stat.icon size={22} style={{ color: stat.color }} />
+            <p className="text-sm text-[#4B5563] mt-2">{stat.label}</p>
+            <p className="text-2xl font-extrabold text-[#111827] mt-1">{stat.value}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="neo-glass p-6">
+          <h3 className="font-bold text-[#111827] mb-4">Section-wise ATS Breakdown</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <RadarChart data={radarData}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
+              <PolarRadiusAxis angle={30} domain={[0, 100]} />
+              <Radar dataKey="value" stroke="#FF9933" fill="#FF9933" fillOpacity={0.35} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="neo-glass p-6">
+          <h3 className="font-bold text-[#111827] mb-4">Strengths & Gaps</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase text-[#138808] mb-2">Strengths</p>
+              <ul className="space-y-1 text-sm text-[#4B5563]">
+                {(profile?.strengths || ['Upload resume for AI insights']).map((s, i) => (
+                  <li key={i}>• {s}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase text-[#FF9933] mb-2 flex items-center gap-1">
+                <AlertTriangle size={12} /> Weaknesses
+              </p>
+              <ul className="space-y-1 text-sm text-[#4B5563]">
+                {(profile?.weaknesses || []).map((w, i) => (
+                  <li key={i}>• {w}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          {profile?.learningRoadmap?.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-black/5">
+              <p className="text-xs font-semibold uppercase text-[#111827] mb-2">Learning Roadmap</p>
+              {profile.learningRoadmap.slice(0, 4).map((item, i) => (
+                <p key={i} className="text-sm text-[#4B5563] mb-1">
+                  <span className="font-medium text-[#FF9933]">{item.skill}</span> — {item.course}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="neo-glass p-6">
+        <h3 className="font-bold text-[#111827] mb-4">Top AI Recommendations</h3>
+        {recs.length === 0 ? (
+          <p className="neo-lead">Upload your resume to unlock personalized internship matches.</p>
+        ) : (
+          <div className="space-y-4">
+            {recs.map((job, i) => (
+              <motion.div
+                key={job.id || i}
+                className="p-4 rounded-2xl border border-black/5 bg-white/50"
+                whileHover={{ x: 4 }}
+              >
+                <div className="flex justify-between items-start gap-4">
+                  <div>
+                    <h4 className="font-bold text-[#111827]">{job.title}</h4>
+                    <p className="text-sm text-[#4B5563]">{job.company} · {job.location}</p>
+                    <p className="text-xs text-[#6B7280] mt-2 line-clamp-2">{job.aiExplanation}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-lg font-extrabold text-[#FF9933]">{job.matchScore}%</span>
+                    <p className="text-[10px] text-[#4B5563]">match</p>
+                    {job.selectionProbability != null && (
+                      <p className="text-[10px] text-[#138808] mt-1">{job.selectionProbability}% selection est.</p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <AIChatAssistant />
+    </div>
+  );
+};
+
+export default AIIntelligenceHub;
