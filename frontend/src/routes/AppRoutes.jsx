@@ -4,6 +4,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Pages
 import Home from '../pages/Home';
 import Login from '../pages/auth/Login';
+import AdminLogin from '../pages/auth/AdminLogin';
+import PartnerLogin from '../pages/auth/PartnerLogin';
 import FindInternship from '../pages/FindInternship';
 import ResumeTemplates from '../pages/ResumeTemplates';
 import SuccessStoriesPublic from '../pages/SuccessStoriesPublic';
@@ -32,6 +34,7 @@ import AdminApplications from '../components/dashboard/admin/Applications';
 import AdminAnalytics from '../components/dashboard/admin/Analytics';
 import AdminSettings from '../components/dashboard/admin/Settings';
 import AdminSuccessStories from '../components/dashboard/admin/SuccessStories';
+import WebsiteCMS from '../components/dashboard/admin/WebsiteCMS';
 
 // Partner Components
 import PartnerOverview from '../components/dashboard/partner/Overview';
@@ -47,6 +50,8 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/partner/login" element={<PartnerLogin />} />
       <Route path="/find-internship" element={<FindInternship />} />
       <Route path="/resources/resume-templates" element={<ResumeTemplates />} />
       <Route path="/success-stories" element={<SuccessStoriesPublic />} />
@@ -67,6 +72,7 @@ const AppRoutes = () => {
       <Route path="/admin/dashboard" element={<AdminDashboard />}>
         <Route index element={<AdminOverview />} />
         <Route path="profile" element={<AdminProfile />} />
+        <Route path="website" element={<WebsiteCMS />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="internships" element={<AdminInternships />} />
         <Route path="applications" element={<AdminApplications />} />

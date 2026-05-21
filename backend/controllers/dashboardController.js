@@ -203,8 +203,35 @@ const getAdminDashboardSummary = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get partner dashboard summary
+// @route   GET /api/dashboard/partner-summary
+// @access  Private/Partner
+const getPartnerDashboardSummary = asyncHandler(async (req, res) => {
+  const partnerId = req.user.id;
+
+  const myInternships = await Internship.find({ createdBy: partnerId }).sort({ createdAt: -1 }).lean();
+  const activeInternships = myInternships.filter((i) => i.status === 'active').length;
+
+  const internshipIds = myInternships.map((i) => i._id);
+  const totalApplications = internshipIds.length
+    ? await Application.countDocuments({ internship: { $in: internshipIds } })
+    : 0;
+  const pendingApplications = internshipIds.length
+    ? await Application.countDocuments({ internship: { $in: internshipIds }, status: 'Applied' })
+    : 0;
+
+  res.json({
+    activeInternships,
+    totalInternships: myInternships.length,
+    totalApplications,
+    pendingApplications,
+    recentInternships: myInternships.slice(0, 5),
+  });
+});
+
 module.exports = {
   getDashboardSummary,
   getRecentActivity,
-  getAdminDashboardSummary
+  getAdminDashboardSummary,
+  getPartnerDashboardSummary
 };

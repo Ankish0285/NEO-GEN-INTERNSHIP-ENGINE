@@ -8,12 +8,17 @@ import {
     Settings, 
     Users, 
     PlusCircle,
-    Star
+    Star,
+    Globe2
 } from 'lucide-react';
 
 export const roleConfig = {
     student: {
         basePath: '/dashboard',
+        panelTitle: 'Student Dashboard',
+        panelBadge: 'Student',
+        accentClass: 'from-saffron to-[#ffad5c]',
+        badgeClass: 'bg-saffron/15 text-saffron border-saffron/30',
         menuItems: [
             { path: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/dashboard/profile', label: 'Profile', icon: User },
@@ -27,9 +32,15 @@ export const roleConfig = {
     },
     admin: {
         basePath: '/admin/dashboard',
+        panelTitle: 'Super Admin',
+        panelBadge: 'Super Admin',
+        accentClass: 'from-indigo-600 to-violet-700',
+        badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+        loginPath: '/admin/login',
         menuItems: [
             { path: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/admin/dashboard/profile', label: 'Profile', icon: User },
+            { path: '/admin/dashboard/website', label: 'Website Control', icon: Globe2 },
             { path: '/admin/dashboard/users', label: 'Users', icon: Users },
             { path: '/admin/dashboard/internships', label: 'Internships', icon: Briefcase },
             { path: '/admin/dashboard/applications', label: 'Applications', icon: FileText },
@@ -40,6 +51,11 @@ export const roleConfig = {
     },
     partner: {
         basePath: '/partner/dashboard',
+        panelTitle: 'Partner Portal',
+        panelBadge: 'Partner',
+        accentClass: 'from-amber-500 to-orange-600',
+        badgeClass: 'bg-amber-100 text-amber-900 border-amber-200',
+        loginPath: '/partner/login',
         menuItems: [
             { path: '/partner/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/partner/dashboard/profile', label: 'Profile', icon: User },
@@ -70,5 +86,4 @@ export const getRoleBasedRedirect = (role) => {
     }
 };
 
-// Get login redirect URL
-export const getLoginPath = () => '/login';
+export const getLoginPath = (role) => roleConfig[role]?.loginPath || '/login';

@@ -33,7 +33,8 @@ const Overview = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Admin Overview</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Super Admin Overview</h1>
+      <p className="text-sm text-gray-500">Platform-wide statistics and management</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-700">Total Users</h3>

@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { api } from '../../services/api';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 
 const Contact = () => {
+  const { settings } = useSiteSettings();
+  const { contact } = settings;
+  const supportLines = (contact.supportHours || '').split('\n').filter(Boolean);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -118,10 +123,9 @@ const Contact = () => {
     <section className="contact-section" id="contact-section" style={{ padding: '80px 0', backgroundColor: '#f9fafb' }}>
       <div className="container">
         <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 className="section-title" style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>Get In Touch</h2>
+          <h2 className="section-title" style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>{contact.title}</h2>
           <p className="section-subtitle" style={{ fontSize: '1.125rem', color: '#6b7280', maxWidth: '700px', margin: '0 auto' }}>
-            Have questions about our internship programs or need support? We'd love to hear from you. 
-            Fill out the form below and we'll respond as soon as possible.
+            {contact.subtitle}
           </p>
         </div>
 
@@ -134,8 +138,8 @@ const Contact = () => {
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827', marginBottom: '10px' }}>Email</h3>
               <p>
-                <a href="mailto:support@neogen.gov.in" className="contact-link" style={{ color: '#6b7280', textDecoration: 'none' }}>
-                  support@neogen.gov.in
+                <a href={`mailto:${contact.email}`} className="contact-link" style={{ color: '#6b7280', textDecoration: 'none' }}>
+                  {contact.email}
                 </a>
               </p>
             </div>
@@ -146,12 +150,14 @@ const Contact = () => {
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827', marginBottom: '10px' }}>Phone</h3>
               <p style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <a href="tel:+911234567890" className="contact-link" style={{ color: '#6b7280', textDecoration: 'none' }}>
-                  +91 123 456 7890
+                <a href={`tel:${contact.phone?.replace(/\s/g, '')}`} className="contact-link" style={{ color: '#6b7280', textDecoration: 'none' }}>
+                  {contact.phone}
                 </a>
-                <a href="tel:1800123456" className="contact-link" style={{ color: '#6b7280', textDecoration: 'none' }}>
-                  1800-123-456 (Toll Free)
+                {contact.phoneTollFree && (
+                <a href={`tel:${contact.phoneTollFree.replace(/\D/g, '')}`} className="contact-link" style={{ color: '#6b7280', textDecoration: 'none' }}>
+                  {contact.phoneTollFree}
                 </a>
+                )}
               </p>
             </div>
 
@@ -161,9 +167,9 @@ const Contact = () => {
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827', marginBottom: '10px' }}>Office</h3>
               <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-                Ministry of Skill Development<br />
-                Shram Shakti Bhawan<br />
-                New Delhi - 110001
+                {contact.addressLine1}<br />
+                {contact.addressLine2}<br />
+                {contact.addressLine3}
               </p>
             </div>
 
@@ -173,8 +179,9 @@ const Contact = () => {
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827', marginBottom: '10px' }}>Support Hours</h3>
               <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-                Mon - Fri: 9:00 AM - 6:00 PM<br />
-                Sat: 10:00 AM - 2:00 PM
+                {supportLines.map((line, i) => (
+                  <React.Fragment key={i}>{line}{i < supportLines.length - 1 && <br />}</React.Fragment>
+                ))}
               </p>
             </div>
           </div>

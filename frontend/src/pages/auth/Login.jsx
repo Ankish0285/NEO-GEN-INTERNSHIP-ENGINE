@@ -181,12 +181,22 @@ const Login = () => {
             </button>
           </div>
 
-          {/* Sign Up Link */}
-          <div className="text-center">
+          <div className="text-center space-y-3 pt-2 border-t border-gray-100">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <a href="/" className="font-medium text-blue-600 hover:text-blue-500">
-                Sign up
+                Sign up on home
+              </a>
+            </p>
+            <p className="text-xs text-gray-500">
+              Super Admin?{' '}
+              <a href="/admin/login" className="font-medium text-indigo-600 hover:underline">
+                Admin portal
+              </a>
+              {' · '}
+              Partner?{' '}
+              <a href="/partner/login" className="font-medium text-amber-600 hover:underline">
+                Partner portal
               </a>
             </p>
           </div>

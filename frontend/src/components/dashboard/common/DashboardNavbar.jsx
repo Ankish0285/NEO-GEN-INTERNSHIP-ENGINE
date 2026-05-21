@@ -5,6 +5,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from './NotificationDropdown';
 import { resolveStoryImageUrl } from '../../../utils/resolveStoryImageUrl';
+import { roleConfig } from '../../../utils/roleConfig';
 
 const DashboardNavbar = ({ onMenuClick, user }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -20,9 +21,11 @@ const DashboardNavbar = ({ onMenuClick, user }) => {
       ? fallbackAvatar
       : (resolveStoryImageUrl(rawPic) || fallbackAvatar);
 
+  const panelConfig = roleConfig[user?.role] || roleConfig.student;
+
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate(panelConfig.loginPath || '/login');
   };
 
   const getSectionTitle = () => {
@@ -50,7 +53,10 @@ const DashboardNavbar = ({ onMenuClick, user }) => {
               <Menu size={24} />
             </button>
             
-            <div className="hidden md:flex flex-col">
+            <div className="hidden md:flex flex-col gap-0.5">
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border w-fit ${panelConfig.badgeClass}`}>
+                  {panelConfig.panelBadge}
+                </span>
                 <h1 className="text-xl font-bold text-navy">{getSectionTitle()}</h1>
             </div>
             

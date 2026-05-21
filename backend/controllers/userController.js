@@ -45,6 +45,8 @@ const createPartner = asyncHandler(async (req, res) => {
         email: email.toLowerCase(),
         password: hashed,
         role: 'partner',
+        partnerStatus: 'approved',
+        isVerified: true,
         partnerInfo: {
             organization: organization || '',
             contactName: contactName || '',

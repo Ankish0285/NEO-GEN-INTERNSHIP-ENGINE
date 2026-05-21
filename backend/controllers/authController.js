@@ -394,6 +394,20 @@ const loginUser = asyncHandler(async (req, res) => {
         });
     }
 
+    if (user.role === 'admin') {
+        return res.status(403).json({
+            success: false,
+            message: 'Super Admin accounts must sign in via the Super Admin portal (/admin/login).'
+        });
+    }
+
+    if (user.role === 'partner') {
+        return res.status(403).json({
+            success: false,
+            message: 'Partner accounts must sign in via the Partner portal (/partner/login).'
+        });
+    }
+
     // Log Activity
     try {
         await ActivityLog.create({
@@ -425,10 +439,10 @@ const loginUser = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Authenticate admin
+// @desc    Authenticate super admin only
 // @route   POST /api/admin/login
 // @access  Public
-const loginAdmin = asyncHandler(async (req, res) => {
+const loginSuperAdmin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -437,7 +451,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    console.log(`[Auth] Admin/Partner Login Attempt: ${normalizedEmail}`);
+    console.log(`[Auth] Super Admin login attempt: ${normalizedEmail}`);
 
     const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
@@ -446,9 +460,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
         throw new Error('Invalid email or password');
     }
 
-    if (user.role !== 'admin' && user.role !== 'partner') {
+    if (user.role !== 'admin') {
         res.status(403);
-        throw new Error('Access denied. You are not an admin or partner.');
+        throw new Error('Access denied. Super Admin credentials required.');
     }
 
     if (user.isBlocked) {
@@ -456,11 +470,10 @@ const loginAdmin = asyncHandler(async (req, res) => {
         throw new Error('Your account has been blocked. Please contact support.');
     }
 
-    // Log Activity
     try {
         await ActivityLog.create({
             user: user._id,
-            action: `${user.role === 'admin' ? 'Super Admin' : 'Partner'} Logged In`,
+            action: 'Super Admin Logged In',
             details: { email: user.email },
             ip: req.ip,
             userAgent: req.get('User-Agent')
@@ -470,7 +483,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
     }
 
     const token = generateToken(user._id);
-    console.log(`[Auth] ${user.role} ${normalizedEmail} logged in successfully`);
+    console.log(`[Auth] Super Admin ${normalizedEmail} logged in successfully`);
 
     res.status(200).json({
         success: true,
@@ -479,7 +492,76 @@ const loginAdmin = asyncHandler(async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        message: 'Login successful'
+        message: 'Super Admin login successful'
+    });
+});
+
+// @desc    Authenticate partner only
+// @route   POST /api/partner/login
+// @access  Public
+const loginPartner = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        res.status(400);
+        throw new Error('Please provide email and password');
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log(`[Auth] Partner login attempt: ${normalizedEmail}`);
+
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
+
+    if (!user || !(await user.matchPassword(password))) {
+        res.status(401);
+        throw new Error('Invalid email or password');
+    }
+
+    if (user.role !== 'partner') {
+        res.status(403);
+        throw new Error('Access denied. Partner credentials required.');
+    }
+
+    if (user.isBlocked) {
+        res.status(403);
+        throw new Error('Your account has been blocked. Please contact support.');
+    }
+
+    if (user.partnerStatus === 'pending') {
+        res.status(403);
+        throw new Error('Your partner account is pending approval. Please contact the Super Admin.');
+    }
+
+    if (user.partnerStatus === 'rejected') {
+        res.status(403);
+        throw new Error('Your partner application was rejected. Please contact support.');
+    }
+
+    try {
+        await ActivityLog.create({
+            user: user._id,
+            action: 'Partner Logged In',
+            details: { email: user.email, organization: user.partnerInfo?.organization },
+            ip: req.ip,
+            userAgent: req.get('User-Agent')
+        });
+    } catch (err) {
+        console.error('[Auth] Activity log error:', err);
+    }
+
+    const token = generateToken(user._id);
+    console.log(`[Auth] Partner ${normalizedEmail} logged in successfully`);
+
+    res.status(200).json({
+        success: true,
+        token,
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        partnerStatus: user.partnerStatus,
+        partnerInfo: user.partnerInfo,
+        message: 'Partner login successful'
     });
 });
 
@@ -581,7 +663,8 @@ const googleLogin = asyncHandler(async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    loginAdmin,
+    loginSuperAdmin,
+    loginPartner,
     googleLogin,
     getMe,
     verifyOtp,

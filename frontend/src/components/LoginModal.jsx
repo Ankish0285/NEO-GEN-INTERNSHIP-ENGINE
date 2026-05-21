@@ -68,19 +68,23 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login' }) => {
           
           setTimeout(() => {
             onClose();
-            
-            // Redirect based on role
             if (result.role === 'admin') {
-              console.log('[LoginModal] Redirecting admin to /admin/dashboard');
               window.location.href = '/admin/dashboard';
+            } else if (result.role === 'partner') {
+              window.location.href = '/partner/dashboard';
             } else {
-              console.log('[LoginModal] Redirecting student to /dashboard');
               window.location.href = '/dashboard';
             }
           }, 1000);
         } else {
-          console.error('[LoginModal] Login failed:', result.message);
-          setError(result.message || 'Invalid email or password. Please try again.');
+          const msg = result.message || 'Invalid email or password. Please try again.';
+          if (msg.includes('Super Admin portal')) {
+            setError(`${msg} Use Admin Login from the footer.`);
+          } else if (msg.includes('Partner portal')) {
+            setError(`${msg} Use Partner Login from the footer.`);
+          } else {
+            setError(msg);
+          }
         }
       } else {
         // SIGNUP FLOW

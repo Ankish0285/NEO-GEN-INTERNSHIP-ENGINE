@@ -6,6 +6,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
+  const requiredLoginPath =
+    allowedRoles?.includes('admin') ? '/admin/login'
+    : allowedRoles?.includes('partner') ? '/partner/login'
+    : '/login';
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -15,11 +20,10 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to={requiredLoginPath} state={{ from: location }} replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // Redirect to their appropriate dashboard if they try to access a route not for them
     if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
     if (user.role === 'partner') return <Navigate to="/partner/dashboard" replace />;
     return <Navigate to="/dashboard" replace />;

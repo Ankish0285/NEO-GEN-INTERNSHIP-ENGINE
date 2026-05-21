@@ -15,7 +15,8 @@ const Sidebar = ({ isOpen, onClose, role = 'student' }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menuItems = roleConfig[role]?.menuItems || roleConfig.student.menuItems;
+  const config = roleConfig[role] || roleConfig.student;
+  const menuItems = config.menuItems;
 
   const handleLogout = () => {
     logout();
@@ -24,23 +25,28 @@ const Sidebar = ({ isOpen, onClose, role = 'student' }) => {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full glass-card rounded-none rounded-r-[24px] border-r border-navy/10 shadow-lg">
-      <div className="h-20 flex items-center px-8 border-b border-navy/5">
-        <div className="flex items-center gap-3 w-full">
-          <div className="w-10 h-10 bg-gradient-to-br from-saffron to-[#ffad5c] rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md rotate-3">
-            N
+      <div className="h-auto min-h-[5rem] flex items-start justify-between px-6 py-4 border-b border-navy/5">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 bg-gradient-to-br ${config.accentClass} rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md`}>
+              N
+            </div>
+            <span className="text-xl font-black text-navy tracking-tight">Neo<span className="text-saffron">Gen</span></span>
           </div>
-          <span className="text-2xl font-black text-navy tracking-tight">Neo<span className="text-saffron">Gen</span></span>
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border w-fit ${config.badgeClass}`}>
+            {config.panelBadge}
+          </span>
         </div>
         <button 
           onClick={onClose}
-          className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 md:hidden"
+          className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 md:hidden shrink-0"
         >
           <X size={20} />
         </button>
       </div>
 
       <nav className="flex-1 px-3 space-y-1 py-6 overflow-y-auto">
-        <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Main Menu</p>
+        <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{config.panelTitle}</p>
         {menuItems.map((item) => {
           const Icon = item.icon;
           

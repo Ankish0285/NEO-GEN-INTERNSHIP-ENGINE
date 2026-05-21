@@ -24,7 +24,7 @@ const AuthService = {
     return await api.post('/auth/send-otp', { email });
   },
 
-  // Universal Login - backend determines role
+  // Student portal login only
   login: async (email, password) => {
     const data = await api.post('/auth/login', { email, password });
 
@@ -33,6 +33,34 @@ const AuthService = {
       const user = { ...data };
       delete user.token;
       delete user.success;
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+    return data;
+  },
+
+  loginAdmin: async (email, password) => {
+    const data = await api.post('/admin/login', { email, password });
+
+    if (data.success && data.token) {
+      localStorage.setItem('token', data.token);
+      const user = { ...data };
+      delete user.token;
+      delete user.success;
+      delete user.message;
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+    return data;
+  },
+
+  loginPartner: async (email, password) => {
+    const data = await api.post('/partner/login', { email, password });
+
+    if (data.success && data.token) {
+      localStorage.setItem('token', data.token);
+      const user = { ...data };
+      delete user.token;
+      delete user.success;
+      delete user.message;
       localStorage.setItem('user', JSON.stringify(user));
     }
     return data;

@@ -3,12 +3,14 @@ const router = express.Router();
 const { 
     getDashboardSummary, 
     getRecentActivity,
-    getAdminDashboardSummary
+    getAdminDashboardSummary,
+    getPartnerDashboardSummary
 } = require('../controllers/dashboardController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, partner } = require('../middleware/authMiddleware');
 
 router.get('/summary', protect, getDashboardSummary);
 router.get('/activity', protect, getRecentActivity);
 router.get('/admin-summary', protect, admin, getAdminDashboardSummary);
+router.get('/partner-summary', protect, partner, getPartnerDashboardSummary);
 
 module.exports = router;

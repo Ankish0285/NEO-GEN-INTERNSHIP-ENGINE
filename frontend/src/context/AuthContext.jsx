@@ -24,35 +24,48 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  const persistSession = (data) => {
+    const userData = { ...data };
+    delete userData.token;
+    delete userData.success;
+    delete userData.message;
+    setUser(userData);
+    setIsAuthenticated(true);
+    return { success: true, role: userData.role };
+  };
+
   const login = async (email, password) => {
     try {
-      console.log(`[AuthContext] Login attempt - email: ${email}`);
-      
-      // Single login endpoint - backend determines role
       const data = await AuthService.login(email, password);
-      
-      console.log('[AuthContext] Login response received:', { success: data.success, role: data.role, hasToken: !!data.token });
-      
-      // Check if login was successful
       if (data.success && data.token) {
-        // AuthService already sets localStorage
-        const userData = { ...data };
-        delete userData.token;
-        delete userData.success;
-        delete userData.message;
-        
-        console.log('[AuthContext] ✅ User data set:', { name: userData.name, role: userData.role, email: userData.email });
-        
-        setUser(userData);
-        setIsAuthenticated(true);
-        
-        return { success: true, role: userData.role };
+        return persistSession(data);
       }
-      
-      console.error('[AuthContext] ❌ Login failed:', data.message);
       return { success: false, message: data.message || 'Login failed' };
     } catch (error) {
-      console.error('[AuthContext] ❌ Login error:', error);
+      return { success: false, message: error.data?.message || error.message || 'Login failed' };
+    }
+  };
+
+  const loginAdmin = async (email, password) => {
+    try {
+      const data = await AuthService.loginAdmin(email, password);
+      if (data.success && data.token) {
+        return persistSession(data);
+      }
+      return { success: false, message: data.message || 'Login failed' };
+    } catch (error) {
+      return { success: false, message: error.data?.message || error.message || 'Login failed' };
+    }
+  };
+
+  const loginPartner = async (email, password) => {
+    try {
+      const data = await AuthService.loginPartner(email, password);
+      if (data.success && data.token) {
+        return persistSession(data);
+      }
+      return { success: false, message: data.message || 'Login failed' };
+    } catch (error) {
       return { success: false, message: error.data?.message || error.message || 'Login failed' };
     }
   };
@@ -107,7 +120,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, verifyOtp, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, loginAdmin, loginPartner, register, verifyOtp, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

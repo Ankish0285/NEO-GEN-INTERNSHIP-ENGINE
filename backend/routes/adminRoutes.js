@@ -1,5 +1,5 @@
 const express = require('express');
-const { loginAdmin } = require('../controllers/authController');
+const { loginSuperAdmin } = require('../controllers/authController');
 const { 
     getUsers, updateUserRole, toggleBlockUser, 
     updatePartnerStatus, getSystemAnalytics, impersonateUser, getAuditLogs 
@@ -9,7 +9,7 @@ const { protect, admin } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Public specific bypass
-router.post('/login', loginAdmin);
+router.post('/login', loginSuperAdmin);
 
 // God Mode routes (Protected & Admin Only)
 router.use(protect, admin);

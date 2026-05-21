@@ -70,6 +70,7 @@ app.use(cors());
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/partner', require('./routes/partnerRoutes'));
 app.use('/api/internships', require('./routes/internshipRoutes'));
 app.use('/api/guides', require('./routes/guideRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
@@ -82,6 +83,7 @@ app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/resume', require('./routes/atsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/stories', require('./routes/successStoryRoutes'));
+app.use('/api/site-settings', require('./routes/siteSettingsRoutes'));
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

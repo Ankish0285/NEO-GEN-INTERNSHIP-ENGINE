@@ -3,8 +3,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, User as UserIcon, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { resolveStoryImageUrl } from '../utils/resolveStoryImageUrl';
-import logo from '../assets/images/logo.png';
+import defaultLogo from '../assets/images/logo.png';
 import LoginModal from './LoginModal';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,6 +13,11 @@ const Navbar = () => {
   const [modalInitialTab, setModalInitialTab] = useState('login');
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { settings } = useSiteSettings();
+  const { branding } = settings;
+  const logoSrc = branding.logoUrl
+    ? resolveStoryImageUrl(branding.logoUrl) || branding.logoUrl
+    : defaultLogo;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -51,10 +57,13 @@ const Navbar = () => {
         <div className="container flex justify-between items-center">
           <div className="navbar-brand">
             <Link to="/" style={{display: 'flex', alignItems: 'center', gap: '16px', minWidth: '220px', textDecoration: 'none'}}>
-              <img src={logo} alt="NEO GEN Internship Engine logo" className="brand-logo-img" style={{width:'48px', height:'48px', flexShrink:0}} />
+              <img src={logoSrc} alt="Site logo" className="brand-logo-img" style={{width:'48px', height:'48px', flexShrink:0, objectFit:'contain'}} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = defaultLogo; }} />
               <div className="brand-text">
-                <h2 className="brand-name" style={{marginBottom: 0}}><span className="neo-text">NEO</span> <span className="gen-text">GEN</span></h2>
-                <p className="brand-subtitle" style={{marginTop: '2px'}}>INTERNSHIP ENGINE</p>
+                <h2 className="brand-name" style={{marginBottom: 0}}>
+                  <span className="neo-text" style={{ color: branding.primaryColor }}>{branding.brandNameLine1}</span>{' '}
+                  <span className="gen-text" style={{ color: branding.secondaryColor }}>{branding.brandNameLine2}</span>
+                </h2>
+                <p className="brand-subtitle" style={{marginTop: '2px'}}>{branding.brandSubtitle}</p>
               </div>
             </Link>
           </div>

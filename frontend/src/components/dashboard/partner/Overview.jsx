@@ -1,43 +1,62 @@
 import React, { useEffect, useState } from 'react';
 import Card from '../../ui/Card';
-import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 
 const Overview = () => {
-  const { user } = useAuth();
-  const [internships, setInternships] = useState([]);
+  const [summary, setSummary] = useState({
+    activeInternships: 0,
+    totalApplications: 0,
+    pendingApplications: 0,
+    recentInternships: [],
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadInternships = async () => {
+    const loadSummary = async () => {
       try {
         setLoading(true);
-        const myInternships = await api.get('/internships');
-        // Filter by createdBy if available, or assume backend filters for partner if endpoint changes
-        // Currently assuming filtering client side as per original code
-        const mine = (myInternships || []).filter(i => i.createdBy === user?._id);
-        setInternships(mine);
+        const data = await api.get('/dashboard/partner-summary');
+        setSummary({
+          activeInternships: data.activeInternships ?? 0,
+          totalApplications: data.totalApplications ?? 0,
+          pendingApplications: data.pendingApplications ?? 0,
+          recentInternships: data.recentInternships ?? [],
+        });
       } catch (e) {
-        console.error("Error loading internships", e);
-        setInternships([]);
+        console.error('Error loading partner summary', e);
       } finally {
         setLoading(false);
       }
     };
 
-    if (user) {
-      loadInternships();
-    }
-  }, [user]);
+    loadSummary();
+  }, []);
+
+  const internships = summary.recentInternships;
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Partner Overview</h1>
-      
+      <p className="text-sm text-gray-500">Your organization&apos;s internships and applications</p>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-700">Active Internships</h3>
-          <p className="text-3xl font-bold text-blue-600 mt-2">{internships.length}</p>
+          <p className="text-3xl font-bold text-amber-600 mt-2">
+            {loading ? '...' : summary.activeInternships}
+          </p>
+        </Card>
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold text-gray-700">Total Applications</h3>
+          <p className="text-3xl font-bold text-blue-600 mt-2">
+            {loading ? '...' : summary.totalApplications}
+          </p>
+        </Card>
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold text-gray-700">Pending Review</h3>
+          <p className="text-3xl font-bold text-orange-600 mt-2">
+            {loading ? '...' : summary.pendingApplications}
+          </p>
         </Card>
       </div>
 

@@ -2,10 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ArrowRight, Download } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 
 const Resources = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { settings } = useSiteSettings();
+  const { resources, branding } = settings;
 
   const handleAction = () => {
     if (isAuthenticated) {
@@ -36,8 +39,8 @@ const Resources = () => {
     <section className="resources-section" id="resources-section" style={{ padding: '80px 0', backgroundColor: '#fff' }}>
         <div className="container">
             <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>Resume Templates</h2>
-                <p style={{ fontSize: '1.125rem', color: '#6b7280' }}>Download modern, ATS-friendly resume templates for different roles.</p>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>{resources.title}</h2>
+                <p style={{ fontSize: '1.125rem', color: '#6b7280' }}>{resources.subtitle}</p>
             </div>
             
             <div className="resource-guides-container">
@@ -131,7 +134,7 @@ const Resources = () => {
                         onClick={handleAction}
                         style={{
                             padding: '16px 40px',
-                            backgroundColor: '#f97316', // Orange accent
+                            backgroundColor: branding.primaryColor,
                             color: 'white',
                             border: 'none',
                             borderRadius: '50px',
@@ -155,7 +158,7 @@ const Resources = () => {
                             e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(249, 115, 22, 0.3)';
                         }}
                     >
-                        Explore Roles <ArrowRight size={20} />
+                        {resources.ctaText} <ArrowRight size={20} />
                     </button>
                 </div>
             </div>
