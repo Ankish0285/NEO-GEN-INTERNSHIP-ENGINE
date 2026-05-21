@@ -35,8 +35,65 @@ const getApplicationsContext = async (userId) => {
   }));
 };
 
+const buildMemoryFromProfile = (profile, user) => ({
+  interests: profile?.interests?.length ? profile.interests : user?.interests || [],
+  past_ats_scores: (profile?.atsHistory || []).map((h) => h.score),
+  preferences: profile?.preferences || {},
+  past_recommendations: (profile?.recommendationHistory || []).slice(-10).map((r) => r.internshipId),
+});
+
+const persistAIProfile = async (userId, pipeline, user) => {
+  if (!pipeline?.profile) return null;
+  const existing = await AIStudentProfile.findOne({ user: userId });
+  const atsScore = pipeline.ats?.ats_score || 0;
+  const atsHistory = [...(existing?.atsHistory || [])];
+  if (atsScore > 0) {
+    atsHistory.push({ score: atsScore, at: new Date() });
+    if (atsHistory.length > 20) atsHistory.shift();
+  }
+  const recHistory = [...(existing?.recommendationHistory || [])];
+  (pipeline.recommendations || []).slice(0, 5).forEach((r) => {
+    recHistory.push({
+      internshipId: r.internship_id,
+      title: r.title,
+      matchPercentage: r.match_percentage,
+      at: new Date(),
+    });
+  });
+  if (recHistory.length > 30) recHistory.splice(0, recHistory.length - 30);
+
+  return AIStudentProfile.findOneAndUpdate(
+    { user: userId },
+    {
+      user: userId,
+      skillProfile: pipeline.profile.skill_profile || [],
+      softSkills: pipeline.profile.soft_skills || [],
+      careerDomain: pipeline.profile.career_domain,
+      strengths: pipeline.profile.strengths || [],
+      weaknesses: pipeline.profile.weaknesses || [],
+      employabilityScore: pipeline.profile.employability_score || 0,
+      internshipReadinessScore: pipeline.profile.internship_readiness_score || 0,
+      profileSummary: pipeline.profile.profile_summary || '',
+      growthAnalysis: pipeline.profile.growth_analysis || {},
+      futureTechnologies: pipeline.profile.future_technologies || [],
+      recommendedCareerPath: pipeline.profile.recommended_career_path || [],
+      learningRoadmap: pipeline.profile.learning_roadmap || [],
+      latestAtsScore: atsScore,
+      latestMatchPercentage: pipeline.ats?.match_percentage || 0,
+      aiConfidenceScore: pipeline.ats?.ai_confidence_score || 0,
+      interests: user?.interests || existing?.interests || [],
+      atsHistory,
+      recommendationHistory: recHistory,
+      lastAnalyzedAt: new Date(),
+      rawAnalysis: pipeline,
+    },
+    { upsert: true, new: true }
+  );
+};
+
 const runAIPipelineForUser = async (userId, resumeText, req = null) => {
   const user = await User.findById(userId).lean();
+  const existingProfile = await AIStudentProfile.findOne({ user: userId }).lean();
   const applications = await getApplicationsContext(userId);
   const internships = await Internship.find({
     status: { $in: ['active', 'published'] },
@@ -56,42 +113,26 @@ const runAIPipelineForUser = async (userId, resumeText, req = null) => {
         preferredLocation: user?.preferredLocation,
         atsScore: user?.atsScore,
         interests: user?.interests || [],
+        ats_history: buildMemoryFromProfile(existingProfile, user).past_ats_scores,
       },
       applications,
+      memory: buildMemoryFromProfile(existingProfile, user),
       topK: 15,
     });
   }
 
-  if (pipeline?.profile) {
-    await AIStudentProfile.findOneAndUpdate(
-      { user: userId },
-      {
-        user: userId,
-        skillProfile: pipeline.profile.skill_profile || [],
-        softSkills: pipeline.profile.soft_skills || [],
-        careerDomain: pipeline.profile.career_domain,
-        strengths: pipeline.profile.strengths || [],
-        weaknesses: pipeline.profile.weaknesses || [],
-        employabilityScore: pipeline.profile.employability_score || 0,
-        recommendedCareerPath: pipeline.profile.recommended_career_path || [],
-        learningRoadmap: pipeline.profile.learning_roadmap || [],
-        latestAtsScore: pipeline.ats?.ats_score || 0,
-        latestMatchPercentage: pipeline.ats?.match_percentage || 0,
-        aiConfidenceScore: pipeline.ats?.ai_confidence_score || 0,
-        lastAnalyzedAt: new Date(),
-        rawAnalysis: pipeline,
-      },
-      { upsert: true, new: true }
-    );
-  }
+  await persistAIProfile(userId, pipeline, user);
 
   if (req) {
     emitAIUpdate(req, userId, 'ai:analysis:complete', {
       atsScore: pipeline?.ats?.ats_score,
+      sectionScores: pipeline?.ats?.section_detail,
       recommendationsCount: pipeline?.recommendations?.length || 0,
+      profile: pipeline?.profile,
     });
     emitAIUpdate(req, userId, 'ai:recommendations:updated', {
       recommendations: pipeline?.recommendations || [],
+      groups: pipeline?.recommendation_groups,
     });
   }
 
@@ -112,6 +153,54 @@ const getAIProfile = asyncHandler(async (req, res) => {
     profile,
     hasResume: !!resume,
     latestResumeId: resume?._id,
+    rawAnalysis: profile?.rawAnalysis,
+  });
+});
+
+// @route GET /api/ai/intelligence
+const getAIIntelligence = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).lean();
+  const profile = await AIStudentProfile.findOne({ user: req.user.id }).lean();
+  const resume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 });
+  const applications = await getApplicationsContext(req.user.id);
+  const internships = await Internship.find({
+    status: { $in: ['active', 'published'] },
+  }).lean();
+
+  if (!(await aiClient.isAvailable())) {
+    res.status(503);
+    throw new Error('AI service offline — start backend with npm start');
+  }
+  if (!resume?.parsedText) {
+    res.status(400);
+    throw new Error('Upload a resume first');
+  }
+
+  const data = await aiClient.getIntelligence({
+    resumeText: resume.parsedText,
+    internships: internships.map(mapInternshipForAI),
+    userData: {
+      skills: user?.skills || [],
+      course: user?.course,
+      interests: user?.interests || [],
+      ats_history: buildMemoryFromProfile(profile, user).past_ats_scores,
+    },
+    applications,
+    memory: buildMemoryFromProfile(profile, user),
+    topK: 15,
+  });
+
+  await persistAIProfile(req.user.id, data, user);
+
+  res.json({
+    success: true,
+    data: {
+      ats: data.ats,
+      profile: data.profile,
+      recommendations: data.recommendations,
+      groups: data.recommendation_groups,
+      vectorIndex: data.vector_index,
+    },
   });
 });
 
@@ -129,7 +218,10 @@ const analyzeResumeAI = asyncHandler(async (req, res) => {
     analysis = await aiClient.analyzeATS(resume.parsedText, jobDescription || '');
     const pipeline = await runAIPipelineForUser(req.user.id, resume.parsedText, req);
     analysis.recommendations = pipeline?.recommendations;
+    analysis.recommendation_groups = pipeline?.recommendation_groups;
     analysis.student_profile = pipeline?.profile;
+    analysis.section_wise_scores = pipeline?.ats?.section_wise_scores;
+    analysis.why_score_is_low = pipeline?.ats?.why_score_is_low;
   } else {
     const scoreData = calculateATSScore(resume.parsedText);
     analysis = {
@@ -209,21 +301,41 @@ const getAIRecommendations = asyncHandler(async (req, res) => {
     duration: r.duration,
     description: r.description,
     matchScore: r.match_percentage,
+    aiCompatibilityScore: r.ai_compatibility_score,
     selectionProbability: r.selection_probability,
+    interviewProbability: r.interview_probability,
+    hiringConfidence: r.hiring_confidence,
+    selectionTier: r.selection_tier,
     matchedSkills: r.matched_skills,
     missingSkills: r.missing_skills,
     atsScore: r.ats_score,
     aiExplanation: r.ai_explanation,
     recommendedImprovements: r.recommended_improvements,
     skillGapCourses: r.skill_gap_courses,
+    categoryTags: r.category_tags,
     type: 'Internship',
     postedAt: 'Recently',
   }));
+
+  const mapGroup = (items) =>
+    (items || []).map((r) => ({
+      id: r.internship_id,
+      title: r.title,
+      company: r.company,
+      matchScore: r.match_percentage,
+      selectionProbability: r.selection_probability,
+    }));
 
   res.json({
     success: true,
     count: formatted.length,
     recommendations: formatted,
+    groups: {
+      bestMatch: mapGroup(result.groups?.best_match),
+      highestMatch: mapGroup(result.groups?.highest_match),
+      easiestSelection: mapGroup(result.groups?.easiest_selection),
+      skillBased: mapGroup(result.groups?.skill_based),
+    },
     studentProfile: result.student_profile,
   });
 });
@@ -270,21 +382,35 @@ const aiChat = asyncHandler(async (req, res) => {
   const profile = await AIStudentProfile.findOne({ user: req.user.id });
   const resume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 });
 
-  const context = {
-    ats_score: profile?.latestAtsScore || user?.atsScore || 0,
-    skills: profile?.skillProfile || user?.skills || [],
-    career_domain: profile?.careerDomain?.label || 'technology',
-    missing_skills: resume?.missingKeywords || [],
-  };
-
   let data;
   if (await aiClient.isAvailable()) {
-    data = await aiClient.chat(message, context);
+    const intelligence = profile?.rawAnalysis;
+    if (intelligence?.ats && resume?.parsedText) {
+      data = await aiClient.chatWithIntelligence(message, intelligence);
+    } else if (resume?.parsedText) {
+      const pipeline = await runAIPipelineForUser(req.user.id, resume.parsedText);
+      data = await aiClient.chatWithIntelligence(message, pipeline || {});
+    } else {
+      data = await aiClient.chat(message, {
+        ats_score: profile?.latestAtsScore || user?.atsScore || 0,
+        skills: profile?.skillProfile || user?.skills || [],
+        career_domain: profile?.careerDomain?.label || 'technology',
+      });
+    }
   } else {
     data = {
       reply: 'AI assistant is starting up. Upload your resume and check Recommendations.',
       suggestions: ['Improve my ATS score', 'Find internships'],
     };
+  }
+
+  if (profile && message) {
+    profile.chatHistory = [
+      ...(profile.chatHistory || []).slice(-18),
+      { role: 'user', message, at: new Date() },
+      { role: 'assistant', message: data.reply, at: new Date() },
+    ];
+    await profile.save();
   }
 
   res.json({ success: true, data });
@@ -326,15 +452,41 @@ const getAdminAIInsights = asyncHandler(async (req, res) => {
     domainFreq[d] = (domainFreq[d] || 0) + 1;
   });
 
+  const techDemand = {};
+  internships.forEach((job) => {
+    (job.skills || []).forEach((s) => {
+      techDemand[s] = (techDemand[s] || 0) + 1;
+    });
+  });
+  const topTechnologies = Object.entries(techDemand)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12)
+    .map(([tech, count]) => ({ tech, count }));
+
+  const avgReadiness =
+    profiles.length > 0
+      ? Math.round(
+          profiles.reduce((s, p) => s + (p.internshipReadinessScore || 0), 0) / profiles.length
+        )
+      : 0;
+
+  const recCount = profiles.reduce(
+    (s, p) => s + (p.recommendationHistory?.length || 0),
+    0
+  );
+
   res.json({
     success: true,
     insights: {
       totalAIProfiles: profiles.length,
       averageAtsScore: avgAts,
+      averageReadinessScore: avgReadiness,
       topDemandedSkills: topSkills,
+      topDemandedTechnologies: topTechnologies,
       careerDomainDistribution: domainFreq,
       totalInternships: internships.length,
       totalApplications: applications.length,
+      aiRecommendationEvents: recCount,
       hiringTrend: {
         activeInternships: internships.filter((i) =>
           ['active', 'published'].includes(i.status)
@@ -348,12 +500,25 @@ const getAdminAIInsights = asyncHandler(async (req, res) => {
               )
             : 0,
       },
+      studentPerformance: {
+        avgEmployability:
+          profiles.length > 0
+            ? Math.round(
+                profiles.reduce((s, p) => s + (p.employabilityScore || 0), 0) /
+                  profiles.length
+              )
+            : 0,
+        improvingProfiles: profiles.filter(
+          (p) => p.growthAnalysis?.trend === 'improving'
+        ).length,
+      },
       topStudents: profiles
         .sort((a, b) => (b.employabilityScore || 0) - (a.employabilityScore || 0))
         .slice(0, 5)
         .map((p) => ({
           userId: p.user,
           employabilityScore: p.employabilityScore,
+          readiness: p.internshipReadinessScore,
           domain: p.careerDomain?.label,
           ats: p.latestAtsScore,
         })),
@@ -364,6 +529,7 @@ const getAdminAIInsights = asyncHandler(async (req, res) => {
 module.exports = {
   getAIStatus,
   getAIProfile,
+  getAIIntelligence,
   analyzeResumeAI,
   getAIRecommendations,
   matchSingleInternship,

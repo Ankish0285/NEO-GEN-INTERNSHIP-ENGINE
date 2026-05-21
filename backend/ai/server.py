@@ -6,11 +6,12 @@ from pydantic import BaseModel, Field
 
 from engines.ats_engine import analyze_ats
 from engines.chat_engine import chat_response
+from engines.intelligence import build_full_intelligence, chat_with_intelligence
 from engines.profile_engine import build_student_profile
 from engines.recommendation_engine import recommend_internships
 from engines.resume_parser import parse_resume
 
-app = FastAPI(title='NeoGen AI', version='1.0.0')
+app = FastAPI(title='NeoGen AI', version='2.0.0')
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
 
 
@@ -32,6 +33,7 @@ class RecommendRequest(BaseModel):
     user_data: dict = Field(default_factory=dict)
     applications: list = Field(default_factory=list)
     top_k: int = 12
+    memory: dict = Field(default_factory=dict)
 
 
 class ChatRequest(BaseModel):
@@ -46,7 +48,30 @@ class MatchRequest(BaseModel):
 
 @app.get('/api/v1/health')
 def health():
-    return {'status': 'ok', 'service': 'neogen-ai', 'version': '1.0.0'}
+    return {'status': 'ok', 'service': 'neogen-ai', 'version': '2.0.0'}
+
+
+@app.post('/api/v1/intelligence')
+def full_intelligence(body: RecommendRequest):
+    if len(body.resume_text.strip()) < 20 and not body.user_data:
+        raise HTTPException(400, 'resume_text or user_data required')
+    data = build_full_intelligence(
+        body.resume_text,
+        body.internships,
+        body.user_data,
+        body.applications,
+        body.memory,
+        body.top_k,
+    )
+    return {'success': True, 'data': data}
+
+
+@app.post('/api/v1/chat/intelligence')
+def chat_intel(body: ChatRequest):
+    intel = body.context.get('intelligence') or {}
+    if intel:
+        return {'success': True, 'data': chat_with_intelligence(body.message, intel)}
+    return {'success': True, 'data': chat_response(body.message, body.context)}
 
 
 @app.post('/api/v1/ats/analyze')
@@ -96,17 +121,22 @@ def chat(body: ChatRequest):
 
 @app.post('/api/v1/pipeline/full')
 def full_pipeline(body: RecommendRequest):
-    ats = analyze_ats(body.resume_text, '') if body.resume_text else {}
-    profile = build_student_profile(body.resume_text, body.user_data, body.applications)
-    recs = recommend_internships(
-        body.resume_text, body.internships, body.user_data, body.applications, body.top_k
+    data = build_full_intelligence(
+        body.resume_text,
+        body.internships,
+        body.user_data,
+        body.applications,
+        body.memory,
+        body.top_k,
     )
     return {
         'success': True,
         'data': {
-            'ats': ats,
-            'profile': profile,
-            'recommendations': recs['recommendations'],
-            'student_profile': recs.get('student_profile', profile),
+            'ats': data['ats'],
+            'profile': data['profile'],
+            'recommendations': data['recommendations'],
+            'recommendation_groups': data.get('recommendation_groups', {}),
+            'student_profile': data['student_profile'],
+            'vector_index': data.get('vector_index'),
         },
     }

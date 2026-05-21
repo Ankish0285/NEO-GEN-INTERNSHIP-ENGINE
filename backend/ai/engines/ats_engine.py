@@ -8,6 +8,7 @@ from typing import Any
 
 import joblib
 
+from engines.advanced_resume import enrich_ats_analysis
 from engines.embeddings import semantic_similarity
 from engines.resume_parser import parse_resume
 from engines.skills_db import COURSE_SUGGESTIONS, TECHNICAL_SKILLS
@@ -113,7 +114,7 @@ def analyze_ats(resume_text: str, job_description: str = '') -> dict[str, Any]:
 
     confidence = round(min(98, 70 + len(parsed['skills']) * 2 + semantic * 0.1), 2)
 
-    return {
+    base = {
         'ats_score': ats_score,
         'match_percentage': round((semantic + kw['keyword_match_percentage']) / 2, 2),
         'keyword_match_percentage': kw['keyword_match_percentage'],
@@ -124,10 +125,9 @@ def analyze_ats(resume_text: str, job_description: str = '') -> dict[str, Any]:
         'breakdown': section_scores,
         'sections': sections,
         'formatting_issues': parsed['formatting_issues'],
-        'weak_sections': [
-            k for k, v in section_scores.items() if v < 55
-        ],
+        'weak_sections': [k for k, v in section_scores.items() if v < 55],
         'improvement_tips': tips[:8],
         'resume_analysis': parsed,
         'ai_confidence_score': confidence,
     }
+    return enrich_ats_analysis(base, resume_text)

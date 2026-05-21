@@ -4,6 +4,7 @@ const { protect } = require('../middleware/authMiddleware');
 const {
   getAIStatus,
   getAIProfile,
+  getAIIntelligence,
   analyzeResumeAI,
   getAIRecommendations,
   matchSingleInternship,
@@ -13,6 +14,7 @@ const {
 
 router.get('/status', getAIStatus);
 router.get('/profile', protect, getAIProfile);
+router.get('/intelligence', protect, getAIIntelligence);
 router.post('/analyze', protect, analyzeResumeAI);
 router.get('/recommendations', protect, getAIRecommendations);
 router.post('/match/:internshipId', protect, matchSingleInternship);

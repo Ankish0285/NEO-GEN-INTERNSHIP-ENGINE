@@ -115,13 +115,15 @@ const Analytics = () => {
 
       {aiInsights && (
         <Card className="p-6" title="AI Platform Insights" subtitle="Hiring trends and skill demand from NeoGen AI">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-4 mb-4">
             <Brain className="text-[#FF9933]" size={22} />
-            <span className="text-sm text-[#4B5563]">Average student ATS: {aiInsights.averageAtsScore}%</span>
+            <span className="text-sm text-[#4B5563]">Avg ATS: {aiInsights.averageAtsScore}%</span>
+            <span className="text-sm text-[#4B5563]">Avg readiness: {aiInsights.averageReadinessScore}%</span>
+            <span className="text-sm text-[#4B5563]">AI rec events: {aiInsights.aiRecommendationEvents}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <h4 className="text-sm font-semibold text-[#111827] mb-2">Top Demanded Skills</h4>
+              <h4 className="text-sm font-semibold text-[#111827] mb-2">Top Student Skills</h4>
               <ul className="space-y-1 text-sm text-[#4B5563]">
                 {(aiInsights.topDemandedSkills || []).slice(0, 8).map((s) => (
                   <li key={s.skill}>{s.skill} — {s.count} profiles</li>
@@ -129,10 +131,19 @@ const Analytics = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-[#111827] mb-2">Hiring Trend</h4>
+              <h4 className="text-sm font-semibold text-[#111827] mb-2">Most Demanded Technologies</h4>
+              <ul className="space-y-1 text-sm text-[#4B5563]">
+                {(aiInsights.topDemandedTechnologies || []).slice(0, 8).map((t) => (
+                  <li key={t.tech}>{t.tech} — {t.count} listings</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-[#111827] mb-2">Recruiter & Performance</h4>
               <p className="text-sm text-[#4B5563]">Active internships: {aiInsights.hiringTrend?.activeInternships}</p>
               <p className="text-sm text-[#4B5563]">Acceptance rate: {aiInsights.hiringTrend?.acceptanceRate}%</p>
-              <p className="text-sm text-[#4B5563] mt-2">AI profiles analyzed: {aiInsights.totalAIProfiles}</p>
+              <p className="text-sm text-[#4B5563]">Avg employability: {aiInsights.studentPerformance?.avgEmployability}%</p>
+              <p className="text-sm text-[#4B5563]">Improving profiles: {aiInsights.studentPerformance?.improvingProfiles}</p>
             </div>
           </div>
         </Card>

@@ -18,6 +18,10 @@ const aiStudentProfileSchema = mongoose.Schema(
     strengths: [String],
     weaknesses: [String],
     employabilityScore: { type: Number, default: 0 },
+    internshipReadinessScore: { type: Number, default: 0 },
+    profileSummary: String,
+    growthAnalysis: { type: mongoose.Schema.Types.Mixed },
+    futureTechnologies: [String],
     recommendedCareerPath: [String],
     learningRoadmap: [
       {
@@ -31,6 +35,24 @@ const aiStudentProfileSchema = mongoose.Schema(
     aiConfidenceScore: { type: Number, default: 0 },
     lastAnalyzedAt: Date,
     rawAnalysis: { type: mongoose.Schema.Types.Mixed },
+    interests: [String],
+    atsHistory: [{ score: Number, at: { type: Date, default: Date.now } }],
+    recommendationHistory: [
+      {
+        internshipId: String,
+        title: String,
+        matchPercentage: Number,
+        at: { type: Date, default: Date.now },
+      },
+    ],
+    chatHistory: [
+      {
+        role: String,
+        message: String,
+        at: { type: Date, default: Date.now },
+      },
+    ],
+    preferences: { type: mongoose.Schema.Types.Mixed },
   },
   { timestamps: true }
 );

@@ -8,22 +8,29 @@ sys.path.insert(0, str(ROOT))
 
 from engines.ats_engine import analyze_ats
 from engines.chat_engine import chat_response
+from engines.intelligence import build_full_intelligence, chat_with_intelligence
 from engines.profile_engine import build_student_profile
 from engines.recommendation_engine import recommend_internships
 from engines.resume_parser import parse_resume
 
 
-def _read_payload():
-    if not sys.stdin.isatty():
-        return json.load(sys.stdin)
+def _read_payload(cmd: str):
     if len(sys.argv) > 2:
         return json.loads(sys.argv[2])
+    if cmd == 'health':
+        return {}
+    try:
+        raw = sys.stdin.read()
+        if raw.strip():
+            return json.loads(raw)
+    except Exception:
+        pass
     return {}
 
 
 def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else 'health'
-    payload = _read_payload()
+    payload = _read_payload(cmd)
 
     if cmd == 'health':
         out = {'status': 'ok', 'service': 'neogen-ai'}
@@ -56,26 +63,29 @@ def main():
         out = analyze_ats(payload.get('resume_text', ''), job_doc)
     elif cmd == 'chat':
         out = chat_response(payload.get('message', ''), payload.get('context', {}))
-    elif cmd == 'pipeline':
-        ats = analyze_ats(payload.get('resume_text', ''), '') if payload.get('resume_text') else {}
-        profile = build_student_profile(
-            payload.get('resume_text', ''),
-            payload.get('user_data', {}),
-            payload.get('applications', []),
-        )
-        recs = recommend_internships(
+    elif cmd == 'intelligence':
+        out = build_full_intelligence(
             payload.get('resume_text', ''),
             payload.get('internships', []),
             payload.get('user_data', {}),
             payload.get('applications', []),
+            payload.get('memory', {}),
+            payload.get('top_k', 15),
+        )
+    elif cmd == 'pipeline':
+        out = build_full_intelligence(
+            payload.get('resume_text', ''),
+            payload.get('internships', []),
+            payload.get('user_data', {}),
+            payload.get('applications', []),
+            payload.get('memory', {}),
             payload.get('top_k', 12),
         )
-        out = {
-            'ats': ats,
-            'profile': profile,
-            'recommendations': recs['recommendations'],
-            'student_profile': recs.get('student_profile', profile),
-        }
+    elif cmd == 'chat_intel':
+        out = chat_with_intelligence(
+            payload.get('message', ''),
+            payload.get('intelligence', {}),
+        )
     else:
         print(json.dumps({'error': f'unknown command: {cmd}'}))
         sys.exit(1)

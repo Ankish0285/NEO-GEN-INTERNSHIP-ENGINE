@@ -4,6 +4,8 @@ export const getAIStatus = () => api.get('/ai/status');
 
 export const getAIProfile = () => api.get('/ai/profile');
 
+export const getAIIntelligence = () => api.get('/ai/intelligence');
+
 export const analyzeResumeAI = (jobDescription = '') =>
   api.post('/ai/analyze', { jobDescription });
 
@@ -20,6 +22,7 @@ export const getAdminAIInsights = () => api.get('/ai/admin/insights');
 export default {
   getAIStatus,
   getAIProfile,
+  getAIIntelligence,
   analyzeResumeAI,
   getAIRecommendations,
   matchInternshipAI,

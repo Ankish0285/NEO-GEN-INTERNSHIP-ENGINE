@@ -119,8 +119,27 @@ const fullPipeline = (payload) =>
     internships: payload.internships || [],
     user_data: payload.userData || {},
     applications: payload.applications || [],
+    memory: payload.memory || {},
     top_k: payload.topK || 12,
   });
+
+const getIntelligence = (payload) =>
+  callAI('/api/v1/intelligence', 'intelligence', {
+    resume_text: payload.resumeText || '',
+    internships: payload.internships || [],
+    user_data: payload.userData || {},
+    applications: payload.applications || [],
+    memory: payload.memory || {},
+    top_k: payload.topK || 15,
+  });
+
+const chatWithIntelligence = (message, intelligence) =>
+  callAI(
+    '/api/v1/chat/intelligence',
+    'chat_intel',
+    { message, intelligence },
+    true
+  ).catch(() => chat(message, { intelligence }));
 
 const matchInternship = (resumeText, internship) =>
   callAI('/api/v1/match/internship', 'match', {
@@ -154,8 +173,10 @@ module.exports = {
   buildProfile,
   getRecommendations,
   fullPipeline,
+  getIntelligence,
   matchInternship,
   chat,
+  chatWithIntelligence,
   startAIServer,
   runCli,
 };
