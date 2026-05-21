@@ -4,24 +4,19 @@ const Internship = require('../models/Internship');
 const { createAndNotify } = require('../utils/notificationHelper');
 const Resume = require('../models/Resume');
 const User = require('../models/User');
-const axios = require('axios');
 const { isHttpUrl, fixLocalResumeHttpUrl, isCloudinaryUrl } = require('../utils/resumeUrl');
 const { attachResolvedResumeUrls } = require('../utils/attachApplicationResumeUrls');
+const aiClient = require('../services/aiServiceClient');
+const { calculateATSScore } = require('../utils/atsScoring');
 
-// Helper to calculate ATS Score via ATS Django API
-const calculateAtsScore = async (resumeUrl, jobDescription) => {
+const scoreFromResumeText = async (resumeText, jobDescription) => {
+  if (!resumeText || resumeText.length < 20) return { ats_score: 0 };
   try {
-    const baseUrl = process.env.ATS_API_URL;
-    if (!baseUrl) {
-      console.warn('[ATS] ATS_API_URL not set. Returning default score 0.');
-      return { ats_score: 0 };
-    }
-    const url = `${baseUrl.replace(/\/+$/, '')}/ats/score`;
-    const response = await axios.post(url, { resumeUrl, jobDescription }, { timeout: 15000 });
-    return response.data || { ats_score: 0 };
-  } catch (err) {
-    console.error(`[ATS] HTTP error: ${err.message}`);
-    return { ats_score: 0 };
+    const ai = await aiClient.analyzeATS(resumeText, jobDescription);
+    return { ats_score: ai.ats_score || 0 };
+  } catch {
+    const fallback = calculateATSScore(resumeText);
+    return { ats_score: fallback.score || 0 };
   }
 };
 
@@ -133,19 +128,17 @@ const createApplication = asyncHandler(async (req, res) => {
   let finalAtsScore = resumeDoc?.atsScore || 0;
 
   // Calculate real-time ATS score if we have a resume URL and an internship description
-  if (resumeUrl && internship) {
-      const jobDesc = [
-          internship.description,
-          internship.requirements,
-          (internship.requiredSkills || []).join(' ')
-      ].join(' ');
+  if (internship && resumeDoc?.parsedText) {
+    const jobDesc = [
+      internship.description,
+      internship.eligibility,
+      (internship.skills || []).join(' '),
+    ].join(' ');
 
-      console.log(`[ATS] Calculating score for application...`);
-      const atsResult = await calculateAtsScore(resumeUrl, jobDesc);
-      if (atsResult && atsResult.ats_score) {
-          finalAtsScore = atsResult.ats_score;
-          console.log(`[ATS] Score calculated: ${finalAtsScore}`);
-      }
+    const atsResult = await scoreFromResumeText(resumeDoc.parsedText, jobDesc);
+    if (atsResult?.ats_score) {
+      finalAtsScore = Math.round(atsResult.ats_score);
+    }
   }
 
   const application = await Application.create({

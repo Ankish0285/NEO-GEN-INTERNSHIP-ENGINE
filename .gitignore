@@ -1,6 +1,9 @@
 DON'T TOUCH/
 node_modules/
 **/node_modules/
+backend/ai/.venv/
+**/__pycache__/
+**/*.pyc
 dist/
 **/dist/
 .env

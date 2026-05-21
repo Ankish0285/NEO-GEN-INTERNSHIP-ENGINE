@@ -1,9 +1,0 @@
-Django>=5.0
-djangorestframework
-django-cors-headers
-pandas
-scikit-learn
-joblib
-numpy
-requests
-PyPDF2

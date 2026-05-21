@@ -31,6 +31,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const ensureAdminExists = require('./utils/ensureAdmin');
+const { startAIServer } = require('./services/aiServiceClient');
 
 const app = express();
 const server = http.createServer(app);
@@ -105,6 +106,7 @@ const PORT = process.env.PORT || 5000;
         console.log('[Bootstrap] Initializing database connection...'.yellow);
 		await connectDB();
 		await ensureAdminExists();
+		startAIServer();
 		server.listen(PORT, () => console.log(`Server started on port ${PORT}`.green.bold));
 	} catch (err) {
 		console.error(`[Bootstrap Error] Server failed to start: ${err.message}`.red);

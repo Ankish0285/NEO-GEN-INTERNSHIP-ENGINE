@@ -1,33 +1,17 @@
-"""
-NeoGen AI Service — FastAPI microservice
-Run: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
-"""
-
-from typing import Any, Optional
+"""NeoGen AI API — runs inside backend/ai (uvicorn server:app --port 8001)."""
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from app.ats_engine import analyze_ats
-from app.chat_engine import chat_response
-from app.profile_engine import build_student_profile
-from app.recommendation_engine import recommend_internships
-from app.resume_parser import parse_resume
+from engines.ats_engine import analyze_ats
+from engines.chat_engine import chat_response
+from engines.profile_engine import build_student_profile
+from engines.recommendation_engine import recommend_internships
+from engines.resume_parser import parse_resume
 
-app = FastAPI(
-    title='NeoGen AI Service',
-    description='ATS intelligence, resume NLP, recommendations, career profiling',
-    version='1.0.0',
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*'],
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
+app = FastAPI(title='NeoGen AI', version='1.0.0')
+app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
 
 
 class ATSRequest(BaseModel):
@@ -90,11 +74,7 @@ def profile_build(body: ProfileRequest):
 @app.post('/api/v1/recommendations')
 def recommendations(body: RecommendRequest):
     result = recommend_internships(
-        body.resume_text,
-        body.internships,
-        body.user_data,
-        body.applications,
-        body.top_k,
+        body.resume_text, body.internships, body.user_data, body.applications, body.top_k
     )
     return {'success': True, 'data': result}
 
@@ -106,8 +86,7 @@ def match_internship(body: MatchRequest):
         str(body.internship.get('description', '')),
         ' '.join(body.internship.get('skills', []) or []),
     ])
-    ats = analyze_ats(body.resume_text, job_doc)
-    return {'success': True, 'data': ats}
+    return {'success': True, 'data': analyze_ats(body.resume_text, job_doc)}
 
 
 @app.post('/api/v1/chat')
@@ -117,17 +96,10 @@ def chat(body: ChatRequest):
 
 @app.post('/api/v1/pipeline/full')
 def full_pipeline(body: RecommendRequest):
-    """Single call: ATS + profile + recommendations."""
     ats = analyze_ats(body.resume_text, '') if body.resume_text else {}
-    profile = build_student_profile(
-        body.resume_text, body.user_data, body.applications
-    )
+    profile = build_student_profile(body.resume_text, body.user_data, body.applications)
     recs = recommend_internships(
-        body.resume_text,
-        body.internships,
-        body.user_data,
-        body.applications,
-        body.top_k,
+        body.resume_text, body.internships, body.user_data, body.applications, body.top_k
     )
     return {
         'success': True,

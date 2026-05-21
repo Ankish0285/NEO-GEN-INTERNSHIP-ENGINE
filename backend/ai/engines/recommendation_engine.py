@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.ats_engine import analyze_ats
-from app.embeddings import rank_by_similarity, semantic_similarity
-from app.profile_engine import build_student_profile
-from app.skills_db import COURSE_SUGGESTIONS
+from engines.ats_engine import analyze_ats
+from engines.embeddings import rank_by_similarity, semantic_similarity
+from engines.profile_engine import build_student_profile
+from engines.skills_db import COURSE_SUGGESTIONS
 
 
 def _internship_doc(job: dict) -> str:

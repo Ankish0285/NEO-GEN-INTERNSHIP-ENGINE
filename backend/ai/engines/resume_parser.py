@@ -1,7 +1,7 @@
 import re
 from typing import Any
 
-from app.skills_db import TECHNICAL_SKILLS, SOFT_SKILLS
+from engines.skills_db import TECHNICAL_SKILLS, SOFT_SKILLS
 
 
 def _find_skills(text: str, keywords: list[str]) -> list[str]:

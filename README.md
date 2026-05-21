@@ -5,7 +5,7 @@ NEO GEN is a full-stack internship management and ATS (Applicant Tracking System
 
 - **Frontend**: React 18 + Vite + TailwindCSS
 - **Backend**: Node.js/Express + MongoDB
-- **ML Service**: Python/Django + scikit-learn
+- **AI/ML**: Python inside `backend/ai` (scikit-learn + FastAPI, auto-started with backend)
 
 ---
 
@@ -15,8 +15,7 @@ NEO GEN is a full-stack internship management and ATS (Applicant Tracking System
 NEO GEN/
 ├── .git/                          # Git repository
 ├── .venv/                         # Python virtual environment
-├── ats-ml-backend/               # ML/ATS Backend (Python/Django)
-├── backend/                      # REST API Backend (Node.js/Express)
+├── backend/                      # REST API + AI/ML (Node.js + backend/ai)
 ├── frontend/                     # Frontend (React/Vite)
 ├── package.json                  # Root workspace config
 ├── package-lock.json            # Dependencies lock

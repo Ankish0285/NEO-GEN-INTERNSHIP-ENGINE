@@ -8,9 +8,9 @@ from typing import Any
 
 import joblib
 
-from app.embeddings import semantic_similarity
-from app.resume_parser import parse_resume
-from app.skills_db import COURSE_SUGGESTIONS, TECHNICAL_SKILLS
+from engines.embeddings import semantic_similarity
+from engines.resume_parser import parse_resume
+from engines.skills_db import COURSE_SUGGESTIONS, TECHNICAL_SKILLS
 
 _ML_MODEL = None
 _ML_VECTORIZER = None
@@ -20,7 +20,7 @@ def _load_ml():
     global _ML_MODEL, _ML_VECTORIZER
     if _ML_MODEL is not None:
         return _ML_MODEL, _ML_VECTORIZER
-    base = Path(__file__).resolve().parents[2] / 'backend' / 'ats' / 'ml'
+    base = Path(__file__).resolve().parent.parent / 'models'
     model_path = base / 'ats_model.pkl'
     vec_path = base / 'tfidf.pkl'
     if model_path.exists() and vec_path.exists():

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.ats_engine import analyze_ats
-from app.resume_parser import parse_resume
-from app.skills_db import CAREER_DOMAINS, COURSE_SUGGESTIONS
+from engines.ats_engine import analyze_ats
+from engines.resume_parser import parse_resume
+from engines.skills_db import CAREER_DOMAINS, COURSE_SUGGESTIONS
 
 
 def predict_career_domain(skills: list[str]) -> dict[str, Any]:
