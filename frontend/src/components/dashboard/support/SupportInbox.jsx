@@ -191,18 +191,18 @@ const SupportInbox = ({ mode = 'admin' }) => {
         <p>
           {isAdmin
             ? 'Manage all support tickets, reply to users, and assign partners.'
-            : 'View and reply to tickets assigned to you.'}
+            : 'View and reply to all support tickets for your team.'}
         </p>
       </div>
 
-      <div className="neo-glass overflow-hidden flex flex-col lg:flex-row min-h-[560px] rounded-2xl border border-black/5">
+      <div className="neo-glass overflow-hidden flex flex-col lg:flex-row min-h-140 rounded-2xl border border-black/5">
         {/* Ticket list */}
-        <div className="lg:w-[340px] border-b lg:border-b-0 lg:border-r border-black/5 flex flex-col">
+        <div className="lg:w-85 border-b lg:border-b-0 lg:border-r border-black/5 flex flex-col">
           <div className="p-4 space-y-3 border-b border-black/5">
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                className="neo-input !pl-9 !min-h-[40px] text-sm"
+                className="neo-input pl-9! min-h-10! text-sm"
                 placeholder="Search tickets..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -212,7 +212,7 @@ const SupportInbox = ({ mode = 'admin' }) => {
             <div className="flex gap-2 items-center">
               <Filter size={14} className="text-gray-400 shrink-0" />
               <select
-                className="neo-input !min-h-[36px] text-sm flex-1"
+                className="neo-input min-h-9! text-sm flex-1"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -265,7 +265,7 @@ const SupportInbox = ({ mode = 'admin' }) => {
         </div>
 
         {/* Conversation */}
-        <div className="flex-1 flex flex-col min-h-[400px]">
+        <div className="flex-1 flex flex-col min-h-100">
           {!selected ? (
             <div className="flex-1 flex items-center justify-center text-gray-500 p-8 text-center">
               Select a ticket to view the conversation
@@ -283,7 +283,7 @@ const SupportInbox = ({ mode = 'admin' }) => {
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
                   <select
-                    className="neo-input !min-h-[34px] text-xs"
+                    className="neo-input min-h-8.5! text-xs"
                     value={selected.status}
                     onChange={(e) => handleStatus(e.target.value)}
                   >
@@ -296,7 +296,7 @@ const SupportInbox = ({ mode = 'admin' }) => {
                   {isAdmin && (
                     <>
                       <select
-                        className="neo-input !min-h-[34px] text-xs max-w-[160px]"
+                        className="neo-input min-h-8.5! text-xs max-w-40"
                         value={selected.assignedTo?._id || selected.assignedTo || ''}
                         onChange={(e) => handleAssign(e.target.value)}
                       >
@@ -384,7 +384,7 @@ const SupportInbox = ({ mode = 'admin' }) => {
 
               <form onSubmit={handleReply} className="p-4 border-t border-black/5 flex flex-col gap-2">
                 <textarea
-                  className="neo-input min-h-[80px] resize-none"
+                  className="neo-input min-h-20 resize-none"
                   placeholder="Type your reply..."
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}

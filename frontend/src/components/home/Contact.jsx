@@ -90,15 +90,31 @@ const Contact = () => {
     setLoading(true);
 
     try {
+      const subjectMap = {
+        internship: 'Internship Inquiry',
+        technical: 'Technical Support',
+        partnership: 'Partnership Opportunity',
+        feedback: 'Feedback',
+        other: 'General Inquiry',
+      };
+      const categoryMap = {
+        internship: 'Internship',
+        technical: 'Technical',
+        partnership: 'General',
+        feedback: 'General',
+        other: 'Other',
+      };
+
       const payload = {
         name: formData.name.trim(),
         email: formData.email.trim(),
         phone: (formData.phone || '').trim(),
-        subject: (formData.subject || '').trim(),
+        subject: subjectMap[formData.subject] || formData.subject.trim(),
+        category: categoryMap[formData.subject] || 'General',
         message: formData.message.trim(),
       };
 
-      await api.post('/messages', payload);
+      await api.post('/support-tickets', payload);
 
       setSuccess('Thank you! Your message has been sent successfully. We\'ll get back to you soon.');
       setFormData({

@@ -1,6 +1,6 @@
 const express = require('express');
 const upload = require('../middleware/uploadMiddleware');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, optionalAuth } = require('../middleware/authMiddleware');
 const {
   createTicket,
   getTickets,
@@ -23,7 +23,7 @@ router.get('/health', (req, res) => {
 router.get('/unread-count', protect, getUnreadCount);
 router.get('/meta/assignees', protect, admin, getAssignees);
 router.get('/', protect, getTickets);
-router.post('/', protect, upload.single('file'), createTicket);
+router.post('/', optionalAuth, upload.single('file'), createTicket);
 router.get('/:id', protect, getTicket);
 router.post('/:id/reply', protect, upload.single('file'), replyTicket);
 router.patch('/:id/status', protect, updateStatus);

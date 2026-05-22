@@ -22,9 +22,10 @@ const replySchema = new mongoose.Schema(
 const supportTicketSchema = new mongoose.Schema(
   {
     ticketId: { type: String, required: true, unique: true, index: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false, index: true },
     userName: { type: String, default: '' },
     email: { type: String, default: '' },
+    phone: { type: String, default: '' },
     role: { type: String, enum: ['student', 'admin', 'partner'], default: 'student' },
     subject: { type: String, required: true, trim: true },
     message: { type: String, required: true },

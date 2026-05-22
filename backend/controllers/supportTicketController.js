@@ -78,9 +78,8 @@ async function notifyAdminsNewTicket(req, ticket) {
 function canAccessTicket(user, ticket) {
   if (!user || !ticket) return false;
   const role = userRole(user);
-  if (role === 'admin') return true;
+  if (role === 'admin' || role === 'partner') return true;
   if (isTicketOwner(user, ticket)) return true;
-  if (role === 'partner' && idsMatch(ticket.assignedTo, user._id)) return true;
   return false;
 }
 
@@ -103,12 +102,13 @@ function parseAttachments(body) {
 // @desc    Create support ticket
 // @route   POST /api/support-tickets
 const createTicket = asyncHandler(async (req, res) => {
-  const { subject, message, category, priority } = req.body;
+  const { subject, message, category, priority, name, email, phone } = req.body;
   if (!subject?.trim() || !message?.trim()) {
     res.status(400);
     throw new Error('Subject and message are required');
   }
 
+  const user = req.user || null;
   const ticketId = await generateTicketId();
   const attachments = parseAttachments(req.body);
   if (req.file) {
@@ -120,10 +120,11 @@ const createTicket = asyncHandler(async (req, res) => {
 
   const ticket = await SupportTicket.create({
     ticketId,
-    userId: req.user._id,
-    userName: req.user.name || req.user.fullName || 'User',
-    email: req.user.email,
-    role: req.user.role,
+    userId: user?._id || null,
+    userName: (user?.name || user?.fullName || (name || 'Guest')).trim(),
+    email: (user?.email || (email || '')).trim(),
+    phone: (user?.phone || phone || '').trim(),
+    role: user?.role || 'student',
     subject: subject.trim(),
     message: message.trim(),
     category: category || 'General',
@@ -157,8 +158,6 @@ const getTickets = asyncHandler(async (req, res) => {
       });
     }
     and.push({ $or: ownerOr });
-  } else if (role === 'partner') {
-    filter.assignedTo = req.user._id;
   } else if (role === 'admin' && assignedTo) {
     filter.assignedTo = assignedTo;
   }
@@ -192,10 +191,8 @@ const getTickets = asyncHandler(async (req, res) => {
 // @route   GET /api/support-tickets/unread-count
 const getUnreadCount = asyncHandler(async (req, res) => {
   let count = 0;
-  if (req.user.role === 'admin') {
+  if (req.user.role === 'admin' || req.user.role === 'partner') {
     count = await SupportTicket.countDocuments({ unreadByStaff: true });
-  } else if (req.user.role === 'partner') {
-    count = await SupportTicket.countDocuments({ assignedTo: req.user._id, unreadByStaff: true });
   } else {
     count = await SupportTicket.countDocuments({ userId: req.user._id, unreadByUser: true });
   }
@@ -344,14 +341,9 @@ const updateStatus = asyncHandler(async (req, res) => {
   }
 
   const role = userRole(req.user);
-  if (role === 'partner') {
-    if (!idsMatch(ticket.assignedTo, req.user._id)) {
-      res.status(403);
-      throw new Error('Not authorized');
-    }
-  } else if (role !== 'admin') {
+  if (role !== 'admin' && role !== 'partner') {
     res.status(403);
-    throw new Error('Admin access required');
+    throw new Error('Admin or Partner access required');
   }
 
   ticket.status = status;
