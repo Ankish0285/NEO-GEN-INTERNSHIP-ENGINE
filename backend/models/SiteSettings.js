@@ -48,6 +48,7 @@ const siteSettingsSchema = new mongoose.Schema(
     },
     hero: {
       backgroundImage: { type: String, default: '' },
+      backgroundImages: { type: [String], default: [] },
       titleBefore: { type: String, default: '' },
       titleHighlight1: { type: String, default: 'NEO' },
       titleHighlight2: { type: String, default: 'GEN' },

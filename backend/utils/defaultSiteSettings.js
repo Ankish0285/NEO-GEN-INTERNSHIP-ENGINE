@@ -13,6 +13,7 @@ const defaultSiteSettings = {
   },
   hero: {
     backgroundImage: DEFAULT_HERO_IMAGE,
+    backgroundImages: [DEFAULT_HERO_IMAGE],
     titleBefore: 'Launch Your Career with',
     titleHighlight1: 'NEO',
     titleHighlight2: 'GEN',

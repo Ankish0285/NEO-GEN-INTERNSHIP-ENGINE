@@ -12,6 +12,7 @@ export const defaultSiteSettings = {
   },
   hero: {
     backgroundImage: DEFAULT_HERO_IMAGE,
+    backgroundImages: [DEFAULT_HERO_IMAGE],
     titleBefore: 'Launch Your Career with',
     titleHighlight1: 'NEO',
     titleHighlight2: 'GEN',
@@ -119,7 +120,19 @@ export function mergeSiteSettings(remote) {
   const policies = remote.policies || {};
   return {
     branding: { ...defaultSiteSettings.branding, ...(remote.branding || {}) },
-    hero: { ...defaultSiteSettings.hero, ...(remote.hero || {}) },
+    hero: {
+      ...defaultSiteSettings.hero,
+      ...(remote.hero || {}),
+      backgroundImages: Array.isArray(remote.hero?.backgroundImages)
+        ? remote.hero.backgroundImages.length > 0
+          ? remote.hero.backgroundImages
+          : remote.hero?.backgroundImage
+          ? [remote.hero.backgroundImage]
+          : defaultSiteSettings.hero.backgroundImages
+        : remote.hero?.backgroundImage
+        ? [remote.hero.backgroundImage]
+        : defaultSiteSettings.hero.backgroundImages,
+    },
     about: {
       ...defaultSiteSettings.about,
       ...(remote.about || {}),

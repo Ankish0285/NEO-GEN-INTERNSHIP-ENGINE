@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Save, Upload, Globe, Image, FileText, Mail, Share2, Scale, Users, Plus, Trash2 } from 'lucide-react';
@@ -56,6 +56,10 @@ const WebsiteCMS = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [showAddPanel, setShowAddPanel] = useState(false);
+  const addUrlInputRef = React.useRef(null);
+  const addFileInputRef = React.useRef(null);
 
   useEffect(() => {
     if (!loading && !dirty) {
@@ -87,7 +91,7 @@ const WebsiteCMS = () => {
     setDraft((prev) => {
       const sectionData = prev[section] || {};
       const arr = [...(sectionData[arrayKey] || [])];
-      arr[index] = { ...arr[index], [key]: value };
+      arr[index] = key === null ? value : { ...arr[index], [key]: value };
       return { ...prev, [section]: { ...sectionData, [arrayKey]: arr } };
     });
   };
@@ -96,7 +100,26 @@ const WebsiteCMS = () => {
     setDirty(true);
     setDraft((prev) => {
       const sectionData = prev[section] || {};
-      const arr = [...(sectionData[arrayKey] || []), item];
+      const baseImages = Array.isArray(sectionData[arrayKey])
+        ? sectionData[arrayKey]
+        : section === 'hero' && arrayKey === 'backgroundImages' && sectionData.backgroundImage
+        ? [sectionData.backgroundImage]
+        : [];
+      const arr = [...baseImages, item];
+      return { ...prev, [section]: { ...sectionData, [arrayKey]: arr } };
+    });
+  };
+
+  const addArrayItemAtStart = (section, arrayKey, item) => {
+    setDirty(true);
+    setDraft((prev) => {
+      const sectionData = prev[section] || {};
+      const baseImages = Array.isArray(sectionData[arrayKey])
+        ? sectionData[arrayKey]
+        : section === 'hero' && arrayKey === 'backgroundImages' && sectionData.backgroundImage
+        ? [sectionData.backgroundImage]
+        : [];
+      const arr = [item, ...baseImages];
       return { ...prev, [section]: { ...sectionData, [arrayKey]: arr } };
     });
   };
@@ -150,11 +173,21 @@ const WebsiteCMS = () => {
     }
   };
 
+  const heroImages = useMemo(() => {
+    const images = Array.isArray(draft.hero?.backgroundImages)
+      ? [...draft.hero.backgroundImages]
+      : [];
+    if (draft.hero?.backgroundImage && !images.includes(draft.hero.backgroundImage)) {
+      images.unshift(draft.hero.backgroundImage);
+    }
+    return images.filter((img) => !!img);
+  }, [draft.hero?.backgroundImages, draft.hero?.backgroundImage]);
+
   const logoPreview = draft.branding?.logoUrl
     ? resolveStoryImageUrl(draft.branding.logoUrl) || draft.branding.logoUrl
     : null;
-  const heroPreview = draft.hero?.backgroundImage
-    ? resolveStoryImageUrl(draft.hero.backgroundImage) || draft.hero.backgroundImage
+  const heroPreview = heroImages[0]
+    ? resolveStoryImageUrl(heroImages[0]) || heroImages[0]
     : null;
 
   if (!authLoading && user?.role !== 'admin') {
@@ -240,11 +273,101 @@ const WebsiteCMS = () => {
 
         {activeTab === 'hero' && (
           <div className="grid gap-6 max-w-2xl">
-            <Field label="Background image">
+            <Field label="Hero background images">
               {heroPreview && (
                 <img src={heroPreview} alt="Hero" className="w-full max-h-40 object-cover rounded-lg mb-2" />
               )}
-              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 mb-2">
+              <p className="text-sm text-gray-500 mb-3">
+                {heroImages.length > 0
+                  ? `${heroImages.length} image${heroImages.length === 1 ? '' : 's'} added`
+                  : 'No hero images added yet.'}
+              </p>
+              {heroImages.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto mb-3">
+                  {heroImages.map((imageUrl, index) => (
+                    <img
+                      key={index}
+                      src={resolveStoryImageUrl(imageUrl) || imageUrl}
+                      alt={`Hero slide ${index + 1}`}
+                      className="h-20 w-32 rounded-lg object-cover border"
+                    />
+                  ))}
+                </div>
+              )}
+              {heroImages.map((imageUrl, index) => (
+                <div key={index} className="grid grid-cols-[1fr_auto] gap-3 items-center mb-3">
+                  <TextInput
+                    value={imageUrl}
+                    onChange={(v) => patchArrayItem('hero', 'backgroundImages', index, null, v)}
+                    placeholder={`Hero image ${index + 1} URL`}
+                  />
+                  <button
+                    type="button"
+                    className="admin-btn-ghost text-sm px-3 py-2"
+                    onClick={() => removeArrayItem('hero', 'backgroundImages', index)}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddPanel((s) => {
+                      const next = !s;
+                      if (!s) {
+                        setTimeout(() => addUrlInputRef.current?.focus(), 60);
+                      }
+                      return next;
+                    });
+                  }}
+                  className="admin-btn-primary"
+                >
+                  {showAddPanel ? 'Close' : 'Add image'}
+                </button>
+              </div>
+
+              {showAddPanel && (
+                <div className="mt-3 space-y-3">
+                  <div className="flex gap-3">
+                    <TextInput
+                      ref={addUrlInputRef}
+                      value={heroImageUrl}
+                      onChange={(v) => setHeroImageUrl(v)}
+                      placeholder="Paste image URL to add"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const trimmed = heroImageUrl.trim();
+                        if (!trimmed) return;
+                        addArrayItemAtStart('hero', 'backgroundImages', trimmed);
+                        setHeroImageUrl('');
+                        setShowAddPanel(false);
+                      }}
+                      className="admin-btn-primary"
+                    >
+                      Add image
+                    </button>
+                  </div>
+                  <div>
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">
+                      <Upload size={16} />
+                      Upload image
+                      <input
+                        ref={addFileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploading}
+                        onChange={(e) => handleUpload(e, (url) => { addArrayItemAtStart('hero', 'backgroundImages', url); setShowAddPanel(false); })}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 mt-3">
                 <Upload size={16} />
                 Upload hero image
                 <input
@@ -252,14 +375,9 @@ const WebsiteCMS = () => {
                   accept="image/*"
                   className="hidden"
                   disabled={uploading}
-                  onChange={(e) => handleUpload(e, (url) => patch('hero', 'backgroundImage', url))}
+                  onChange={(e) => handleUpload(e, (url) => addArrayItem('hero', 'backgroundImages', url))}
                 />
               </label>
-              <TextInput
-                value={draft.hero.backgroundImage}
-                onChange={(v) => patch('hero', 'backgroundImage', v)}
-                placeholder="Image URL"
-              />
             </Field>
             <Field label="Title (before highlights)">
               <TextInput value={draft.hero.titleBefore} onChange={(v) => patch('hero', 'titleBefore', v)} />

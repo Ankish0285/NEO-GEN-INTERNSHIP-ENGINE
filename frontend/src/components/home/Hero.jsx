@@ -13,9 +13,28 @@ const Hero = () => {
   const { settings } = useSiteSettings();
   const canPostInternship = user?.role === 'admin' || user?.role === 'partner';
   const { branding, hero } = settings;
-  const bg =
-    resolveStoryImageUrl(hero.backgroundImage) || hero.backgroundImage || DEFAULT_HERO_IMAGE;
+  const heroImages = Array.isArray(hero.backgroundImages) && hero.backgroundImages.length
+    ? hero.backgroundImages
+    : hero.backgroundImage
+    ? [hero.backgroundImage]
+    : [DEFAULT_HERO_IMAGE];
+  const [activeImageIndex, setActiveImageIndex] = React.useState(0);
   const overlay = hero.overlayOpacity ?? 0.72;
+
+  React.useEffect(() => {
+    if (heroImages.length <= 1) {
+      setActiveImageIndex(0);
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      setActiveImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
+  const bg = resolveStoryImageUrl(heroImages[activeImageIndex]) || heroImages[activeImageIndex];
 
   return (
     <section className="neo-hero" id="hero-section">
