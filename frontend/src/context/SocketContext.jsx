@@ -35,7 +35,7 @@ export const SocketProvider = ({ children }) => {
 
     // Listen for personal notifications if authenticated
     if (isAuthenticated && user?._id) {
-      socket.emit('joinUser', user._id);
+      socket.emit('joinUser', user._id || user.id);
 
       socket.on('ai:analysis:complete', (payload) => {
         toast.success(`AI analysis complete — ATS ${payload?.atsScore ?? ''}%`);
@@ -55,10 +55,16 @@ export const SocketProvider = ({ children }) => {
         window.dispatchEvent(new CustomEvent('refreshNotifications'));
       });
 
+      socket.on('ticket:updated', () => {
+        window.dispatchEvent(new CustomEvent('refreshSupportUnread'));
+        window.dispatchEvent(new CustomEvent('refreshNotifications'));
+      });
+
       return () => {
         socket.off('ai:analysis:complete');
         socket.off('ai:recommendations:updated');
         socket.off(personalEvent);
+        socket.off('ticket:updated');
       };
     }
 

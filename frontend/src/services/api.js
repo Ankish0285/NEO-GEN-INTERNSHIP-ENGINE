@@ -41,6 +41,7 @@ export const api = {
   get: (url, config) => axiosInstance.get(url, config),
   post: (url, body, config) => axiosInstance.post(url, body, config),
   put: (url, body, config) => axiosInstance.put(url, body, config),
+  patch: (url, body, config) => axiosInstance.patch(url, body, config),
   delete: (url, config) => axiosInstance.delete(url, config),
   upload: (url, formData, config = {}) => axiosInstance.post(url, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },

@@ -42,6 +42,8 @@ import PartnerPostInternship from '../components/dashboard/partner/PostInternshi
 import PartnerApplications from '../components/dashboard/partner/Applications';
 import PartnerAnalytics from '../components/dashboard/partner/Analytics';
 import PartnerSettings from '../components/dashboard/partner/Settings';
+import StudentSupport from '../components/dashboard/support/StudentSupport';
+import SupportInbox from '../components/dashboard/support/SupportInbox';
 
 const AppRoutes = () => {
   return (
@@ -66,6 +68,7 @@ const AppRoutes = () => {
         <Route path="analytics" element={<StudentAnalytics />} />
         <Route path="settings" element={<StudentSettings />} />
         <Route path="success-stories" element={<SuccessStories />} />
+        <Route path="support" element={<StudentSupport />} />
       </Route>
 
       {/* Admin Routes */}
@@ -79,6 +82,7 @@ const AppRoutes = () => {
         <Route path="success-stories" element={<AdminSuccessStories />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="support-inbox" element={<SupportInbox mode="admin" />} />
       </Route>
 
       {/* Partner Routes */}
@@ -89,6 +93,7 @@ const AppRoutes = () => {
         <Route path="applications" element={<PartnerApplications />} />
         <Route path="analytics" element={<PartnerAnalytics />} />
         <Route path="settings" element={<PartnerSettings />} />
+        <Route path="support-inbox" element={<SupportInbox mode="partner" />} />
       </Route>
 
       {/* Catch all */}

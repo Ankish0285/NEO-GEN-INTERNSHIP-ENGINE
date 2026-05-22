@@ -55,6 +55,10 @@ io.on('connection', (socket) => {
     if (userId) socket.join(`user:${userId}`);
   });
 
+  socket.on('joinTicket', (ticketId) => {
+    if (ticketId) socket.join(`ticket:${ticketId}`);
+  });
+
   socket.on('sendMessage', (data) => {
     io.to(data.roomId).emit('newMessage', data);
   });
@@ -90,6 +94,8 @@ app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/stories', require('./routes/successStoryRoutes'));
 app.use('/api/site-settings', require('./routes/siteSettingsRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
+app.use('/api/support-tickets', require('./routes/supportTicketRoutes'));
+console.log('[Routes] Support tickets API → /api/support-tickets'.cyan);
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

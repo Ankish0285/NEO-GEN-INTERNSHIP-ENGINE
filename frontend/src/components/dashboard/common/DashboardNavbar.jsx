@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, Bell, User, LogOut, Settings, ChevronDown, Search } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
@@ -7,10 +7,27 @@ import NotificationDropdown from './NotificationDropdown';
 import { resolveStoryImageUrl } from '../../../utils/resolveStoryImageUrl';
 import { roleConfig } from '../../../utils/roleConfig';
 import DashboardBrand from './DashboardBrand';
+import SupportTicketService from '../../../services/supportTicketService';
 
 const DashboardNavbar = ({ onMenuClick, user }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [supportUnread, setSupportUnread] = useState(0);
+
+  const fetchSupportUnread = useCallback(async () => {
+    try {
+      const res = await SupportTicketService.getUnreadCount();
+      setSupportUnread(res.count || 0);
+    } catch {
+      setSupportUnread(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSupportUnread();
+    window.addEventListener('refreshSupportUnread', fetchSupportUnread);
+    return () => window.removeEventListener('refreshSupportUnread', fetchSupportUnread);
+  }, [fetchSupportUnread]);
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,6 +56,8 @@ const DashboardNavbar = ({ onMenuClick, user }) => {
     if (path.includes('applications')) return 'Applications';
     if (path.includes('success-stories')) return 'Success Stories';
     if (path.includes('analytics')) return 'Analytics';
+    if (path.includes('support-inbox')) return 'Support Inbox';
+    if (path.includes('support')) return 'Contact Support';
     if (path.includes('settings')) return 'Settings';
     if (path.includes('profile')) return 'Profile';
     if (path.endsWith('/dashboard') || path.endsWith('/dashboard/')) return 'Overview';
@@ -99,6 +118,11 @@ const DashboardNavbar = ({ onMenuClick, user }) => {
             >
               <Bell size={20} />
               <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#FF9933] ring-2 ring-white" />
+              {supportUnread > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white">
+                  {supportUnread > 9 ? '9+' : supportUnread}
+                </span>
+              )}
             </button>
             <NotificationDropdown
               isOpen={isNotificationsOpen}

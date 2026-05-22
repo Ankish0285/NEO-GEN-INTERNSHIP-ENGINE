@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, LogOut } from 'lucide-react';
 import { clsx } from 'clsx';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { roleConfig } from '../../../utils/roleConfig';
 import DashboardBrand from './DashboardBrand';
+import SupportTicketService from '../../../services/supportTicketService';
 
 const Sidebar = ({ isOpen, onClose, role = 'student' }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [supportUnread, setSupportUnread] = useState(0);
+
+  const fetchSupportUnread = useCallback(async () => {
+    try {
+      const res = await SupportTicketService.getUnreadCount();
+      setSupportUnread(res.count || 0);
+    } catch {
+      setSupportUnread(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSupportUnread();
+    const handler = () => fetchSupportUnread();
+    window.addEventListener('refreshSupportUnread', handler);
+    return () => window.removeEventListener('refreshSupportUnread', handler);
+  }, [fetchSupportUnread, role]);
 
   const config = roleConfig[role] || roleConfig.student;
   const menuItems = config.menuItems;
@@ -53,7 +71,12 @@ const Sidebar = ({ isOpen, onClose, role = 'student' }) => {
               }
             >
               <Icon size={20} className="shrink-0" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.supportMenu && supportUnread > 0 && (
+                <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#FF9933] text-white text-[10px] font-bold flex items-center justify-center">
+                  {supportUnread > 99 ? '99+' : supportUnread}
+                </span>
+              )}
             </NavLink>
           );
         })}

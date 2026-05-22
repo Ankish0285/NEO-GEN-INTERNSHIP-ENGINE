@@ -10,7 +10,9 @@ import {
     PlusCircle,
     Star,
     Globe2,
-    Brain
+    Brain,
+    Headphones,
+    LifeBuoy
 } from 'lucide-react';
 
 export const roleConfig = {
@@ -27,6 +29,7 @@ export const roleConfig = {
             { path: '/dashboard/ats-resume', label: 'ATS Resume', icon: FileText },
             { path: '/dashboard/ai-intelligence', label: 'AI Intelligence', icon: Brain },
             { path: '/dashboard/applications', label: 'Applications', icon: Briefcase },
+            { path: '/dashboard/support', label: 'Contact Support', icon: LifeBuoy, supportMenu: true },
             { path: '/dashboard/recommendations', label: 'Recommendations', icon: ThumbsUp },
             { path: '/dashboard/success-stories', label: 'Success Stories', icon: Star },
             { path: '/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
@@ -47,6 +50,7 @@ export const roleConfig = {
             { path: '/admin/dashboard/users', label: 'Users', icon: Users },
             { path: '/admin/dashboard/internships', label: 'Internships', icon: Briefcase },
             { path: '/admin/dashboard/applications', label: 'Applications', icon: FileText },
+            { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
@@ -64,6 +68,7 @@ export const roleConfig = {
             { path: '/partner/dashboard/profile', label: 'Profile', icon: User },
             { path: '/partner/dashboard/post-internship', label: 'Post Internship', icon: PlusCircle },
             { path: '/partner/dashboard/applications', label: 'Applications', icon: Briefcase },
+            { path: '/partner/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/partner/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/partner/dashboard/settings', label: 'Settings', icon: Settings },
         ]
