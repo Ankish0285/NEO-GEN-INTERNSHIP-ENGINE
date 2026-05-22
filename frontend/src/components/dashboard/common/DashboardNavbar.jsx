@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from './NotificationDropdown';
 import { resolveStoryImageUrl } from '../../../utils/resolveStoryImageUrl';
 import { roleConfig } from '../../../utils/roleConfig';
+import DashboardBrand from './DashboardBrand';
 
 const DashboardNavbar = ({ onMenuClick, user }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -74,7 +75,9 @@ const DashboardNavbar = ({ onMenuClick, user }) => {
             <span className="neo-topbar__badge">{panelConfig.panelBadge}</span>
             <h1 className="neo-topbar__title">{getSectionTitle()}</h1>
           </div>
-          <span className="md:hidden font-bold text-lg text-[#111827]">NeoGen</span>
+          <div className="md:hidden min-w-0 max-w-[200px]">
+            <DashboardBrand variant="compact" showSubtitle={false} />
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

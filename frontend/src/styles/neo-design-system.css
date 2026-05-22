@@ -473,18 +473,30 @@ body {
   border-bottom: 1px solid rgba(17, 24, 39, 0.06);
 }
 
-.neo-sidebar__logo {
-  width: 44px;
-  height: 44px;
+.neo-dash-brand__logo {
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--neo-saffron), #ffb347);
-  color: white;
-  font-weight: 800;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px rgba(255, 153, 51, 0.3);
+  object-fit: contain;
+  background: #fff;
+  padding: 4px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: 0 4px 16px rgba(255, 153, 51, 0.18);
+}
+
+.neo-dash-brand__subtitle {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--neo-gray-500, #6b7280);
+}
+
+.neo-dash-brand-link {
+  display: block;
+  min-width: 0;
+}
+
+.neo-dash-brand--compact .neo-dash-brand__subtitle {
+  display: none;
 }
 
 .neo-dash-nav-link {

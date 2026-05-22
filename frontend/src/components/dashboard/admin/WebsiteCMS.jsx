@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Save, Upload, Globe, Image, FileText, Mail, Share2, Scale } from 'lucide-react';
+import { Save, Upload, Globe, Image, FileText, Mail, Share2, Scale, Users, Plus, Trash2 } from 'lucide-react';
 import Card from '../../ui/Card';
 import SiteSettingsService from '../../../services/siteSettingsService';
+import { useAuth } from '../../../context/AuthContext';
 import { useSiteSettings } from '../../../context/SiteSettingsContext';
 import { resolveStoryImageUrl } from '../../../utils/resolveStoryImageUrl';
 import { mergeSiteSettings, buildSiteSettingsPayload } from '../../../utils/defaultSiteSettings';
@@ -16,6 +18,7 @@ const TABS = [
   { id: 'footer', label: 'Footer & Social', icon: Share2 },
   { id: 'resources', label: 'Resources', icon: FileText },
   { id: 'policies', label: 'Policies', icon: Scale },
+  { id: 'team', label: 'Built By', icon: Users },
 ];
 
 const Field = ({ label, children, hint }) => (
@@ -46,6 +49,7 @@ const TextArea = ({ value, onChange, rows = 3, ...props }) => (
 );
 
 const WebsiteCMS = () => {
+  const { user, loading: authLoading } = useAuth();
   const { settings, loading, applySettings, refresh } = useSiteSettings();
   const [draft, setDraft] = useState(() => mergeSiteSettings(null));
   const [activeTab, setActiveTab] = useState('branding');
@@ -88,6 +92,24 @@ const WebsiteCMS = () => {
     });
   };
 
+  const addArrayItem = (section, arrayKey, item) => {
+    setDirty(true);
+    setDraft((prev) => {
+      const sectionData = prev[section] || {};
+      const arr = [...(sectionData[arrayKey] || []), item];
+      return { ...prev, [section]: { ...sectionData, [arrayKey]: arr } };
+    });
+  };
+
+  const removeArrayItem = (section, arrayKey, index) => {
+    setDirty(true);
+    setDraft((prev) => {
+      const sectionData = prev[section] || {};
+      const arr = (sectionData[arrayKey] || []).filter((_, i) => i !== index);
+      return { ...prev, [section]: { ...sectionData, [arrayKey]: arr } };
+    });
+  };
+
   const handleUpload = async (e, onUrl) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -113,7 +135,7 @@ const WebsiteCMS = () => {
       setDraft(JSON.parse(JSON.stringify(merged)));
       setDirty(false);
       await refresh();
-      toast.success('Website updated — changes are live');
+      toast.success('Website updated — scroll to the bottom of the home page to see Built By');
     } catch (err) {
       const msg = err.data?.message || err.message || 'Failed to save';
       if (err.status === 404 || String(msg).includes('404')) {
@@ -134,6 +156,10 @@ const WebsiteCMS = () => {
   const heroPreview = draft.hero?.backgroundImage
     ? resolveStoryImageUrl(draft.hero.backgroundImage) || draft.hero.backgroundImage
     : null;
+
+  if (!authLoading && user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <div className="space-y-8">
@@ -355,6 +381,115 @@ const WebsiteCMS = () => {
             <Field label="Title"><TextInput value={draft.resources.title} onChange={(v) => patch('resources', 'title', v)} /></Field>
             <Field label="Subtitle"><TextArea value={draft.resources.subtitle} onChange={(v) => patch('resources', 'subtitle', v)} /></Field>
             <Field label="CTA button text"><TextInput value={draft.resources.ctaText} onChange={(v) => patch('resources', 'ctaText', v)} /></Field>
+          </div>
+        )}
+
+        {activeTab === 'team' && (
+          <div className="grid gap-6 max-w-3xl">
+            <Field label="Section title">
+              <TextInput value={draft.team?.title} onChange={(v) => patch('team', 'title', v)} />
+            </Field>
+            <Field label="Section subtitle">
+              <TextArea value={draft.team?.subtitle} onChange={(v) => patch('team', 'subtitle', v)} rows={2} />
+            </Field>
+
+            <p className="admin-hint">
+              Only Super Admin can edit this section. After saving, open the home page and scroll past Policies to see it.
+            </p>
+            <div className="flex items-center justify-between pt-2 border-t">
+              <h3 className="font-semibold text-gray-800">Team members</h3>
+              <button
+                type="button"
+                className="admin-btn-ghost inline-flex items-center gap-2 text-sm"
+                onClick={() =>
+                  addArrayItem('team', 'members', {
+                    name: '',
+                    position: '',
+                    note: '',
+                    photoUrl: '',
+                  })
+                }
+              >
+                <Plus size={16} />
+                Add member
+              </button>
+            </div>
+
+            {(draft.team?.members || []).length === 0 && (
+              <p className="admin-hint">No members yet. Click &quot;Add member&quot; to show who built the platform on the home page.</p>
+            )}
+
+            {(draft.team?.members || []).map((member, i) => {
+              const photoPreview = member.photoUrl
+                ? resolveStoryImageUrl(member.photoUrl) || member.photoUrl
+                : null;
+              return (
+                <div key={i} className="admin-form-section space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold text-gray-500">Member {i + 1}</p>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+                      onClick={() => removeArrayItem('team', 'members', i)}
+                    >
+                      <Trash2 size={14} />
+                      Remove
+                    </button>
+                  </div>
+                  <Field label="Photo">
+                    <div className="flex items-center gap-4">
+                      {photoPreview && (
+                        <img
+                          src={photoPreview}
+                          alt={member.name || 'Member'}
+                          className="w-16 h-16 rounded-full object-cover border"
+                        />
+                      )}
+                      <label className="admin-btn-ghost cursor-pointer inline-flex items-center gap-2">
+                        <Upload size={16} />
+                        {uploading ? 'Uploading...' : 'Upload photo'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          disabled={uploading}
+                          onChange={(e) =>
+                            handleUpload(e, (url) => patchArrayItem('team', 'members', i, 'photoUrl', url))
+                          }
+                        />
+                      </label>
+                    </div>
+                    <TextInput
+                      value={member.photoUrl}
+                      onChange={(v) => patchArrayItem('team', 'members', i, 'photoUrl', v)}
+                      placeholder="Or paste image URL"
+                    />
+                  </Field>
+                  <Field label="Name">
+                    <TextInput
+                      value={member.name}
+                      onChange={(v) => patchArrayItem('team', 'members', i, 'name', v)}
+                      placeholder="e.g. Ankish Kumar"
+                    />
+                  </Field>
+                  <Field label="Position / role">
+                    <TextInput
+                      value={member.position}
+                      onChange={(v) => patchArrayItem('team', 'members', i, 'position', v)}
+                      placeholder="e.g. Full Stack Developer"
+                    />
+                  </Field>
+                  <Field label="Short note">
+                    <TextArea
+                      value={member.note}
+                      onChange={(v) => patchArrayItem('team', 'members', i, 'note', v)}
+                      rows={2}
+                      placeholder="A brief line about their contribution"
+                    />
+                  </Field>
+                </div>
+              );
+            })}
           </div>
         )}
 

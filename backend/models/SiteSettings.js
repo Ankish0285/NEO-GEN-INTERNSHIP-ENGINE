@@ -25,6 +25,16 @@ const stepSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const teamMemberSchema = new mongoose.Schema(
+  {
+    name: { type: String, default: '' },
+    position: { type: String, default: '' },
+    note: { type: String, default: '' },
+    photoUrl: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
 const siteSettingsSchema = new mongoose.Schema(
   {
     key: { type: String, default: 'main', unique: true },
@@ -92,6 +102,11 @@ const siteSettingsSchema = new mongoose.Schema(
       privacy: { type: textBlockSchema, default: () => ({}) },
       terms: { type: textBlockSchema, default: () => ({}) },
       cookies: { type: textBlockSchema, default: () => ({}) },
+    },
+    team: {
+      title: { type: String, default: 'Built By' },
+      subtitle: { type: String, default: 'The people who brought NEO GEN to life' },
+      members: { type: [teamMemberSchema], default: [] },
     },
   },
   { timestamps: true }

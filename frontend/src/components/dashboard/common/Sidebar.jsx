@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { roleConfig } from '../../../utils/roleConfig';
+import DashboardBrand from './DashboardBrand';
 
 const Sidebar = ({ isOpen, onClose, role = 'student' }) => {
   const { logout } = useAuth();
@@ -20,14 +21,8 @@ const Sidebar = ({ isOpen, onClose, role = 'student' }) => {
     <div className="neo-sidebar flex flex-col h-full">
       <div className="neo-sidebar__brand">
         <div className="flex items-start justify-between">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-3">
-              <div className="neo-sidebar__logo">N</div>
-              <span className="text-xl font-extrabold tracking-tight text-[#111827]">
-                Neo<span className="neo-brand-saffron">G</span>
-                <span className="neo-brand-green">en</span>
-              </span>
-            </div>
+          <div className="flex flex-col gap-2 min-w-0">
+            <DashboardBrand variant="sidebar" showSubtitle />
             <span className="neo-topbar__badge w-fit">{config.panelBadge}</span>
           </div>
           <button

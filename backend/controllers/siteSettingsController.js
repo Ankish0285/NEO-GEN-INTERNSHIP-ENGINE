@@ -16,6 +16,7 @@ const SECTION_KEYS = [
   'social',
   'resources',
   'policies',
+  'team',
 ];
 
 function isCloudinaryConfigured() {
@@ -67,9 +68,30 @@ async function getOrCreateSettings() {
   return doc;
 }
 
+function normalizeTeamSection(raw) {
+  const base = defaultSiteSettings.team;
+  if (!raw || typeof raw !== 'object') {
+    return { title: base.title, subtitle: base.subtitle, members: [] };
+  }
+  const members = Array.isArray(raw.members)
+    ? raw.members.map((m) => ({
+        name: String(m?.name ?? '').trim(),
+        position: String(m?.position ?? '').trim(),
+        note: String(m?.note ?? '').trim(),
+        photoUrl: String(m?.photoUrl ?? '').trim(),
+      }))
+    : [];
+  return {
+    title: String(raw.title ?? base.title).trim() || base.title,
+    subtitle: String(raw.subtitle ?? base.subtitle).trim() || base.subtitle,
+    members,
+  };
+}
+
 function toPublicPayload(doc) {
   const obj = doc.toObject ? doc.toObject() : doc;
   delete obj.__v;
+  obj.team = normalizeTeamSection(obj.team);
   return obj;
 }
 
@@ -99,6 +121,14 @@ const updateSiteSettings = asyncHandler(async (req, res) => {
 
   for (const section of SECTION_KEYS) {
     if (incoming[section] === undefined) continue;
+
+    // Team/builder list must fully replace (not deep-merge) so members persist correctly
+    if (section === 'team') {
+      doc.team = normalizeTeamSection(incoming.team);
+      doc.markModified('team');
+      continue;
+    }
+
     const current = toPlainSection(doc[section]);
     doc[section] = deepMerge(current, incoming[section]);
     doc.markModified(section);
@@ -130,6 +160,11 @@ const updateSiteSettings = asyncHandler(async (req, res) => {
 // @route   POST /api/site-settings/upload
 // @access  Private/Admin
 const uploadSiteAsset = asyncHandler(async (req, res) => {
+  if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error('Forbidden - Super Admin access required');
+  }
+
   if (!req.file) {
     res.status(400);
     throw new Error('Please upload an image file');

@@ -76,6 +76,11 @@ export const defaultSiteSettings = {
     subtitle: 'Download modern, ATS-friendly resume templates for different roles.',
     ctaText: 'Explore Roles',
   },
+  team: {
+    title: 'Built By',
+    subtitle: 'Meet the team behind NEO GEN Internship Engine',
+    members: [],
+  },
   policies: {
     privacy: {
       title: 'Privacy Policy',
@@ -105,6 +110,7 @@ export const SITE_SETTING_SECTIONS = [
   'social',
   'resources',
   'policies',
+  'team',
 ];
 
 export function mergeSiteSettings(remote) {
@@ -132,6 +138,13 @@ export function mergeSiteSettings(remote) {
     footer: { ...defaultSiteSettings.footer, ...(remote.footer || {}) },
     social: { ...defaultSiteSettings.social, ...(remote.social || {}) },
     resources: { ...defaultSiteSettings.resources, ...(remote.resources || {}) },
+    team: {
+      ...defaultSiteSettings.team,
+      ...(remote.team || {}),
+      members: Array.isArray(remote.team?.members)
+        ? remote.team.members
+        : defaultSiteSettings.team.members,
+    },
     policies: {
       privacy: { ...defaultSiteSettings.policies.privacy, ...(policies.privacy || {}) },
       terms: { ...defaultSiteSettings.policies.terms, ...(policies.terms || {}) },

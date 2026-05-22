@@ -2,13 +2,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 import { resolveStoryImageUrl } from '../../utils/resolveStoryImageUrl';
 import { DEFAULT_HERO_IMAGE } from '../../utils/defaultSiteSettings';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { settings } = useSiteSettings();
+  const canPostInternship = user?.role === 'admin' || user?.role === 'partner';
   const { branding, hero } = settings;
   const bg =
     resolveStoryImageUrl(hero.backgroundImage) || hero.backgroundImage || DEFAULT_HERO_IMAGE;
@@ -72,13 +75,21 @@ const Hero = () => {
               {hero.primaryButtonText}
               <ArrowRight size={18} />
             </button>
-            <button
-              type="button"
-              className="neo-btn neo-btn-success"
-              onClick={() => navigate('/login')}
-            >
-              {hero.secondaryButtonText}
-            </button>
+            {canPostInternship && (
+              <button
+                type="button"
+                className="neo-btn neo-btn-success"
+                onClick={() =>
+                  navigate(
+                    user.role === 'admin'
+                      ? '/admin/dashboard/internships'
+                      : '/partner/dashboard/post-internship'
+                  )
+                }
+              >
+                {hero.secondaryButtonText}
+              </button>
+            )}
           </div>
         </motion.div>
       </div>

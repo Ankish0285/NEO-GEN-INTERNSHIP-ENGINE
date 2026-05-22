@@ -9,6 +9,7 @@ import Reviews from '../components/home/Reviews';
 import Resources from '../components/home/Resources';
 import Contact from '../components/home/Contact';
 import Policies from '../components/home/Policies';
+import BuiltBy from '../components/home/BuiltBy';
 import LandingCTA from '../components/home/LandingCTA';
 import Footer from '../components/Footer';
 
@@ -26,6 +27,7 @@ const Home = () => {
       <LandingCTA />
       <Contact />
       <Policies />
+      <BuiltBy />
       <Footer />
     </div>
   );

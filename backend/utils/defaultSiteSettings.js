@@ -78,6 +78,11 @@ const defaultSiteSettings = {
     subtitle: 'Download modern, ATS-friendly resume templates for different roles.',
     ctaText: 'Explore Roles',
   },
+  team: {
+    title: 'Built By',
+    subtitle: 'Meet the team behind NEO GEN Internship Engine',
+    members: [],
+  },
   policies: {
     privacy: {
       title: 'Privacy Policy',
