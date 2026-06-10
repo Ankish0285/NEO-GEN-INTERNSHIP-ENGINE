@@ -299,6 +299,44 @@ const generateSuggestions = (scoreData) => {
 };
 
 /**
+ * Extract name from resume text
+ * @param {string} text - Parsed resume text
+ * @returns {string} Extracted name
+ */
+const extractNameFromText = (text) => {
+    const lines = text.split('\n').filter(line => line.trim().length > 0);
+    const firstFewLines = lines.slice(0, 5); // Check first 5 lines for name
+
+    for (const line of firstFewLines) {
+        const trimmed = line.trim();
+        // Check if line looks like a name (2-4 words, starts with capital, not email/phone/link)
+        if (
+            trimmed.length > 3 && 
+            trimmed.length < 50 &&
+            !trimmed.includes('@') && 
+            !trimmed.match(/\d{3,}/) && 
+            !trimmed.toLowerCase().includes('linkedin') &&
+            !trimmed.toLowerCase().includes('github') &&
+            !trimmed.toLowerCase().includes('phone') &&
+            !trimmed.toLowerCase().includes('email') &&
+            !trimmed.toLowerCase().includes('address') &&
+            !trimmed.toLowerCase().includes('resume')
+        ) {
+            // Check for capitalization pattern (common in names)
+            const words = trimmed.split(/\s+/);
+            if (words.length >= 2 && words.length <= 4) {
+                const allStartWithCapital = words.every(word => word.length >= 2 && word[0] === word[0].toUpperCase());
+                const hasCapWords = trimmed.match(/[A-Z][a-z]+/g)?.length >= 2;
+                if (allStartWithCapital || hasCapWords) {
+                    return trimmed;
+                }
+            }
+        }
+    }
+    return '';
+};
+
+/**
  * Extract key information from resume
  * @param {string} text - Parsed resume text
  * @returns {Object} Extracted information
@@ -341,6 +379,7 @@ const extractResumeInfo = (text) => {
         phone: phoneMatch ? phoneMatch[0] : null,
         linkedin: linkedinMatch ? linkedinMatch[0] : null,
         github: githubMatch ? githubMatch[0] : null,
+        name: extractNameFromText(text),
         firstLine: lines[0] || '',
         lines: lines.slice(0, 10) // First 10 lines might contain name and summary
     };

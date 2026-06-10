@@ -96,6 +96,18 @@ const uploadResume = asyncHandler(async (req, res) => {
     }
 
     const resumeInfo = extractResumeInfo(parsedText);
+    
+    // Check if this might be someone else's resume, but don't block upload - just log it
+    const user = await User.findById(req.user.id).select('name email');
+    
+    // Log resume info for debugging
+    console.log('Resume upload info:', {
+        userName: user.name,
+        userEmail: user.email,
+        resumeName: resumeInfo.name,
+        resumeEmail: resumeInfo.email
+    });
+
     if (resumeInfo.skills?.length) {
       await User.findByIdAndUpdate(req.user.id, {
         $addToSet: { skills: { $each: resumeInfo.skills } },

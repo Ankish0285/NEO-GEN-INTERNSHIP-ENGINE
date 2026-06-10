@@ -1,0 +1,2036 @@
+[
+  {
+    "id": 774004,
+    "name": "Jennifer Williams",
+    "experience_level": "Experienced",
+    "domain": "Cyber Security",
+    "resume_text": "Jennifer Williams\nEmail: jennifer.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at University of Delhi\n\nSkills:\nSIEM, Penetration Testing, Ethical Hacking, OWASP, Network Security\n\nProjects:\n4 project(s) completed in Cyber Security.\n\nExperience:\n6 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "SIEM",
+      "Penetration Testing",
+      "Ethical Hacking",
+      "OWASP",
+      "Network Security"
+    ],
+    "education": [
+      "B.Tech Computer Science, University of Delhi"
+    ],
+    "projects": 4,
+    "experience_years": 6,
+    "ats_score": 95
+  },
+  {
+    "id": 784187,
+    "name": "Vivaan Iyer",
+    "experience_level": "Fresher",
+    "domain": "Android",
+    "resume_text": "Vivaan Iyer\nEmail: vivaan.iyer@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at NIT Trichy\n\nSkills:\nJava, Android Studio, XML, Kotlin, Firebase\n\nProjects:\n1 project(s) completed in Android.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Java",
+      "Android Studio",
+      "XML",
+      "Kotlin",
+      "Firebase"
+    ],
+    "education": [
+      "B.Sc CS, NIT Trichy"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 65
+  },
+  {
+    "id": 646095,
+    "name": "Michael Nair",
+    "experience_level": "Fresher",
+    "domain": "DevOps",
+    "resume_text": "Michael Nair\nEmail: michael.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at Stanford\n\nSkills:\nLinux, CI/CD, Docker, AWS\n\nProjects:\n2 project(s) completed in DevOps.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "Linux",
+      "CI/CD",
+      "Docker",
+      "AWS"
+    ],
+    "education": [
+      "BBA, Stanford"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 69
+  },
+  {
+    "id": 159535,
+    "name": "William Brown",
+    "experience_level": "Fresher",
+    "domain": "Backend",
+    "resume_text": "William Brown\nEmail: william.brown@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at IIIT Hyderabad\n\nSkills:\nFastAPI, PostgreSQL, MongoDB, Node.js\n\nProjects:\n1 project(s) completed in Backend.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "FastAPI",
+      "PostgreSQL",
+      "MongoDB",
+      "Node.js"
+    ],
+    "education": [
+      "MCA, IIIT Hyderabad"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 65
+  },
+  {
+    "id": 120884,
+    "name": "Jennifer Reddy",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Jennifer Reddy\nEmail: jennifer.reddy@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at University of Delhi\n\nSkills:\nSEO, Analytics, Social Media, Content Marketing\n\nProjects:\n1 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "SEO",
+      "Analytics",
+      "Social Media",
+      "Content Marketing"
+    ],
+    "education": [
+      "MCA, University of Delhi"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 62
+  },
+  {
+    "id": 335781,
+    "name": "Jane Singh",
+    "experience_level": "Fresher",
+    "domain": "Full Stack",
+    "resume_text": "Jane Singh\nEmail: jane.singh@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at NIT Trichy\n\nSkills:\nPython, Node.js, React, HTML\n\nProjects:\n3 project(s) completed in Full Stack.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Looking for a passionate frontend developer with React experience",
+    "skills": [
+      "Python",
+      "Node.js",
+      "React",
+      "HTML"
+    ],
+    "education": [
+      "B.Sc CS, NIT Trichy"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 79
+  },
+  {
+    "id": 754319,
+    "name": "Robert Das",
+    "experience_level": "Experienced",
+    "domain": "Data Science",
+    "resume_text": "Robert Das\nEmail: robert.das@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at MIT\n\nSkills:\nMachine Learning, SQL, Pandas, Statistics, Python, Tableau\n\nProjects:\n5 project(s) completed in Data Science.\n\nExperience:\n4 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Machine Learning",
+      "SQL",
+      "Pandas",
+      "Statistics",
+      "Python",
+      "Tableau"
+    ],
+    "education": [
+      "BBA, MIT"
+    ],
+    "projects": 5,
+    "experience_years": 4,
+    "ats_score": 95
+  },
+  {
+    "id": 999626,
+    "name": "Emily Singh",
+    "experience_level": "Fresher",
+    "domain": "Frontend",
+    "resume_text": "Emily Singh\nEmail: emily.singh@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at BITS Pilani\n\nSkills:\nReact, Next.js, Tailwind CSS, TypeScript, JavaScript\n\nProjects:\n3 project(s) completed in Frontend.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "education": [
+      "M.Tech AI, BITS Pilani"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 72
+  },
+  {
+    "id": 381610,
+    "name": "Aditya Jones",
+    "experience_level": "Fresher",
+    "domain": "Android",
+    "resume_text": "Aditya Jones\nEmail: aditya.jones@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at IIT Bombay\n\nSkills:\nKotlin, XML, Java\n\nProjects:\n1 project(s) completed in Android.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "Kotlin",
+      "XML",
+      "Java"
+    ],
+    "education": [
+      "MBA, IIT Bombay"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 56
+  },
+  {
+    "id": 802144,
+    "name": "John Jones",
+    "experience_level": "Fresher",
+    "domain": "Flutter",
+    "resume_text": "John Jones\nEmail: john.jones@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at IIT Bombay\n\nSkills:\nFirebase, REST APIs, State Management, Flutter\n\nProjects:\n2 project(s) completed in Flutter.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "Firebase",
+      "REST APIs",
+      "State Management",
+      "Flutter"
+    ],
+    "education": [
+      "BBA, IIT Bombay"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 68
+  },
+  {
+    "id": 339920,
+    "name": "David Nair",
+    "experience_level": "Fresher",
+    "domain": "Backend",
+    "resume_text": "David Nair\nEmail: david.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at BITS Pilani\n\nSkills:\nPython, MongoDB, PostgreSQL\n\nProjects:\n3 project(s) completed in Backend.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "Python",
+      "MongoDB",
+      "PostgreSQL"
+    ],
+    "education": [
+      "B.Sc CS, BITS Pilani"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 63
+  },
+  {
+    "id": 969801,
+    "name": "John Smith",
+    "experience_level": "Fresher",
+    "domain": "Backend",
+    "resume_text": "John Smith\nEmail: john.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at IIT Bombay\n\nSkills:\nNode.js, Express, Python, MongoDB\n\nProjects:\n1 project(s) completed in Backend.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Node.js",
+      "Express",
+      "Python",
+      "MongoDB"
+    ],
+    "education": [
+      "B.Tech IT, IIT Bombay"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 73
+  },
+  {
+    "id": 386022,
+    "name": "Jane Iyer",
+    "experience_level": "Fresher",
+    "domain": "Frontend",
+    "resume_text": "Jane Iyer\nEmail: jane.iyer@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at IIT Bombay\n\nSkills:\nJavaScript, CSS\n\nProjects:\n2 project(s) completed in Frontend.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "JavaScript",
+      "CSS"
+    ],
+    "education": [
+      "B.Tech Computer Science, IIT Bombay"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 58
+  },
+  {
+    "id": 260449,
+    "name": "Emily Kumar",
+    "experience_level": "Fresher",
+    "domain": "AI ML",
+    "resume_text": "Emily Kumar\nEmail: emily.kumar@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at IIT Bombay\n\nSkills:\nTensorFlow, Computer Vision\n\nProjects:\n2 project(s) completed in AI ML.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "TensorFlow",
+      "Computer Vision"
+    ],
+    "education": [
+      "B.Tech Computer Science, IIT Bombay"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 61
+  },
+  {
+    "id": 878439,
+    "name": "Vivaan Gupta",
+    "experience_level": "Fresher",
+    "domain": "Android",
+    "resume_text": "Vivaan Gupta\nEmail: vivaan.gupta@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at IIIT Hyderabad\n\nSkills:\nKotlin, Android Studio, Java, XML, Firebase\n\nProjects:\n3 project(s) completed in Android.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Kotlin",
+      "Android Studio",
+      "Java",
+      "XML",
+      "Firebase"
+    ],
+    "education": [
+      "MBA, IIIT Hyderabad"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 77
+  },
+  {
+    "id": 526829,
+    "name": "Amanda Jones",
+    "experience_level": "Experienced",
+    "domain": "Frontend",
+    "resume_text": "Amanda Jones\nEmail: amanda.jones@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at VIT Vellore\n\nSkills:\nReact, Next.js, HTML, JavaScript, CSS, TypeScript, Tailwind CSS\n\nProjects:\n3 project(s) completed in Frontend.\n\nExperience:\n3 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "React",
+      "Next.js",
+      "HTML",
+      "JavaScript",
+      "CSS",
+      "TypeScript",
+      "Tailwind CSS"
+    ],
+    "education": [
+      "BBA, VIT Vellore"
+    ],
+    "projects": 3,
+    "experience_years": 3,
+    "ats_score": 95
+  },
+  {
+    "id": 828270,
+    "name": "Vivaan Smith",
+    "experience_level": "Intermediate",
+    "domain": "Business Analyst",
+    "resume_text": "Vivaan Smith\nEmail: vivaan.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at NIT Trichy\n\nSkills:\nUML, Excel, Requirements Gathering, SQL, Power BI\n\nProjects:\n4 project(s) completed in Business Analyst.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "UML",
+      "Excel",
+      "Requirements Gathering",
+      "SQL",
+      "Power BI"
+    ],
+    "education": [
+      "M.Tech AI, NIT Trichy"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 93
+  },
+  {
+    "id": 633645,
+    "name": "David Nair",
+    "experience_level": "Intermediate",
+    "domain": "AI ML",
+    "resume_text": "David Nair\nEmail: david.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at MIT\n\nSkills:\nTensorFlow, NLP, Python, Computer Vision, scikit-learn\n\nProjects:\n2 project(s) completed in AI ML.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Cloud intern with AWS or Azure exposure required",
+    "skills": [
+      "TensorFlow",
+      "NLP",
+      "Python",
+      "Computer Vision",
+      "scikit-learn"
+    ],
+    "education": [
+      "B.Tech IT, MIT"
+    ],
+    "projects": 2,
+    "experience_years": 1,
+    "ats_score": 84
+  },
+  {
+    "id": 644726,
+    "name": "Sai Gupta",
+    "experience_level": "Experienced",
+    "domain": "Flutter",
+    "resume_text": "Sai Gupta\nEmail: sai.gupta@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at Stanford\n\nSkills:\nREST APIs, Dart, Flutter, State Management, Firebase\n\nProjects:\n3 project(s) completed in Flutter.\n\nExperience:\n3 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "REST APIs",
+      "Dart",
+      "Flutter",
+      "State Management",
+      "Firebase"
+    ],
+    "education": [
+      "MCA, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 3,
+    "ats_score": 95
+  },
+  {
+    "id": 107391,
+    "name": "Vivaan Kumar",
+    "experience_level": "Intermediate",
+    "domain": "Full Stack",
+    "resume_text": "Vivaan Kumar\nEmail: vivaan.kumar@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at NIT Trichy\n\nSkills:\nHTML, MongoDB, PostgreSQL, Python, React\n\nProjects:\n2 project(s) completed in Full Stack.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Cloud intern with AWS or Azure exposure required",
+    "skills": [
+      "HTML",
+      "MongoDB",
+      "PostgreSQL",
+      "Python",
+      "React"
+    ],
+    "education": [
+      "M.Tech AI, NIT Trichy"
+    ],
+    "projects": 2,
+    "experience_years": 2,
+    "ats_score": 86
+  },
+  {
+    "id": 143799,
+    "name": "Jennifer Nair",
+    "experience_level": "Fresher",
+    "domain": "Flutter",
+    "resume_text": "Jennifer Nair\nEmail: jennifer.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at IIIT Hyderabad\n\nSkills:\nState Management, REST APIs\n\nProjects:\n1 project(s) completed in Flutter.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "State Management",
+      "REST APIs"
+    ],
+    "education": [
+      "MBA, IIIT Hyderabad"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 54
+  },
+  {
+    "id": 501218,
+    "name": "Robert Smith",
+    "experience_level": "Experienced",
+    "domain": "Android",
+    "resume_text": "Robert Smith\nEmail: robert.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at IIIT Hyderabad\n\nSkills:\nJava, Firebase, Android Studio, XML, Kotlin\n\nProjects:\n5 project(s) completed in Android.\n\nExperience:\n4 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "Java",
+      "Firebase",
+      "Android Studio",
+      "XML",
+      "Kotlin"
+    ],
+    "education": [
+      "B.Tech IT, IIIT Hyderabad"
+    ],
+    "projects": 5,
+    "experience_years": 4,
+    "ats_score": 93
+  },
+  {
+    "id": 567376,
+    "name": "Ananya Johnson",
+    "experience_level": "Fresher",
+    "domain": "Cloud",
+    "resume_text": "Ananya Johnson\nEmail: ananya.johnson@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at IIT Bombay\n\nSkills:\nGit, AWS\n\nProjects:\n3 project(s) completed in Cloud.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "Git",
+      "AWS"
+    ],
+    "education": [
+      "MCA, IIT Bombay"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 62
+  },
+  {
+    "id": 533335,
+    "name": "William Sharma",
+    "experience_level": "Experienced",
+    "domain": "Cloud",
+    "resume_text": "William Sharma\nEmail: william.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at Stanford\n\nSkills:\nKubernetes, Linux, Docker, Terraform, Azure, AWS, Git\n\nProjects:\n4 project(s) completed in Cloud.\n\nExperience:\n5 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Kubernetes",
+      "Linux",
+      "Docker",
+      "Terraform",
+      "Azure",
+      "AWS",
+      "Git"
+    ],
+    "education": [
+      "B.Tech IT, Stanford"
+    ],
+    "projects": 4,
+    "experience_years": 5,
+    "ats_score": 95
+  },
+  {
+    "id": 480196,
+    "name": "Emily Iyer",
+    "experience_level": "Fresher",
+    "domain": "DevOps",
+    "resume_text": "Emily Iyer\nEmail: emily.iyer@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at IIIT Hyderabad\n\nSkills:\nDocker, AWS, Git\n\nProjects:\n2 project(s) completed in DevOps.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Docker",
+      "AWS",
+      "Git"
+    ],
+    "education": [
+      "B.Tech IT, IIIT Hyderabad"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 66
+  },
+  {
+    "id": 503642,
+    "name": "Aarav Patel",
+    "experience_level": "Experienced",
+    "domain": "Data Science",
+    "resume_text": "Aarav Patel\nEmail: aarav.patel@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at IIT Delhi\n\nSkills:\nSQL, Statistics, Tableau, Machine Learning, Python, Pandas\n\nProjects:\n4 project(s) completed in Data Science.\n\nExperience:\n4 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "SQL",
+      "Statistics",
+      "Tableau",
+      "Machine Learning",
+      "Python",
+      "Pandas"
+    ],
+    "education": [
+      "M.Tech AI, IIT Delhi"
+    ],
+    "projects": 4,
+    "experience_years": 4,
+    "ats_score": 95
+  },
+  {
+    "id": 743817,
+    "name": "Riya Das",
+    "experience_level": "Experienced",
+    "domain": "Backend",
+    "resume_text": "Riya Das\nEmail: riya.das@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at IIIT Hyderabad\n\nSkills:\nPython, MongoDB, Express, PostgreSQL, Node.js, FastAPI\n\nProjects:\n3 project(s) completed in Backend.\n\nExperience:\n6 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Python",
+      "MongoDB",
+      "Express",
+      "PostgreSQL",
+      "Node.js",
+      "FastAPI"
+    ],
+    "education": [
+      "MBA, IIIT Hyderabad"
+    ],
+    "projects": 3,
+    "experience_years": 6,
+    "ats_score": 95
+  },
+  {
+    "id": 772391,
+    "name": "Aditya Sharma",
+    "experience_level": "Fresher",
+    "domain": "Android",
+    "resume_text": "Aditya Sharma\nEmail: aditya.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at MIT\n\nSkills:\nFirebase, Java\n\nProjects:\n1 project(s) completed in Android.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Firebase",
+      "Java"
+    ],
+    "education": [
+      "BBA, MIT"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 50
+  },
+  {
+    "id": 134119,
+    "name": "Aarav Nair",
+    "experience_level": "Intermediate",
+    "domain": "Cloud",
+    "resume_text": "Aarav Nair\nEmail: aarav.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at IIT Bombay\n\nSkills:\nDocker, Kubernetes, Linux, Terraform, Azure\n\nProjects:\n4 project(s) completed in Cloud.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Docker",
+      "Kubernetes",
+      "Linux",
+      "Terraform",
+      "Azure"
+    ],
+    "education": [
+      "MBA, IIT Bombay"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 93
+  },
+  {
+    "id": 447238,
+    "name": "Isha Das",
+    "experience_level": "Intermediate",
+    "domain": "Frontend",
+    "resume_text": "Isha Das\nEmail: isha.das@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at University of Delhi\n\nSkills:\nTailwind CSS, Next.js, HTML, CSS, JavaScript\n\nProjects:\n2 project(s) completed in Frontend.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Tailwind CSS",
+      "Next.js",
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "education": [
+      "BBA, University of Delhi"
+    ],
+    "projects": 2,
+    "experience_years": 1,
+    "ats_score": 78
+  },
+  {
+    "id": 977585,
+    "name": "Ananya Iyer",
+    "experience_level": "Intermediate",
+    "domain": "Cloud",
+    "resume_text": "Ananya Iyer\nEmail: ananya.iyer@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at BITS Pilani\n\nSkills:\nTerraform, Azure, Linux, AWS, Kubernetes\n\nProjects:\n2 project(s) completed in Cloud.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Terraform",
+      "Azure",
+      "Linux",
+      "AWS",
+      "Kubernetes"
+    ],
+    "education": [
+      "M.Tech AI, BITS Pilani"
+    ],
+    "projects": 2,
+    "experience_years": 1,
+    "ats_score": 81
+  },
+  {
+    "id": 733807,
+    "name": "Ananya Sharma",
+    "experience_level": "Intermediate",
+    "domain": "Full Stack",
+    "resume_text": "Ananya Sharma\nEmail: ananya.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at IIT Bombay\n\nSkills:\nPostgreSQL, MongoDB, CSS, Python, Node.js\n\nProjects:\n3 project(s) completed in Full Stack.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "PostgreSQL",
+      "MongoDB",
+      "CSS",
+      "Python",
+      "Node.js"
+    ],
+    "education": [
+      "M.Tech AI, IIT Bombay"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 83
+  },
+  {
+    "id": 811830,
+    "name": "Jane Singh",
+    "experience_level": "Intermediate",
+    "domain": "DevOps",
+    "resume_text": "Jane Singh\nEmail: jane.singh@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at BITS Pilani\n\nSkills:\nGit, Docker, Linux, AWS, Kubernetes, CI/CD\n\nProjects:\n2 project(s) completed in DevOps.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Git",
+      "Docker",
+      "Linux",
+      "AWS",
+      "Kubernetes",
+      "CI/CD"
+    ],
+    "education": [
+      "B.Tech IT, BITS Pilani"
+    ],
+    "projects": 2,
+    "experience_years": 1,
+    "ats_score": 85
+  },
+  {
+    "id": 691258,
+    "name": "John Johnson",
+    "experience_level": "Intermediate",
+    "domain": "AI ML",
+    "resume_text": "John Johnson\nEmail: john.johnson@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at Stanford\n\nSkills:\nNLP, Computer Vision, Pandas, TensorFlow, PyTorch, scikit-learn, Python\n\nProjects:\n3 project(s) completed in AI ML.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "NLP",
+      "Computer Vision",
+      "Pandas",
+      "TensorFlow",
+      "PyTorch",
+      "scikit-learn",
+      "Python"
+    ],
+    "education": [
+      "B.Tech IT, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 87
+  },
+  {
+    "id": 172019,
+    "name": "Vivaan Patel",
+    "experience_level": "Intermediate",
+    "domain": "Data Science",
+    "resume_text": "Vivaan Patel\nEmail: vivaan.patel@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at Stanford\n\nSkills:\nSQL, Statistics, Pandas, Machine Learning, Python\n\nProjects:\n3 project(s) completed in Data Science.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "SQL",
+      "Statistics",
+      "Pandas",
+      "Machine Learning",
+      "Python"
+    ],
+    "education": [
+      "M.Tech AI, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 2,
+    "ats_score": 91
+  },
+  {
+    "id": 993974,
+    "name": "Ananya Nair",
+    "experience_level": "Fresher",
+    "domain": "Cloud",
+    "resume_text": "Ananya Nair\nEmail: ananya.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at University of Delhi\n\nSkills:\nGit, AWS, Kubernetes\n\nProjects:\n2 project(s) completed in Cloud.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Git",
+      "AWS",
+      "Kubernetes"
+    ],
+    "education": [
+      "BBA, University of Delhi"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 71
+  },
+  {
+    "id": 362640,
+    "name": "Sarah Nair",
+    "experience_level": "Intermediate",
+    "domain": "Digital Marketing",
+    "resume_text": "Sarah Nair\nEmail: sarah.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at IIIT Hyderabad\n\nSkills:\nAnalytics, Content Marketing, Social Media, SEO, Google Ads\n\nProjects:\n4 project(s) completed in Digital Marketing.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Analytics",
+      "Content Marketing",
+      "Social Media",
+      "SEO",
+      "Google Ads"
+    ],
+    "education": [
+      "B.Sc CS, IIIT Hyderabad"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 91
+  },
+  {
+    "id": 913387,
+    "name": "Aditya Williams",
+    "experience_level": "Intermediate",
+    "domain": "UI UX",
+    "resume_text": "Aditya Williams\nEmail: aditya.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at VIT Vellore\n\nSkills:\nAdobe XD, User Research, Wireframing, Prototyping, Figma\n\nProjects:\n4 project(s) completed in UI UX.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Adobe XD",
+      "User Research",
+      "Wireframing",
+      "Prototyping",
+      "Figma"
+    ],
+    "education": [
+      "B.Tech IT, VIT Vellore"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 85
+  },
+  {
+    "id": 172220,
+    "name": "Riya Brown",
+    "experience_level": "Intermediate",
+    "domain": "UI UX",
+    "resume_text": "Riya Brown\nEmail: riya.brown@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at NIT Trichy\n\nSkills:\nWireframing, Figma, User Research, Prototyping\n\nProjects:\n4 project(s) completed in UI UX.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Wireframing",
+      "Figma",
+      "User Research",
+      "Prototyping"
+    ],
+    "education": [
+      "B.Tech Computer Science, NIT Trichy"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 76
+  },
+  {
+    "id": 310986,
+    "name": "Jane Das",
+    "experience_level": "Experienced",
+    "domain": "Backend",
+    "resume_text": "Jane Das\nEmail: jane.das@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at BITS Pilani\n\nSkills:\nJava, Express, MongoDB, FastAPI, Python, PostgreSQL\n\nProjects:\n4 project(s) completed in Backend.\n\nExperience:\n6 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Java",
+      "Express",
+      "MongoDB",
+      "FastAPI",
+      "Python",
+      "PostgreSQL"
+    ],
+    "education": [
+      "MCA, BITS Pilani"
+    ],
+    "projects": 4,
+    "experience_years": 6,
+    "ats_score": 95
+  },
+  {
+    "id": 465184,
+    "name": "Aisha Nair",
+    "experience_level": "Fresher",
+    "domain": "DevOps",
+    "resume_text": "Aisha Nair\nEmail: aisha.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at VIT Vellore\n\nSkills:\nAWS, CI/CD\n\nProjects:\n3 project(s) completed in DevOps.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "AWS",
+      "CI/CD"
+    ],
+    "education": [
+      "M.Tech AI, VIT Vellore"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 65
+  },
+  {
+    "id": 304477,
+    "name": "Jane Reddy",
+    "experience_level": "Experienced",
+    "domain": "Flutter",
+    "resume_text": "Jane Reddy\nEmail: jane.reddy@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at University of Delhi\n\nSkills:\nFlutter, Firebase, State Management, Dart, REST APIs\n\nProjects:\n6 project(s) completed in Flutter.\n\nExperience:\n5 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Flutter",
+      "Firebase",
+      "State Management",
+      "Dart",
+      "REST APIs"
+    ],
+    "education": [
+      "B.Tech IT, University of Delhi"
+    ],
+    "projects": 6,
+    "experience_years": 5,
+    "ats_score": 95
+  },
+  {
+    "id": 830866,
+    "name": "Riya Sharma",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Riya Sharma\nEmail: riya.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at NIT Trichy\n\nSkills:\nGoogle Ads, Social Media, Analytics, Content Marketing\n\nProjects:\n2 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "Google Ads",
+      "Social Media",
+      "Analytics",
+      "Content Marketing"
+    ],
+    "education": [
+      "MCA, NIT Trichy"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 72
+  },
+  {
+    "id": 643068,
+    "name": "Emily Williams",
+    "experience_level": "Fresher",
+    "domain": "Full Stack",
+    "resume_text": "Emily Williams\nEmail: emily.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at MIT\n\nSkills:\nHTML, Python\n\nProjects:\n1 project(s) completed in Full Stack.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "HTML",
+      "Python"
+    ],
+    "education": [
+      "B.Tech IT, MIT"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 59
+  },
+  {
+    "id": 329048,
+    "name": "Ananya Johnson",
+    "experience_level": "Fresher",
+    "domain": "Full Stack",
+    "resume_text": "Ananya Johnson\nEmail: ananya.johnson@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at Stanford\n\nSkills:\nPostgreSQL, Node.js, MongoDB, Python\n\nProjects:\n2 project(s) completed in Full Stack.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "PostgreSQL",
+      "Node.js",
+      "MongoDB",
+      "Python"
+    ],
+    "education": [
+      "B.Tech Computer Science, Stanford"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 72
+  },
+  {
+    "id": 160562,
+    "name": "David Williams",
+    "experience_level": "Intermediate",
+    "domain": "AI ML",
+    "resume_text": "David Williams\nEmail: david.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at VIT Vellore\n\nSkills:\nComputer Vision, scikit-learn, Python, NLP, TensorFlow, Pandas\n\nProjects:\n4 project(s) completed in AI ML.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Computer Vision",
+      "scikit-learn",
+      "Python",
+      "NLP",
+      "TensorFlow",
+      "Pandas"
+    ],
+    "education": [
+      "M.Tech AI, VIT Vellore"
+    ],
+    "projects": 4,
+    "experience_years": 2,
+    "ats_score": 90
+  },
+  {
+    "id": 458200,
+    "name": "Vihaan Patel",
+    "experience_level": "Intermediate",
+    "domain": "DevOps",
+    "resume_text": "Vihaan Patel\nEmail: vihaan.patel@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at BITS Pilani\n\nSkills:\nKubernetes, Git, CI/CD, Docker\n\nProjects:\n4 project(s) completed in DevOps.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "Kubernetes",
+      "Git",
+      "CI/CD",
+      "Docker"
+    ],
+    "education": [
+      "BBA, BITS Pilani"
+    ],
+    "projects": 4,
+    "experience_years": 2,
+    "ats_score": 87
+  },
+  {
+    "id": 314248,
+    "name": "Robert Das",
+    "experience_level": "Intermediate",
+    "domain": "Android",
+    "resume_text": "Robert Das\nEmail: robert.das@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at IIIT Hyderabad\n\nSkills:\nFirebase, XML, Java, Android Studio\n\nProjects:\n4 project(s) completed in Android.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Firebase",
+      "XML",
+      "Java",
+      "Android Studio"
+    ],
+    "education": [
+      "B.Tech IT, IIIT Hyderabad"
+    ],
+    "projects": 4,
+    "experience_years": 2,
+    "ats_score": 81
+  },
+  {
+    "id": 966574,
+    "name": "Jennifer Gupta",
+    "experience_level": "Fresher",
+    "domain": "Data Science",
+    "resume_text": "Jennifer Gupta\nEmail: jennifer.gupta@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at Stanford\n\nSkills:\nSQL, Pandas, Tableau\n\nProjects:\n3 project(s) completed in Data Science.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "SQL",
+      "Pandas",
+      "Tableau"
+    ],
+    "education": [
+      "BBA, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 74
+  },
+  {
+    "id": 875762,
+    "name": "Amanda Kumar",
+    "experience_level": "Fresher",
+    "domain": "Android",
+    "resume_text": "Amanda Kumar\nEmail: amanda.kumar@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at Stanford\n\nSkills:\nKotlin, Java\n\nProjects:\n1 project(s) completed in Android.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Kotlin",
+      "Java"
+    ],
+    "education": [
+      "M.Tech AI, Stanford"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 57
+  },
+  {
+    "id": 973905,
+    "name": "David Sharma",
+    "experience_level": "Fresher",
+    "domain": "Business Analyst",
+    "resume_text": "David Sharma\nEmail: david.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at IIIT Hyderabad\n\nSkills:\nRequirements Gathering, SQL\n\nProjects:\n1 project(s) completed in Business Analyst.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Requirements Gathering",
+      "SQL"
+    ],
+    "education": [
+      "M.Tech AI, IIIT Hyderabad"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 63
+  },
+  {
+    "id": 625570,
+    "name": "Amanda Williams",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Amanda Williams\nEmail: amanda.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at University of Delhi\n\nSkills:\nAnalytics, Social Media, Google Ads, Content Marketing\n\nProjects:\n1 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Looking for a passionate frontend developer with React experience",
+    "skills": [
+      "Analytics",
+      "Social Media",
+      "Google Ads",
+      "Content Marketing"
+    ],
+    "education": [
+      "B.Tech Computer Science, University of Delhi"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 69
+  },
+  {
+    "id": 769622,
+    "name": "William Kumar",
+    "experience_level": "Intermediate",
+    "domain": "Backend",
+    "resume_text": "William Kumar\nEmail: william.kumar@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at University of Delhi\n\nSkills:\nPython, Express, Node.js, MongoDB, Java\n\nProjects:\n3 project(s) completed in Backend.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "Python",
+      "Express",
+      "Node.js",
+      "MongoDB",
+      "Java"
+    ],
+    "education": [
+      "M.Tech AI, University of Delhi"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 87
+  },
+  {
+    "id": 688305,
+    "name": "Amanda Kumar",
+    "experience_level": "Fresher",
+    "domain": "Business Analyst",
+    "resume_text": "Amanda Kumar\nEmail: amanda.kumar@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at IIIT Hyderabad\n\nSkills:\nSQL, Excel, Power BI, UML, Requirements Gathering\n\nProjects:\n1 project(s) completed in Business Analyst.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Looking for a passionate frontend developer with React experience",
+    "skills": [
+      "SQL",
+      "Excel",
+      "Power BI",
+      "UML",
+      "Requirements Gathering"
+    ],
+    "education": [
+      "B.Sc CS, IIIT Hyderabad"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 67
+  },
+  {
+    "id": 198676,
+    "name": "Aditya Das",
+    "experience_level": "Fresher",
+    "domain": "Full Stack",
+    "resume_text": "Aditya Das\nEmail: aditya.das@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at Stanford\n\nSkills:\nCSS, Python\n\nProjects:\n3 project(s) completed in Full Stack.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "CSS",
+      "Python"
+    ],
+    "education": [
+      "M.Tech AI, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 67
+  },
+  {
+    "id": 874164,
+    "name": "Jane Nair",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Jane Nair\nEmail: jane.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at NIT Trichy\n\nSkills:\nSEO, Social Media, Analytics, Content Marketing, Google Ads\n\nProjects:\n1 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "SEO",
+      "Social Media",
+      "Analytics",
+      "Content Marketing",
+      "Google Ads"
+    ],
+    "education": [
+      "M.Tech AI, NIT Trichy"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 65
+  },
+  {
+    "id": 948705,
+    "name": "Jennifer Brown",
+    "experience_level": "Intermediate",
+    "domain": "Data Science",
+    "resume_text": "Jennifer Brown\nEmail: jennifer.brown@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at BITS Pilani\n\nSkills:\nMachine Learning, Tableau, Statistics, SQL, Pandas\n\nProjects:\n2 project(s) completed in Data Science.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Machine Learning",
+      "Tableau",
+      "Statistics",
+      "SQL",
+      "Pandas"
+    ],
+    "education": [
+      "B.Sc CS, BITS Pilani"
+    ],
+    "projects": 2,
+    "experience_years": 2,
+    "ats_score": 75
+  },
+  {
+    "id": 485174,
+    "name": "Ananya Gupta",
+    "experience_level": "Experienced",
+    "domain": "UI UX",
+    "resume_text": "Ananya Gupta\nEmail: ananya.gupta@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at VIT Vellore\n\nSkills:\nPrototyping, Figma, User Research, Wireframing, Adobe XD\n\nProjects:\n5 project(s) completed in UI UX.\n\nExperience:\n3 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Prototyping",
+      "Figma",
+      "User Research",
+      "Wireframing",
+      "Adobe XD"
+    ],
+    "education": [
+      "M.Tech AI, VIT Vellore"
+    ],
+    "projects": 5,
+    "experience_years": 3,
+    "ats_score": 94
+  },
+  {
+    "id": 664230,
+    "name": "Amanda Williams",
+    "experience_level": "Intermediate",
+    "domain": "Frontend",
+    "resume_text": "Amanda Williams\nEmail: amanda.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at Stanford\n\nSkills:\nNext.js, React, Tailwind CSS, CSS, TypeScript, JavaScript\n\nProjects:\n4 project(s) completed in Frontend.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Next.js",
+      "React",
+      "Tailwind CSS",
+      "CSS",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "education": [
+      "B.Tech IT, Stanford"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 91
+  },
+  {
+    "id": 641382,
+    "name": "Ananya Smith",
+    "experience_level": "Fresher",
+    "domain": "Cloud",
+    "resume_text": "Ananya Smith\nEmail: ananya.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at IIT Delhi\n\nSkills:\nGit, Terraform, Docker, Kubernetes, Linux\n\nProjects:\n2 project(s) completed in Cloud.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "Git",
+      "Terraform",
+      "Docker",
+      "Kubernetes",
+      "Linux"
+    ],
+    "education": [
+      "MBA, IIT Delhi"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 68
+  },
+  {
+    "id": 296582,
+    "name": "David Bose",
+    "experience_level": "Intermediate",
+    "domain": "DevOps",
+    "resume_text": "David Bose\nEmail: david.bose@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at BITS Pilani\n\nSkills:\nLinux, Git, Kubernetes, AWS\n\nProjects:\n4 project(s) completed in DevOps.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "Linux",
+      "Git",
+      "Kubernetes",
+      "AWS"
+    ],
+    "education": [
+      "B.Sc CS, BITS Pilani"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 84
+  },
+  {
+    "id": 426878,
+    "name": "Riya Reddy",
+    "experience_level": "Fresher",
+    "domain": "Android",
+    "resume_text": "Riya Reddy\nEmail: riya.reddy@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at BITS Pilani\n\nSkills:\nAndroid Studio, Firebase\n\nProjects:\n3 project(s) completed in Android.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cloud intern with AWS or Azure exposure required",
+    "skills": [
+      "Android Studio",
+      "Firebase"
+    ],
+    "education": [
+      "BBA, BITS Pilani"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 62
+  },
+  {
+    "id": 709988,
+    "name": "Sarah Johnson",
+    "experience_level": "Fresher",
+    "domain": "Backend",
+    "resume_text": "Sarah Johnson\nEmail: sarah.johnson@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at MIT\n\nSkills:\nPostgreSQL, FastAPI, Express\n\nProjects:\n2 project(s) completed in Backend.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "PostgreSQL",
+      "FastAPI",
+      "Express"
+    ],
+    "education": [
+      "B.Tech Computer Science, MIT"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 68
+  },
+  {
+    "id": 581143,
+    "name": "Riya Williams",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Riya Williams\nEmail: riya.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at IIIT Hyderabad\n\nSkills:\nSocial Media, Content Marketing, Google Ads, Analytics\n\nProjects:\n1 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Social Media",
+      "Content Marketing",
+      "Google Ads",
+      "Analytics"
+    ],
+    "education": [
+      "MCA, IIIT Hyderabad"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 61
+  },
+  {
+    "id": 227550,
+    "name": "Riya Singh",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Riya Singh\nEmail: riya.singh@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at Stanford\n\nSkills:\nGoogle Ads, SEO, Social Media\n\nProjects:\n3 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "Google Ads",
+      "SEO",
+      "Social Media"
+    ],
+    "education": [
+      "BBA, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 74
+  },
+  {
+    "id": 451712,
+    "name": "Emily Williams",
+    "experience_level": "Fresher",
+    "domain": "Flutter",
+    "resume_text": "Emily Williams\nEmail: emily.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at NIT Trichy\n\nSkills:\nREST APIs, Firebase, State Management, Dart, Flutter\n\nProjects:\n2 project(s) completed in Flutter.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "REST APIs",
+      "Firebase",
+      "State Management",
+      "Dart",
+      "Flutter"
+    ],
+    "education": [
+      "B.Sc CS, NIT Trichy"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 80
+  },
+  {
+    "id": 165046,
+    "name": "William Johnson",
+    "experience_level": "Fresher",
+    "domain": "AI ML",
+    "resume_text": "William Johnson\nEmail: william.johnson@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at VIT Vellore\n\nSkills:\nTensorFlow, PyTorch\n\nProjects:\n2 project(s) completed in AI ML.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cloud intern with AWS or Azure exposure required",
+    "skills": [
+      "TensorFlow",
+      "PyTorch"
+    ],
+    "education": [
+      "MBA, VIT Vellore"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 62
+  },
+  {
+    "id": 768673,
+    "name": "Emily Jones",
+    "experience_level": "Intermediate",
+    "domain": "Flutter",
+    "resume_text": "Emily Jones\nEmail: emily.jones@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at MIT\n\nSkills:\nState Management, Firebase, Dart, Flutter, REST APIs\n\nProjects:\n4 project(s) completed in Flutter.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "State Management",
+      "Firebase",
+      "Dart",
+      "Flutter",
+      "REST APIs"
+    ],
+    "education": [
+      "M.Tech AI, MIT"
+    ],
+    "projects": 4,
+    "experience_years": 1,
+    "ats_score": 88
+  },
+  {
+    "id": 183575,
+    "name": "Vivaan Gupta",
+    "experience_level": "Intermediate",
+    "domain": "UI UX",
+    "resume_text": "Vivaan Gupta\nEmail: vivaan.gupta@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at IIT Bombay\n\nSkills:\nUser Research, Prototyping, Adobe XD, Wireframing, Figma\n\nProjects:\n3 project(s) completed in UI UX.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "User Research",
+      "Prototyping",
+      "Adobe XD",
+      "Wireframing",
+      "Figma"
+    ],
+    "education": [
+      "B.Sc CS, IIT Bombay"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 75
+  },
+  {
+    "id": 642822,
+    "name": "Amanda Reddy",
+    "experience_level": "Intermediate",
+    "domain": "Cyber Security",
+    "resume_text": "Amanda Reddy\nEmail: amanda.reddy@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at MIT\n\nSkills:\nEthical Hacking, OWASP, Penetration Testing, SIEM\n\nProjects:\n4 project(s) completed in Cyber Security.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Ethical Hacking",
+      "OWASP",
+      "Penetration Testing",
+      "SIEM"
+    ],
+    "education": [
+      "B.Tech IT, MIT"
+    ],
+    "projects": 4,
+    "experience_years": 2,
+    "ats_score": 81
+  },
+  {
+    "id": 290534,
+    "name": "Jennifer Gupta",
+    "experience_level": "Experienced",
+    "domain": "Full Stack",
+    "resume_text": "Jennifer Gupta\nEmail: jennifer.gupta@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at VIT Vellore\n\nSkills:\nHTML, Python, MongoDB, Node.js, CSS, PostgreSQL\n\nProjects:\n4 project(s) completed in Full Stack.\n\nExperience:\n4 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "HTML",
+      "Python",
+      "MongoDB",
+      "Node.js",
+      "CSS",
+      "PostgreSQL"
+    ],
+    "education": [
+      "MBA, VIT Vellore"
+    ],
+    "projects": 4,
+    "experience_years": 4,
+    "ats_score": 93
+  },
+  {
+    "id": 592329,
+    "name": "Jane Singh",
+    "experience_level": "Experienced",
+    "domain": "Android",
+    "resume_text": "Jane Singh\nEmail: jane.singh@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at VIT Vellore\n\nSkills:\nJava, Firebase, XML, Android Studio, Kotlin\n\nProjects:\n6 project(s) completed in Android.\n\nExperience:\n5 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Java",
+      "Firebase",
+      "XML",
+      "Android Studio",
+      "Kotlin"
+    ],
+    "education": [
+      "B.Sc CS, VIT Vellore"
+    ],
+    "projects": 6,
+    "experience_years": 5,
+    "ats_score": 95
+  },
+  {
+    "id": 459644,
+    "name": "Aditya Smith",
+    "experience_level": "Intermediate",
+    "domain": "Frontend",
+    "resume_text": "Aditya Smith\nEmail: aditya.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at IIIT Hyderabad\n\nSkills:\nCSS, Tailwind CSS, Next.js, TypeScript, React, HTML, JavaScript\n\nProjects:\n3 project(s) completed in Frontend.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Looking for a passionate frontend developer with React experience",
+    "skills": [
+      "CSS",
+      "Tailwind CSS",
+      "Next.js",
+      "TypeScript",
+      "React",
+      "HTML",
+      "JavaScript"
+    ],
+    "education": [
+      "B.Tech IT, IIIT Hyderabad"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 86
+  },
+  {
+    "id": 425658,
+    "name": "Aarav Johnson",
+    "experience_level": "Intermediate",
+    "domain": "Frontend",
+    "resume_text": "Aarav Johnson\nEmail: aarav.johnson@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at IIIT Hyderabad\n\nSkills:\nJavaScript, Next.js, Tailwind CSS, HTML, React, CSS, TypeScript\n\nProjects:\n2 project(s) completed in Frontend.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "JavaScript",
+      "Next.js",
+      "Tailwind CSS",
+      "HTML",
+      "React",
+      "CSS",
+      "TypeScript"
+    ],
+    "education": [
+      "B.Tech Computer Science, IIIT Hyderabad"
+    ],
+    "projects": 2,
+    "experience_years": 1,
+    "ats_score": 94
+  },
+  {
+    "id": 330428,
+    "name": "John Bose",
+    "experience_level": "Fresher",
+    "domain": "Cloud",
+    "resume_text": "John Bose\nEmail: john.bose@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at IIIT Hyderabad\n\nSkills:\nGit, Terraform, Linux, Azure\n\nProjects:\n3 project(s) completed in Cloud.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Git",
+      "Terraform",
+      "Linux",
+      "Azure"
+    ],
+    "education": [
+      "M.Tech AI, IIIT Hyderabad"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 74
+  },
+  {
+    "id": 631401,
+    "name": "Riya Patel",
+    "experience_level": "Experienced",
+    "domain": "DevOps",
+    "resume_text": "Riya Patel\nEmail: riya.patel@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at IIT Delhi\n\nSkills:\nAWS, Git, CI/CD, Docker, Kubernetes, Linux\n\nProjects:\n3 project(s) completed in DevOps.\n\nExperience:\n6 year(s) of experience.",
+    "job_description": "Looking for a passionate frontend developer with React experience",
+    "skills": [
+      "AWS",
+      "Git",
+      "CI/CD",
+      "Docker",
+      "Kubernetes",
+      "Linux"
+    ],
+    "education": [
+      "MCA, IIT Delhi"
+    ],
+    "projects": 3,
+    "experience_years": 6,
+    "ats_score": 95
+  },
+  {
+    "id": 775536,
+    "name": "Vihaan Smith",
+    "experience_level": "Intermediate",
+    "domain": "AI ML",
+    "resume_text": "Vihaan Smith\nEmail: vihaan.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at BITS Pilani\n\nSkills:\nPyTorch, NLP, TensorFlow, Computer Vision, Pandas, scikit-learn, Python\n\nProjects:\n3 project(s) completed in AI ML.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "PyTorch",
+      "NLP",
+      "TensorFlow",
+      "Computer Vision",
+      "Pandas",
+      "scikit-learn",
+      "Python"
+    ],
+    "education": [
+      "B.Sc CS, BITS Pilani"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 94
+  },
+  {
+    "id": 337166,
+    "name": "Vihaan Brown",
+    "experience_level": "Experienced",
+    "domain": "Data Science",
+    "resume_text": "Vihaan Brown\nEmail: vihaan.brown@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at IIT Delhi\n\nSkills:\nMachine Learning, Pandas, Tableau, Statistics, Python, SQL\n\nProjects:\n3 project(s) completed in Data Science.\n\nExperience:\n3 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Machine Learning",
+      "Pandas",
+      "Tableau",
+      "Statistics",
+      "Python",
+      "SQL"
+    ],
+    "education": [
+      "M.Tech AI, IIT Delhi"
+    ],
+    "projects": 3,
+    "experience_years": 3,
+    "ats_score": 95
+  },
+  {
+    "id": 966345,
+    "name": "Aditya Sharma",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Aditya Sharma\nEmail: aditya.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at Stanford\n\nSkills:\nSEO, Content Marketing, Google Ads, Social Media\n\nProjects:\n1 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Flutter developer for mobile app development",
+    "skills": [
+      "SEO",
+      "Content Marketing",
+      "Google Ads",
+      "Social Media"
+    ],
+    "education": [
+      "B.Tech Computer Science, Stanford"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 61
+  },
+  {
+    "id": 642842,
+    "name": "Jennifer Nair",
+    "experience_level": "Fresher",
+    "domain": "Android",
+    "resume_text": "Jennifer Nair\nEmail: jennifer.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nMBA at IIT Delhi\n\nSkills:\nAndroid Studio, Firebase, Java, XML\n\nProjects:\n2 project(s) completed in Android.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Android Studio",
+      "Firebase",
+      "Java",
+      "XML"
+    ],
+    "education": [
+      "MBA, IIT Delhi"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 71
+  },
+  {
+    "id": 515185,
+    "name": "Vihaan Brown",
+    "experience_level": "Intermediate",
+    "domain": "Business Analyst",
+    "resume_text": "Vihaan Brown\nEmail: vihaan.brown@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at MIT\n\nSkills:\nExcel, UML, Requirements Gathering, Power BI, SQL\n\nProjects:\n3 project(s) completed in Business Analyst.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Cloud intern with AWS or Azure exposure required",
+    "skills": [
+      "Excel",
+      "UML",
+      "Requirements Gathering",
+      "Power BI",
+      "SQL"
+    ],
+    "education": [
+      "MCA, MIT"
+    ],
+    "projects": 3,
+    "experience_years": 2,
+    "ats_score": 80
+  },
+  {
+    "id": 185173,
+    "name": "Sai Kumar",
+    "experience_level": "Fresher",
+    "domain": "Full Stack",
+    "resume_text": "Sai Kumar\nEmail: sai.kumar@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at IIT Bombay\n\nSkills:\nPython, CSS, PostgreSQL\n\nProjects:\n1 project(s) completed in Full Stack.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Python",
+      "CSS",
+      "PostgreSQL"
+    ],
+    "education": [
+      "B.Tech Computer Science, IIT Bombay"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 61
+  },
+  {
+    "id": 923576,
+    "name": "Aisha Sharma",
+    "experience_level": "Intermediate",
+    "domain": "AI ML",
+    "resume_text": "Aisha Sharma\nEmail: aisha.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Sc CS at VIT Vellore\n\nSkills:\nPython, TensorFlow, NLP, scikit-learn, Computer Vision\n\nProjects:\n3 project(s) completed in AI ML.\n\nExperience:\n2 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "Python",
+      "TensorFlow",
+      "NLP",
+      "scikit-learn",
+      "Computer Vision"
+    ],
+    "education": [
+      "B.Sc CS, VIT Vellore"
+    ],
+    "projects": 3,
+    "experience_years": 2,
+    "ats_score": 78
+  },
+  {
+    "id": 230404,
+    "name": "Amanda Singh",
+    "experience_level": "Experienced",
+    "domain": "Digital Marketing",
+    "resume_text": "Amanda Singh\nEmail: amanda.singh@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at VIT Vellore\n\nSkills:\nContent Marketing, Google Ads, Analytics, SEO, Social Media\n\nProjects:\n3 project(s) completed in Digital Marketing.\n\nExperience:\n5 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "Content Marketing",
+      "Google Ads",
+      "Analytics",
+      "SEO",
+      "Social Media"
+    ],
+    "education": [
+      "B.Tech Computer Science, VIT Vellore"
+    ],
+    "projects": 3,
+    "experience_years": 5,
+    "ats_score": 95
+  },
+  {
+    "id": 432605,
+    "name": "Robert Gupta",
+    "experience_level": "Fresher",
+    "domain": "Digital Marketing",
+    "resume_text": "Robert Gupta\nEmail: robert.gupta@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at MIT\n\nSkills:\nContent Marketing, Social Media, Analytics\n\nProjects:\n1 project(s) completed in Digital Marketing.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Content Marketing",
+      "Social Media",
+      "Analytics"
+    ],
+    "education": [
+      "B.Tech IT, MIT"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 63
+  },
+  {
+    "id": 726787,
+    "name": "Jane Sharma",
+    "experience_level": "Fresher",
+    "domain": "UI UX",
+    "resume_text": "Jane Sharma\nEmail: jane.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at NIT Trichy\n\nSkills:\nPrototyping, Figma, Adobe XD\n\nProjects:\n1 project(s) completed in UI UX.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Prototyping",
+      "Figma",
+      "Adobe XD"
+    ],
+    "education": [
+      "BBA, NIT Trichy"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 69
+  },
+  {
+    "id": 564702,
+    "name": "Michael Williams",
+    "experience_level": "Experienced",
+    "domain": "Business Analyst",
+    "resume_text": "Michael Williams\nEmail: michael.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at VIT Vellore\n\nSkills:\nSQL, UML, Power BI, Requirements Gathering, Excel\n\nProjects:\n3 project(s) completed in Business Analyst.\n\nExperience:\n6 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "SQL",
+      "UML",
+      "Power BI",
+      "Requirements Gathering",
+      "Excel"
+    ],
+    "education": [
+      "MCA, VIT Vellore"
+    ],
+    "projects": 3,
+    "experience_years": 6,
+    "ats_score": 93
+  },
+  {
+    "id": 688225,
+    "name": "Robert Nair",
+    "experience_level": "Fresher",
+    "domain": "UI UX",
+    "resume_text": "Robert Nair\nEmail: robert.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at BITS Pilani\n\nSkills:\nFigma, User Research, Prototyping, Wireframing\n\nProjects:\n3 project(s) completed in UI UX.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Figma",
+      "User Research",
+      "Prototyping",
+      "Wireframing"
+    ],
+    "education": [
+      "M.Tech AI, BITS Pilani"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 78
+  },
+  {
+    "id": 166706,
+    "name": "Vihaan Brown",
+    "experience_level": "Fresher",
+    "domain": "Cyber Security",
+    "resume_text": "Vihaan Brown\nEmail: vihaan.brown@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at IIT Bombay\n\nSkills:\nPenetration Testing, OWASP, Ethical Hacking, Network Security\n\nProjects:\n2 project(s) completed in Cyber Security.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Penetration Testing",
+      "OWASP",
+      "Ethical Hacking",
+      "Network Security"
+    ],
+    "education": [
+      "B.Tech IT, IIT Bombay"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 69
+  },
+  {
+    "id": 511027,
+    "name": "Jennifer Das",
+    "experience_level": "Intermediate",
+    "domain": "AI ML",
+    "resume_text": "Jennifer Das\nEmail: jennifer.das@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at Stanford\n\nSkills:\nComputer Vision, TensorFlow, Pandas, NLP\n\nProjects:\n3 project(s) completed in AI ML.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "Computer Vision",
+      "TensorFlow",
+      "Pandas",
+      "NLP"
+    ],
+    "education": [
+      "MCA, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 70
+  },
+  {
+    "id": 635805,
+    "name": "Sai Smith",
+    "experience_level": "Fresher",
+    "domain": "Cloud",
+    "resume_text": "Sai Smith\nEmail: sai.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at IIT Bombay\n\nSkills:\nKubernetes, Git, AWS\n\nProjects:\n1 project(s) completed in Cloud.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Kubernetes",
+      "Git",
+      "AWS"
+    ],
+    "education": [
+      "B.Tech Computer Science, IIT Bombay"
+    ],
+    "projects": 1,
+    "experience_years": 0,
+    "ats_score": 63
+  },
+  {
+    "id": 167005,
+    "name": "William Kumar",
+    "experience_level": "Experienced",
+    "domain": "Android",
+    "resume_text": "William Kumar\nEmail: william.kumar@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at Stanford\n\nSkills:\nJava, Kotlin, Android Studio, Firebase, XML\n\nProjects:\n5 project(s) completed in Android.\n\nExperience:\n5 year(s) of experience.",
+    "job_description": "Looking for a passionate frontend developer with React experience",
+    "skills": [
+      "Java",
+      "Kotlin",
+      "Android Studio",
+      "Firebase",
+      "XML"
+    ],
+    "education": [
+      "BBA, Stanford"
+    ],
+    "projects": 5,
+    "experience_years": 5,
+    "ats_score": 95
+  },
+  {
+    "id": 399522,
+    "name": "Aarav Sharma",
+    "experience_level": "Fresher",
+    "domain": "DevOps",
+    "resume_text": "Aarav Sharma\nEmail: aarav.sharma@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech Computer Science at NIT Trichy\n\nSkills:\nCI/CD, Linux\n\nProjects:\n3 project(s) completed in DevOps.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "CI/CD",
+      "Linux"
+    ],
+    "education": [
+      "B.Tech Computer Science, NIT Trichy"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 67
+  },
+  {
+    "id": 868341,
+    "name": "Robert Bose",
+    "experience_level": "Fresher",
+    "domain": "Business Analyst",
+    "resume_text": "Robert Bose\nEmail: robert.bose@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at MIT\n\nSkills:\nExcel, Requirements Gathering, UML, Power BI, SQL\n\nProjects:\n3 project(s) completed in Business Analyst.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "DevOps engineer to manage CI/CD pipelines",
+    "skills": [
+      "Excel",
+      "Requirements Gathering",
+      "UML",
+      "Power BI",
+      "SQL"
+    ],
+    "education": [
+      "B.Tech IT, MIT"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 73
+  },
+  {
+    "id": 837382,
+    "name": "Riya Williams",
+    "experience_level": "Fresher",
+    "domain": "DevOps",
+    "resume_text": "Riya Williams\nEmail: riya.williams@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at MIT\n\nSkills:\nGit, AWS\n\nProjects:\n2 project(s) completed in DevOps.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Git",
+      "AWS"
+    ],
+    "education": [
+      "MCA, MIT"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 62
+  },
+  {
+    "id": 442588,
+    "name": "Sai Nair",
+    "experience_level": "Experienced",
+    "domain": "Flutter",
+    "resume_text": "Sai Nair\nEmail: sai.nair@email.com\nPhone: +91-9876543210\n\nEducation:\nB.Tech IT at NIT Trichy\n\nSkills:\nFlutter, REST APIs, Firebase, State Management, Dart\n\nProjects:\n3 project(s) completed in Flutter.\n\nExperience:\n3 year(s) of experience.",
+    "job_description": "UI/UX designer to create beautiful interfaces",
+    "skills": [
+      "Flutter",
+      "REST APIs",
+      "Firebase",
+      "State Management",
+      "Dart"
+    ],
+    "education": [
+      "B.Tech IT, NIT Trichy"
+    ],
+    "projects": 3,
+    "experience_years": 3,
+    "ats_score": 82
+  },
+  {
+    "id": 442749,
+    "name": "Riya Das",
+    "experience_level": "Fresher",
+    "domain": "DevOps",
+    "resume_text": "Riya Das\nEmail: riya.das@email.com\nPhone: +91-9876543210\n\nEducation:\nBBA at IIT Bombay\n\nSkills:\nCI/CD, AWS, Git\n\nProjects:\n3 project(s) completed in DevOps.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Cyber security intern to help with security assessments",
+    "skills": [
+      "CI/CD",
+      "AWS",
+      "Git"
+    ],
+    "education": [
+      "BBA, IIT Bombay"
+    ],
+    "projects": 3,
+    "experience_years": 0,
+    "ats_score": 67
+  },
+  {
+    "id": 396428,
+    "name": "Aisha Smith",
+    "experience_level": "Fresher",
+    "domain": "Data Science",
+    "resume_text": "Aisha Smith\nEmail: aisha.smith@email.com\nPhone: +91-9876543210\n\nEducation:\nMCA at Stanford\n\nSkills:\nPandas, SQL, Statistics\n\nProjects:\n2 project(s) completed in Data Science.\n\nExperience:\n0 year(s) of experience.",
+    "job_description": "Data science intern needed for analytics projects",
+    "skills": [
+      "Pandas",
+      "SQL",
+      "Statistics"
+    ],
+    "education": [
+      "MCA, Stanford"
+    ],
+    "projects": 2,
+    "experience_years": 0,
+    "ats_score": 68
+  },
+  {
+    "id": 565601,
+    "name": "David Das",
+    "experience_level": "Intermediate",
+    "domain": "Business Analyst",
+    "resume_text": "David Das\nEmail: david.das@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at NIT Trichy\n\nSkills:\nRequirements Gathering, Power BI, UML, Excel, SQL\n\nProjects:\n3 project(s) completed in Business Analyst.\n\nExperience:\n1 year(s) of experience.",
+    "job_description": "Seeking AI/ML intern with Python and ML knowledge",
+    "skills": [
+      "Requirements Gathering",
+      "Power BI",
+      "UML",
+      "Excel",
+      "SQL"
+    ],
+    "education": [
+      "M.Tech AI, NIT Trichy"
+    ],
+    "projects": 3,
+    "experience_years": 1,
+    "ats_score": 85
+  },
+  {
+    "id": 302978,
+    "name": "John Johnson",
+    "experience_level": "Experienced",
+    "domain": "Data Science",
+    "resume_text": "John Johnson\nEmail: john.johnson@email.com\nPhone: +91-9876543210\n\nEducation:\nM.Tech AI at Stanford\n\nSkills:\nMachine Learning, Pandas, SQL, Tableau, Statistics, Python\n\nProjects:\n3 project(s) completed in Data Science.\n\nExperience:\n3 year(s) of experience.",
+    "job_description": "Hiring backend engineer proficient in Node.js and databases",
+    "skills": [
+      "Machine Learning",
+      "Pandas",
+      "SQL",
+      "Tableau",
+      "Statistics",
+      "Python"
+    ],
+    "education": [
+      "M.Tech AI, Stanford"
+    ],
+    "projects": 3,
+    "experience_years": 3,
+    "ats_score": 95
+  }
+]

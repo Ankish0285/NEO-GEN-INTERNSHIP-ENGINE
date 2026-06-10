@@ -10,6 +10,7 @@ from engines.intelligence import build_full_intelligence, chat_with_intelligence
 from engines.profile_engine import build_student_profile
 from engines.recommendation_engine import recommend_internships
 from engines.resume_parser import parse_resume
+from engines.internship_intelligence import full_internship_intelligence
 
 app = FastAPI(title='NeoGen AI', version='2.0.0')
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
@@ -140,3 +141,14 @@ def full_pipeline(body: RecommendRequest):
             'vector_index': data.get('vector_index'),
         },
     }
+
+@app.post('/api/v1/premium/internship-intelligence')
+def premium_internship_intelligence(body: RecommendRequest):
+    """Premium Internship Intelligence AI with all 7 tasks."""
+    result = full_internship_intelligence(
+        body.resume_text,
+        '',
+        body.user_data,
+        body.internships
+    )
+    return {'success': True, 'data': result}

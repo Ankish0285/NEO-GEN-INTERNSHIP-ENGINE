@@ -9,3 +9,102 @@ resume_text,job_description,ats_score
 "Junior Python developer.", "Looking for Senior Python Developer.", 60
 "C++ embedded systems engineer.", "Looking for Web Developer.", 15
 "DevOps engineer with AWS and Docker.", "Looking for DevOps with Cloud skills.", 88
+"Full-stack developer with Node.js and MongoDB.", "Need Node.js developer with Express and MongoDB.", 90
+"Backend developer experienced in Python, FastAPI, PostgreSQL.", "Hiring Python backend engineer with FastAPI and PostgreSQL.", 95
+"Mobile app developer with Flutter and Dart.", "Looking for Flutter developer for mobile apps.", 92
+"UI/UX Designer with Figma and Adobe XD.", "Hiring UI/UX designer with Figma skills.", 90
+"Cloud engineer with Azure and Kubernetes.", "Need Azure cloud engineer with Kubernetes.", 91
+"Backend developer with PHP and Laravel.", "Hiring Laravel PHP developer.", 88
+"Security analyst with SIEM and penetration testing.", "Looking for cybersecurity analyst.", 85
+"Game developer with Unity and C#.", "Hiring Unity game developer.", 92
+"Data Analyst with SQL and Tableau.", "Need data analyst with SQL and visualization.", 93
+"QA engineer with Selenium and Cypress.", "Looking for QA automation engineer.", 87
+"Technical writer with API documentation experience.", "Hiring technical writer for developer docs.", 80
+"Salesforce developer with Apex and Visualforce.", "Looking for Salesforce developer.", 85
+"Blockchain developer with Solidity and Ethereum.", "Need Solidity blockchain developer.", 95
+"AR/VR developer with Unreal Engine.", "Hiring AR/VR developer with Unreal.", 88
+"Robotics engineer with ROS and Python.", "Looking for robotics engineer.", 85
+"Computer vision engineer with OpenCV and PyTorch.", "Need computer vision specialist.", 90
+"Natural language processing engineer.", "Hiring NLP engineer.", 93
+"iOS developer with Swift and SwiftUI.", "Looking for iOS Swift developer.", 90
+"Android developer with Kotlin.", "Hiring Android Kotlin developer.", 88
+"Backend engineer with Go and microservices.", "Need Go developer with microservices.", 92
+"Full-stack with Vue.js and NestJS.", "Looking for Vue + NestJS full-stack dev.", 89
+"DevSecOps with Terraform and security.", "Hiring DevSecOps engineer.", 85
+"Data engineer with Spark and Airflow.", "Need data engineer with Spark.", 91
+"Machine learning engineer with TensorFlow.", "Hiring ML engineer with TensorFlow.", 94
+"Business analyst with Excel and Power BI.", "Looking for business analyst.", 82
+"Scrum master with agile certifications.", "Hiring Scrum Master.", 80
+"Product manager with UX and roadmap.", "Looking for Product Manager.", 78
+"System administrator with Linux and Windows.", "Need system admin.", 75
+"Network engineer with Cisco and routing.", "Hiring network engineer.", 80
+"Frontend with Angular and TypeScript.", "Looking for Angular developer.", 88
+"Backend with Ruby on Rails.", "Hiring Rails developer.", 85
+"Data scientist with R and Python.", "Need data scientist with R and Python.", 90
+"AI researcher with publications.", "Hiring AI research scientist.", 85
+"Software architect with microservices.", "Looking for software architect.", 85
+"CTO with leadership experience.", "Hiring Chief Technology Officer.", 80
+"Freelance developer with diverse projects.", "Looking for full-time senior dev.", 50
+"Recent computer science graduate.", "Looking for junior software engineer.", 75
+"Self-taught developer with GitHub portfolio.", "Hiring entry-level developer.", 65
+"Developer with 10+ years of experience.", "Looking for senior engineer with 8+ years.", 90
+"Backend engineer with REST API design.", "Need backend dev with REST APIs.", 88
+"Frontend specialist in accessibility.", "Hiring a11y-focused frontend dev.", 85
+"Engineer with GraphQL and Apollo.", "Looking for GraphQL developer.", 90
+"Dev with Docker and containerization.", "Need dev with Docker skills.", 85
+"Data scientist with NLP and transformers.", "Hiring NLP/LLM engineer.", 95
+"Full-stack developer with TDD and CI/CD.", "Looking for dev with TDD experience.", 90
+"Backend developer with database optimization.", "Need DB optimization expert.", 88
+"Engineer with real-time systems and WebSockets.", "Hiring real-time backend dev.", 87
+"Dev with monitoring and observability tools.", "Looking for SRE/observability expert.", 85
+"Developer with experience in fintech.", "Need fintech software engineer.", 88
+"Engineer with e-commerce platform experience.", "Hiring e-commerce dev.", 86
+"Dev with healthcare/medical software.", "Looking for healthcare IT developer.", 84
+"Engineer with education technology background.", "Hiring edtech developer.", 83
+"Full-stack with SaaS product experience.", "Looking for SaaS dev.", 87
+"Developer with gaming industry experience.", "Need game industry dev.", 80
+"Engineer with IoT and embedded systems.", "Hiring IoT developer.", 82
+"Dev with experience in media streaming.", "Looking for streaming tech expert.", 83
+"Engineer with enterprise software background.", "Need enterprise dev.", 81
+"Full-stack with startup experience.", "Hiring startup full-stack dev.", 85
+"Dev with open-source contributions.", "Looking for open-source contributor.", 80
+"Engineer with AWS certifications.", "Need AWS certified dev.", 88
+"Developer with Google Cloud experience.", "Hiring GCP expert.", 87
+"Dev with Azure certifications.", "Looking for Azure dev.", 86
+"Engineer with multi-cloud experience.", "Need multi-cloud dev.", 89
+"Full-stack with serverless architecture.", "Hiring serverless dev.", 88
+"Developer with event-driven systems.", "Looking for event-driven engineer.", 86
+"Engineer with microservices at scale.", "Need scalable microservices dev.", 90
+"Dev with CI/CD pipelines in GitHub Actions.", "Looking for CI/CD expert.", 85
+"Engineer with performance optimization.", "Hiring performance specialist.", 87
+"Developer with security best practices.", "Need security-focused dev.", 84
+"Engineer with code review and mentoring.", "Looking for tech lead/mentor.", 83
+"Dev with cross-functional collaboration.", "Hiring team player.", 80
+"Engineer with technical writing skills.", "Need dev who documents well.", 78
+"Developer with agile and scrum.", "Looking for agile dev.", 81
+"Engineer with communication skills.", "Hiring communicative dev.", 79
+"Dev with remote work experience.", "Looking for remote-first dev.", 75
+"Engineer with startup growth experience.", "Need startup-scaling dev.", 82
+"Full-stack with mobile-responsive design.", "Hiring responsive dev.", 84
+"Developer with PWA experience.", "Looking for PWA dev.", 81
+"Engineer with TypeScript expertise.", "Need TypeScript specialist.", 88
+"Dev with modern JavaScript (ES2024+).", "Looking for modern JS dev.", 86
+"Engineer with React 18+ and server components.", "Hiring React 18 dev.", 90
+"Developer with Next.js 14+ App Router.", "Need Next.js dev.", 92
+"Engineer with Vue 3 and Composition API.", "Looking for Vue 3 dev.", 89
+"Dev with Svelte and SvelteKit.", "Hiring Svelte dev.", 85
+"Engineer with Tailwind CSS and modern CSS.", "Need CSS expert.", 83
+"Developer with WebGL and three.js.", "Looking for 3D web dev.", 80
+"Engineer with AR/VR for web.", "Hiring web AR/VR dev.", 78
+"Dev with WebAssembly experience.", "Need Wasm dev.", 76
+"Engineer with mobile-first development.", "Looking for mobile-first dev.", 82
+"Developer with SEO and web performance.", "Need SEO-focused dev.", 79
+"Engineer with analytics and A/B testing.", "Hiring analytics dev.", 77
+"Dev with content management systems.", "Looking for CMS dev.", 75
+"Engineer with e-commerce platforms.", "Need Shopify/Magento dev.", 78
+"Developer with payment integration.", "Hiring payment dev.", 76
+"Engineer with authentication/authorization.", "Looking for auth expert.", 84
+"Dev with OAuth and SSO integration.", "Need SSO/OAuth dev.", 82
+"Engineer with data encryption.", "Hiring security dev.", 85
+"Developer with API security best practices.", "Need API security dev.", 83
+"Engineer with GDPR and compliance.", "Looking for compliance-focused dev.", 81
