@@ -81,7 +81,7 @@ const Users = () => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
         window.location.href =
-          response.user.role === 'admin'
+          (response.user.role === 'admin' || response.user.role === 'super_admin')
             ? '/admin/dashboard'
             : response.user.role === 'partner'
               ? '/partner/dashboard'

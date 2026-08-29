@@ -13,26 +13,29 @@ const resetAdmin = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB');
 
-        const email = 'admin@neogen.com';
-        const newPassword = 'admin123';
+        const email = process.env.ADMIN_EMAIL || 'neogenbyankish@gmail.com';
+        const newPassword = process.env.ADMIN_PASSWORD || 'Neogen@0285';
+        const newName = process.env.ADMIN_NAME || 'Ankish(CEO)';
 
         const user = await User.findOne({ email: email.toLowerCase() });
         
         if (!user) {
             console.log('Admin user not found, creating new one...');
             await User.create({
-                name: 'Super Admin',
+                name: newName,
                 email: email,
                 password: newPassword,
-                role: 'admin',
+                role: 'super_admin',
                 active: true,
                 isVerified: true
             });
-            console.log('Admin created with password: admin123');
+            console.log(`Admin created with email: ${email} and password: ${newPassword}`);
         } else {
+            user.name = newName;
             user.password = newPassword;
+            user.role = 'super_admin';
             await user.save();
-            console.log('Admin password reset to: admin123');
+            console.log(`Admin updated - email: ${email}, role: super_admin, password reset to: ${newPassword}`);
         }
 
         process.exit();

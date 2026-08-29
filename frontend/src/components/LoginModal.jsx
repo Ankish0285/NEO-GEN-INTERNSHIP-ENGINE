@@ -68,7 +68,7 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
           
           setTimeout(() => {
             onClose();
-            if (result.role === 'admin') {
+            if (result.role === 'admin' || result.role === 'super_admin') {
               window.location.href = '/admin/dashboard';
             } else if (result.role === 'partner') {
               window.location.href = '/partner/dashboard';
@@ -119,9 +119,12 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
             setTimeout(() => {
               onClose();
               
-              if (result.role === 'admin') {
+              if (result.role === 'admin' || result.role === 'super_admin') {
                 console.log('[LoginModal] Redirecting admin to /admin/dashboard');
                 window.location.href = '/admin/dashboard';
+              } else if (result.role === 'partner') {
+                console.log('[LoginModal] Redirecting partner to /partner/dashboard');
+                window.location.href = '/partner/dashboard';
               } else {
                 console.log('[LoginModal] Redirecting student to /dashboard');
                 window.location.href = '/dashboard';

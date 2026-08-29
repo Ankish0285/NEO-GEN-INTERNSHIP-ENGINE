@@ -26,7 +26,7 @@ const supportTicketSchema = new mongoose.Schema(
     userName: { type: String, default: '' },
     email: { type: String, default: '' },
     phone: { type: String, default: '' },
-    role: { type: String, enum: ['student', 'admin', 'partner'], default: 'student' },
+    role: { type: String, enum: ['student', 'admin', 'super_admin', 'partner'], default: 'student' },
     subject: { type: String, required: true, trim: true },
     message: { type: String, required: true },
     category: {

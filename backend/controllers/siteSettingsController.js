@@ -160,7 +160,7 @@ const updateSiteSettings = asyncHandler(async (req, res) => {
 // @route   POST /api/site-settings/upload
 // @access  Private/Admin
 const uploadSiteAsset = asyncHandler(async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
+  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'super_admin')) {
     res.status(403);
     throw new Error('Forbidden - Super Admin access required');
   }

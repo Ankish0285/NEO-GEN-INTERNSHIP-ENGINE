@@ -4,7 +4,7 @@ const SupportTicket = require('../models/SupportTicket');
 const User = require('../models/User');
 const { createAndNotify } = require('../utils/notificationHelper');
 
-const STAFF_ROLES = ['admin', 'partner'];
+const STAFF_ROLES = ['admin', 'super_admin', 'partner'];
 
 /** Normalize ObjectId or populated { _id } for comparisons */
 function idStr(value) {
@@ -60,7 +60,7 @@ function emitTicketUpdate(req, ticket, recipientIds = []) {
 }
 
 async function notifyAdminsNewTicket(req, ticket) {
-  const admins = await User.find({ role: 'admin', active: { $ne: false } }).select('_id');
+  const admins = await User.find({ role: { $in: ['admin', 'super_admin'] }, active: { $ne: false } }).select('_id');
   await Promise.all(
     admins.map((a) =>
       createAndNotify(req.app, {
@@ -78,7 +78,7 @@ async function notifyAdminsNewTicket(req, ticket) {
 function canAccessTicket(user, ticket) {
   if (!user || !ticket) return false;
   const role = userRole(user);
-  if (role === 'admin' || role === 'partner') return true;
+  if (role === 'admin' || role === 'super_admin' || role === 'partner') return true;
   if (isTicketOwner(user, ticket)) return true;
   return false;
 }
@@ -158,7 +158,7 @@ const getTickets = asyncHandler(async (req, res) => {
       });
     }
     and.push({ $or: ownerOr });
-  } else if (role === 'admin' && assignedTo) {
+  } else if ((role === 'admin' || role === 'super_admin') && assignedTo) {
     filter.assignedTo = assignedTo;
   }
 
@@ -191,7 +191,7 @@ const getTickets = asyncHandler(async (req, res) => {
 // @route   GET /api/support-tickets/unread-count
 const getUnreadCount = asyncHandler(async (req, res) => {
   let count = 0;
-  if (req.user.role === 'admin' || req.user.role === 'partner') {
+  if (req.user.role === 'admin' || req.user.role === 'super_admin' || req.user.role === 'partner') {
     count = await SupportTicket.countDocuments({ unreadByStaff: true });
   } else {
     count = await SupportTicket.countDocuments({ userId: req.user._id, unreadByUser: true });
@@ -219,7 +219,7 @@ const getTicket = asyncHandler(async (req, res) => {
   }
 
   const role = userRole(req.user);
-  if (role === 'admin' || (role === 'partner' && idsMatch(ticket.assignedTo, req.user._id))) {
+  if (role === 'admin' || role === 'super_admin' || (role === 'partner' && idsMatch(ticket.assignedTo, req.user._id))) {
     if (ticket.unreadByStaff) {
       ticket.unreadByStaff = false;
       await ticket.save();
@@ -280,7 +280,7 @@ const replyTicket = asyncHandler(async (req, res) => {
   await ticket.save();
 
   const link =
-    req.user.role === 'admin'
+    (req.user.role === 'admin' || req.user.role === 'super_admin')
       ? '/admin/dashboard/support-inbox'
       : req.user.role === 'partner'
         ? '/partner/dashboard/support-inbox'
@@ -297,7 +297,7 @@ const replyTicket = asyncHandler(async (req, res) => {
       link: '/dashboard/support',
     });
   } else {
-    const admins = await User.find({ role: 'admin', active: { $ne: false } }).select('_id');
+    const admins = await User.find({ role: { $in: ['admin', 'super_admin'] }, active: { $ne: false } }).select('_id');
     await Promise.all(
       admins.map((a) =>
         createAndNotify(req.app, {
@@ -341,7 +341,7 @@ const updateStatus = asyncHandler(async (req, res) => {
   }
 
   const role = userRole(req.user);
-  if (role !== 'admin' && role !== 'partner') {
+  if (role !== 'admin' && role !== 'super_admin' && role !== 'partner') {
     res.status(403);
     throw new Error('Admin or Partner access required');
   }
@@ -368,7 +368,7 @@ const updateStatus = asyncHandler(async (req, res) => {
 // @desc    Assign ticket (admin only)
 // @route   PATCH /api/support-tickets/:id/assign
 const assignTicket = asyncHandler(async (req, res) => {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
     res.status(403);
     throw new Error('Only Super Admin can assign tickets');
   }
@@ -385,7 +385,7 @@ const assignTicket = asyncHandler(async (req, res) => {
     ticket.assignedToName = '';
   } else {
     const assignee = await User.findById(assignedTo);
-    if (!assignee || !['admin', 'partner'].includes(assignee.role)) {
+    if (!assignee || !['admin', 'super_admin', 'partner'].includes(assignee.role)) {
       res.status(400);
       throw new Error('Invalid assignee');
     }
@@ -414,7 +414,7 @@ const assignTicket = asyncHandler(async (req, res) => {
 // @desc    Delete ticket (admin only)
 // @route   DELETE /api/support-tickets/:id
 const deleteTicket = asyncHandler(async (req, res) => {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
     res.status(403);
     throw new Error('Only Super Admin can delete tickets');
   }
@@ -432,12 +432,12 @@ const deleteTicket = asyncHandler(async (req, res) => {
 // @desc    Staff list for assignment dropdown
 // @route   GET /api/support-tickets/meta/assignees
 const getAssignees = asyncHandler(async (req, res) => {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
     res.status(403);
     throw new Error('Admin only');
   }
   const staff = await User.find({
-    role: { $in: ['admin', 'partner'] },
+    role: { $in: ['admin', 'super_admin', 'partner'] },
     active: { $ne: false },
   }).select('name email role');
   res.json({ success: true, staff });

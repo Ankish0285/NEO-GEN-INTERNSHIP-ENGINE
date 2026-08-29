@@ -475,7 +475,7 @@ const loginSuperAdmin = asyncHandler(async (req, res) => {
         throw new Error('Invalid email or password');
     }
 
-    if (user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'super_admin') {
         res.status(403);
         throw new Error('Access denied. Super Admin credentials required.');
     }

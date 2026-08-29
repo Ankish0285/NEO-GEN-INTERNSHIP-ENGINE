@@ -418,7 +418,7 @@ const aiChat = asyncHandler(async (req, res) => {
 
 // @route GET /api/ai/admin/insights
 const getAdminAIInsights = asyncHandler(async (req, res) => {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
     res.status(403);
     throw new Error('Admin only');
   }

@@ -190,7 +190,7 @@ const WebsiteCMS = () => {
     ? resolveStoryImageUrl(heroImages[0]) || heroImages[0]
     : null;
 
-  if (!authLoading && user?.role !== 'admin') {
+  if (!authLoading && user?.role !== 'admin' && user?.role !== 'super_admin') {
     return <Navigate to="/dashboard" replace />;
   }
 

@@ -32,9 +32,9 @@ const DashboardNavbar = ({ onMenuClick, user }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const panelConfig = roleConfig[user?.role] || roleConfig.student;
+  const panelConfig = roleConfig[user?.role] || (user?.role === 'super_admin' ? roleConfig.admin : null) || roleConfig.student;
   const roleLabel =
-    user?.role === 'admin' ? 'Administrator' : user?.role === 'partner' ? 'Partner' : 'Student';
+    (user?.role === 'admin' || user?.role === 'super_admin') ? 'Super Admin' : user?.role === 'partner' ? 'Partner' : 'Student';
 
   const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=FF9933&color=fff`;
   const rawPic = typeof user?.profilePicture === 'string' ? user.profilePicture.trim() : '';
@@ -65,14 +65,14 @@ const DashboardNavbar = ({ onMenuClick, user }) => {
   };
 
   const profilePath =
-    user?.role === 'admin'
+    (user?.role === 'admin' || user?.role === 'super_admin')
       ? '/admin/dashboard/profile'
       : user?.role === 'partner'
         ? '/partner/dashboard/profile'
         : '/dashboard/profile';
 
   const settingsPath =
-    user?.role === 'admin'
+    (user?.role === 'admin' || user?.role === 'super_admin')
       ? '/admin/dashboard/settings'
       : user?.role === 'partner'
         ? '/partner/dashboard/settings'

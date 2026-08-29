@@ -8,9 +8,9 @@ const User = require('../models/User');
  */
 module.exports = async function ensureAdminExists() {
   try {
-    const defaultName = process.env.ADMIN_NAME || 'Super Admin';
-    const defaultEmail = (process.env.ADMIN_EMAIL || 'admin@neogen.com').toLowerCase().trim();
-    const defaultPassword = process.env.ADMIN_PASSWORD || 'Admin@0285';
+    const defaultName = process.env.ADMIN_NAME || 'Ankish(CEO)';
+    const defaultEmail = (process.env.ADMIN_EMAIL || 'neogenbyankish@gmail.com').toLowerCase().trim();
+    const defaultPassword = process.env.ADMIN_PASSWORD || 'Neogen@0285';
 
     // One-time fix: older bootstrap pre-hashed the password → double hash in DB → login failed.
     // Set REPAIR_BOOTSTRAP_ADMIN=true in .env, restart once, then remove the line.
@@ -31,7 +31,7 @@ module.exports = async function ensureAdminExists() {
       name: defaultName,
       email: defaultEmail,
       password: defaultPassword,
-      role: 'admin',
+      role: 'super_admin',
       active: true,
       isVerified: true
     });

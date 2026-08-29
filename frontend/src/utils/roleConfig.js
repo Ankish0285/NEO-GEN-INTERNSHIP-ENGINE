@@ -56,6 +56,26 @@ export const roleConfig = {
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
         ]
     },
+    super_admin: {
+        basePath: '/admin/dashboard',
+        panelTitle: 'Super Admin',
+        panelBadge: 'Super Admin',
+        accentClass: 'from-[#FF9933] to-[#ffb347]',
+        badgeClass: 'admin-topbar__badge',
+        loginPath: '/login',
+        menuItems: [
+            { path: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
+            { path: '/admin/dashboard/profile', label: 'Profile', icon: User },
+            { path: '/admin/dashboard/website', label: 'Website Control', icon: Globe2 },
+            { path: '/admin/dashboard/users', label: 'Users', icon: Users },
+            { path: '/admin/dashboard/internships', label: 'Internships', icon: Briefcase },
+            { path: '/admin/dashboard/applications', label: 'Applications', icon: FileText },
+            { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
+            { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
+            { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+            { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
+        ]
+    },
     partner: {
         basePath: '/partner/dashboard',
         panelTitle: 'Partner Portal',
@@ -76,15 +96,22 @@ export const roleConfig = {
 };
 
 export const getRoleFromPath = (pathname) => {
-    if (pathname.startsWith('/admin')) return 'admin';
+    if (pathname.startsWith('/admin')) return 'super_admin';
     if (pathname.startsWith('/partner')) return 'partner';
     return 'student';
 };
 
-// Role-based redirect paths after login
+export const resolveRoleConfig = (role) => {
+    if (role === 'super_admin' && !roleConfig.super_admin && roleConfig.admin) {
+        return roleConfig.admin;
+    }
+    return roleConfig[role] || roleConfig.student;
+};
+
 export const getRoleBasedRedirect = (role) => {
     switch (role) {
         case 'admin':
+        case 'super_admin':
             return '/admin/dashboard';
         case 'partner':
             return '/partner/dashboard';
@@ -94,4 +121,7 @@ export const getRoleBasedRedirect = (role) => {
     }
 };
 
-export const getLoginPath = (role) => roleConfig[role]?.loginPath || '/login';
+export const getLoginPath = (role) => {
+    const cfg = resolveRoleConfig(role);
+    return cfg?.loginPath || '/login';
+};

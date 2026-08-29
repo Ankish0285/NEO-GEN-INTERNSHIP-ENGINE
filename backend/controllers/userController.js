@@ -69,7 +69,7 @@ const createPartner = asyncHandler(async (req, res) => {
 const blockUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
-    if (!user || user.role === 'admin') {
+    if (!user || user.role === 'admin' || user.role === 'super_admin') {
         res.status(404);
         throw new Error('User not found');
     }
@@ -116,7 +116,7 @@ const toggleUserStatus = asyncHandler(async (req, res) => {
 const deleteUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
-    if (!user || user.role === 'admin') {
+    if (!user || user.role === 'admin' || user.role === 'super_admin') {
         res.status(404);
         throw new Error('User not found');
     }

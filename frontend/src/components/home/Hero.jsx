@@ -11,7 +11,7 @@ const Hero = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { settings } = useSiteSettings();
-  const canPostInternship = user?.role === 'admin' || user?.role === 'partner';
+  const canPostInternship = user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'partner';
   const { branding, hero } = settings;
   const heroImages = Array.isArray(hero.backgroundImages) && hero.backgroundImages.length
     ? hero.backgroundImages
@@ -100,7 +100,7 @@ const Hero = () => {
                 className="neo-btn neo-btn-success"
                 onClick={() =>
                   navigate(
-                    user.role === 'admin'
+                    (user.role === 'admin' || user.role === 'super_admin')
                       ? '/admin/dashboard/internships'
                       : '/partner/dashboard/post-internship'
                   )

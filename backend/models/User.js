@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['student', 'admin', 'partner'],
+      enum: ['student', 'admin', 'super_admin', 'partner'],
       default: 'student',
     },
     active: {
@@ -113,7 +113,7 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 
 // Calculate profile completion on save
 userSchema.pre('save', function (next) {
-  if (this.role === 'admin') return next();
+  if (this.role === 'admin' || this.role === 'super_admin') return next();
 
   let score = 0;
   const totalFields = 8; // name, email, phone, university, course, skills, resume, profilePicture
