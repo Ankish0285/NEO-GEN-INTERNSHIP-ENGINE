@@ -325,7 +325,7 @@ const StudentSupport = () => {
               <p className="text-center text-gray-500 text-sm py-8">No messages yet.</p>
             )}
             {thread.map((msg, idx) => {
-              const isStaff = msg._id !== 'initial' && ['admin', 'partner'].includes(msg.authorRole);
+              const isStaff = msg._id !== 'initial' && ['admin', 'super_admin', 'partner'].includes(msg.authorRole);
               return (
                 <div key={msg._id || idx} className={clsx('flex', isStaff ? 'justify-start' : 'justify-end')}>
                   <div

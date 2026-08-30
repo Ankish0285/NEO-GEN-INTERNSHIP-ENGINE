@@ -146,7 +146,7 @@ const Overview = () => {
             icon={Briefcase}
             color="text-green-primary"
             bgClass="bg-green-light/40"
-            label={`${dashboardData?.pendingReviews ?? 0} pending review`}
+            trend={`${dashboardData?.pendingReviews ?? 0} pending review`}
             loading={loading}
             />
         </motion.div>

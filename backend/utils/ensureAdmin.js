@@ -41,7 +41,7 @@ module.exports = async function ensureAdminExists() {
     console.log(`👤 Name:     ${adminUser.name}`);
     console.log(`📧 Email:    ${adminUser.email}`);
     console.log('🔐 Password: (hidden)');
-    console.log('🔎 Role:     admin');
+    console.log(`🔎 Role:     ${adminUser.role}`);
     console.log('════════════════════════════════════\n');
   } catch (err) {
     console.error('[Bootstrap] Failed to ensure admin exists:', err.message);

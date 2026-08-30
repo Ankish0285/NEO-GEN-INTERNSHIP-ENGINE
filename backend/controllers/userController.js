@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 // @route   GET /api/users
 // @access  Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-    const users = await User.find({ role: { $ne: 'admin' } }).select('-password');
+    const users = await User.find({ role: { $nin: ['admin', 'super_admin'] } }).select('-password');
     res.status(200).json(users);
 });
 

@@ -337,7 +337,7 @@ const SupportInbox = ({ mode = 'admin' }) => {
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={replyRef}>
                 {thread.map((msg, idx) => {
-                  const isStaff = ['admin', 'partner'].includes(msg.authorRole);
+                  const isStaff = ['admin', 'super_admin', 'partner'].includes(msg.authorRole);
                   const isMine =
                     String(msg.author) === String(user?._id) ||
                     (idx === 0 && !isStaff && String(selected.userId) === String(user?._id));
