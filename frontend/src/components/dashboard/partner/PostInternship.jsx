@@ -1,26 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../../ui/Card';
 import Button from '../../ui/Button';
 import { api } from '../../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const PostInternship = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editingId = searchParams.get('edit');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingInternship, setLoadingInternship] = useState(Boolean(editingId));
   const [formData, setFormData] = useState({
     title: '',
     organization: '',
     department: '',
     location: '',
     type: 'Remote',
+    workMode: '',
     skills: '',
     description: '',
     eligibility: '',
+    requirements: '',
+    responsibilities: '',
     duration: '',
     stipend: '',
     deadline: '',
+    startDate: '',
+    openings: '',
+    benefits: '',
     applyLink: ''
   });
+
+  const toDateInput = (dateVal) => {
+    if (!dateVal) return '';
+    const d = new Date(dateVal);
+    if (Number.isNaN(d.getTime())) return '';
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  useEffect(() => {
+    if (!editingId) return;
+    const load = async () => {
+      try {
+        setLoadingInternship(true);
+        const data = await api.get(`/internships/${editingId}`);
+        const internship = data?.data || data;
+        setFormData({
+          title: internship.title || '',
+          organization: internship.organization || '',
+          department: internship.department || '',
+          location: internship.location || '',
+          type: internship.type || 'Remote',
+          workMode: internship.workMode || '',
+          skills: Array.isArray(internship.skills) ? internship.skills.join(', ') : (internship.skills || ''),
+          description: internship.description || '',
+          eligibility: internship.eligibility || '',
+          requirements: internship.requirements || '',
+          responsibilities: internship.responsibilities || '',
+          duration: internship.duration || '',
+          stipend: internship.stipend || '',
+          deadline: toDateInput(internship.deadline),
+          startDate: toDateInput(internship.startDate),
+          openings: internship.openings || '',
+          benefits: internship.benefits || '',
+          applyLink: internship.applyLink || ''
+        });
+      } catch (err) {
+        console.error('Error loading internship for edit:', err);
+        alert('Failed to load internship: ' + (err.response?.data?.message || err.message));
+        navigate('/partner/dashboard');
+      } finally {
+        setLoadingInternship(false);
+      }
+    };
+    load();
+  }, [editingId, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,22 +94,44 @@ const PostInternship = () => {
     try {
       const internshipData = {
         ...formData,
-        skills: formData.skills.split(',').map(f => f.trim())
+        skills: typeof formData.skills === 'string'
+          ? formData.skills.split(',').map(f => f.trim()).filter(Boolean)
+          : (formData.skills || [])
       };
-      await api.post('/internships', internshipData);
-      alert('Internship posted successfully!');
-      navigate('/dashboard/overview');
+      if (editingId) {
+        const response = await api.put(`/internships/${editingId}`, internshipData);
+        alert(`Internship updated successfully!${response?.data?.message ? ' — ' + response.data.message : ''}`);
+      } else {
+        await api.post('/internships', internshipData);
+        alert('Internship posted successfully!');
+      }
+      navigate('/partner/dashboard');
     } catch (error) {
       console.error(error);
-      alert('Failed to post internship: ' + (error.response?.data?.message || error.message));
+      alert(`Failed to ${editingId ? 'update' : 'post'} internship: ` + (error.response?.data?.message || error.message));
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (loadingInternship) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6 text-center text-gray-500">Loading internship details...</Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Post New Internship</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">{editingId ? 'Edit Internship' : 'Post New Internship'}</h1>
+        {editingId && (
+          <Button variant="outline" onClick={() => navigate('/partner/dashboard')}>
+            Cancel
+          </Button>
+        )}
+      </div>
 
       <Card className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,6 +185,38 @@ const PostInternship = () => {
             </div>
 
             <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-gray-700">Work Mode</label>
+              <select
+                name="workMode"
+                value={formData.workMode || ''}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              >
+                <option value="">Select work mode</option>
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="On-site">On-site</option>
+                <option value="In-office">In-office</option>
+              </select>
+            </div>
+
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-gray-700">Internship Type</label>
+              <select
+                name="type"
+                value={formData.type || 'Remote'}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              >
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="In-office">In-office</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Full-time">Full-time</option>
+              </select>
+            </div>
+
+            <div className="sm:col-span-3">
               <label className="block text-sm font-medium text-gray-700">Skills (comma separated)</label>
               <input
                 type="text"
@@ -136,7 +248,52 @@ const PostInternship = () => {
                 value={formData.eligibility}
                 onChange={handleInputChange}
                 required
-                rows={4}
+                rows={3}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            <div className="sm:col-span-6">
+              <label className="block text-sm font-medium text-gray-700">Requirements</label>
+              <textarea
+                name="requirements"
+                value={formData.requirements || ''}
+                onChange={handleInputChange}
+                rows={3}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            <div className="sm:col-span-6">
+              <label className="block text-sm font-medium text-gray-700">Responsibilities</label>
+              <textarea
+                name="responsibilities"
+                value={formData.responsibilities || ''}
+                onChange={handleInputChange}
+                rows={3}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-gray-700">Benefits</label>
+              <textarea
+                name="benefits"
+                value={formData.benefits || ''}
+                onChange={handleInputChange}
+                rows={3}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-gray-700">Number of Openings</label>
+              <input
+                type="number"
+                min="1"
+                name="openings"
+                value={formData.openings || ''}
+                onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
@@ -166,7 +323,18 @@ const PostInternship = () => {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Deadline</label>
+              <label className="block text-sm font-medium text-gray-700">Start Date</label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate || ''}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-gray-700">Application Deadline</label>
               <input
                 type="date"
                 name="deadline"
@@ -192,7 +360,7 @@ const PostInternship = () => {
 
           <div className="flex justify-end">
             <Button type="submit" isLoading={isSubmitting}>
-              Post Internship
+              {editingId ? 'Update Internship' : 'Post Internship'}
             </Button>
           </div>
         </form>

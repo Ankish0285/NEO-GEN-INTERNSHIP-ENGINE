@@ -4,6 +4,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Pages
 import Home from '../pages/Home';
 import Login from '../pages/auth/Login';
+import ForgotPassword from '../pages/auth/ForgotPassword';
+import ResetPassword from '../pages/auth/ResetPassword';
 import FindInternship from '../pages/FindInternship';
 import ResumeTemplates from '../pages/ResumeTemplates';
 import SuccessStoriesPublic from '../pages/SuccessStoriesPublic';
@@ -51,6 +53,8 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/admin/login" element={<Navigate to="/login" replace />} />
       <Route path="/partner/login" element={<Navigate to="/login" replace />} />
       <Route path="/find-internship" element={<FindInternship />} />

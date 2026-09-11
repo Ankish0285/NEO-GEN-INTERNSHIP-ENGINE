@@ -51,6 +51,35 @@ const internshipSchema = mongoose.Schema(
       type: String,
       required: false, // Optional for internal application
     },
+    type: {
+      type: String,
+      required: false,
+    },
+    workMode: {
+      type: String,
+      required: false,
+    },
+    startDate: {
+      type: Date,
+      required: false,
+    },
+    openings: {
+      type: Number,
+      required: false,
+      min: [1, 'Openings must be at least 1'],
+    },
+    benefits: {
+      type: String,
+      required: false,
+    },
+    requirements: {
+      type: String,
+      required: false,
+    },
+    responsibilities: {
+      type: String,
+      required: false,
+    },
     status: {
       type: String,
       enum: ['draft', 'pending', 'active', 'published', 'closed', 'expired'],
@@ -68,4 +97,3 @@ const internshipSchema = mongoose.Schema(
 );
 
 module.exports = mongoose.model('Internship', internshipSchema);
-

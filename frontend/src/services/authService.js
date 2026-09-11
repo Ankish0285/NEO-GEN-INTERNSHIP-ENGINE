@@ -43,6 +43,31 @@ const AuthService = {
 
   loginPartner: (email, password) => AuthService.login(email, password),
 
+  // Forgot Password - send reset link to email
+  forgotPassword: async (email) => {
+    return await api.post('/auth/forgot-password', { email });
+  },
+
+  // Reset Password - using secure token from email link
+  resetPassword: async (token, newPassword, confirmPassword) => {
+    return await api.put(`/auth/reset-password/${token}`, { newPassword, confirmPassword });
+  },
+
+  // Google OAuth login - credential (ID token) posted to backend for verification
+  googleLogin: async (credentialIdToken) => {
+    const data = await api.post('/auth/google', { token: credentialIdToken });
+
+    if (data.success && data.token) {
+      localStorage.setItem('token', data.token);
+      const user = { ...data };
+      delete user.token;
+      delete user.success;
+      delete user.message;
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+    return data;
+  },
+
   // Logout
   logout: () => {
     localStorage.removeItem('token');

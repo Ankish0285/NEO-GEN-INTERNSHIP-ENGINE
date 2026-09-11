@@ -109,6 +109,11 @@ const getInternshipById = asyncHandler(async (req, res) => {
 // @route   POST /api/internships
 // @access  Private
 const createInternship = asyncHandler(async (req, res) => {
+    if (!req.user || !['partner', 'admin', 'super_admin'].includes(req.user.role)) {
+        res.status(403);
+        throw new Error('Forbidden - Only partners and super admins can post internships');
+    }
+
     req.body.createdBy = req.user.id;
     // Set to active so it immediately appears on the webpage
     req.body.status = 'active';
@@ -128,7 +133,7 @@ const createInternship = asyncHandler(async (req, res) => {
 
 // @desc    Update internship
 // @route   PUT /api/internships/:id
-// @access  Private/Admin
+// @access  Private (Super Admin: any internship, Partner: own internship only)
 const updateInternship = asyncHandler(async (req, res) => {
     const internship = await Internship.findById(req.params.id);
 
@@ -137,20 +142,91 @@ const updateInternship = asyncHandler(async (req, res) => {
         throw new Error('Internship not found');
     }
 
-    const updatedInternship = await Internship.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-    });
+    // ===== AUTHORIZATION =====
+    const role = req.user.role;
+    const userId = req.user._id.toString();
+    const ownerId = internship.createdBy ? internship.createdBy.toString() : null;
+
+    let authorized = false;
+    if (role === 'super_admin' || role === 'admin') {
+        authorized = true;
+    } else if (role === 'partner') {
+        authorized = ownerId === userId;
+    }
+
+    if (!authorized) {
+        if (role === 'partner') {
+            res.status(403);
+            throw new Error('Forbidden - You can only edit internships posted by your organization');
+        }
+        res.status(403);
+        throw new Error('Forbidden - You are not allowed to edit this internship');
+    }
+
+    // ===== FIELD SANITIZATION =====
+    // Only allow non-administrative, legitimate editable fields through.
+    // Role-based safety: partners/super admin cannot escalate privileges via update.
+    const ALLOWED_FIELDS = [
+        'title',
+        'organization',
+        'department',
+        'duration',
+        'stipend',
+        'location',
+        'eligibility',
+        'deadline',
+        'description',
+        'skills',
+        'applyLink',
+        'type',
+        'workMode',
+        'startDate',
+        'openings',
+        'benefits',
+        'requirements',
+        'responsibilities'
+    ];
+
+    // Super admin / admin can also update status. Partner cannot arbitrarily approve.
+    if (role === 'super_admin' || role === 'admin') {
+        ALLOWED_FIELDS.push('status');
+    }
+
+    const sanitized = {};
+    for (const field of ALLOWED_FIELDS) {
+        if (req.body[field] !== undefined) {
+            sanitized[field] = req.body[field];
+        }
+    }
+
+    const updatedInternship = await Internship.findByIdAndUpdate(
+        req.params.id,
+        sanitized,
+        {
+            new: true,
+            runValidators: true,
+            context: 'query'
+        }
+    );
 
     // Notify users about update
-    await createAndNotify(req.app, {
-        title: 'Internship Updated',
-        message: `The internship "${internship.title}" at ${internship.organization} has been updated.`,
-        type: 'recurring',
-        priority: 'low',
-        link: `/internships/${internship._id}`
-    });
+    try {
+        await createAndNotify(req.app, {
+            title: 'Internship Updated',
+            message: `The internship "${internship.title}" at ${internship.organization} has been updated.`,
+            type: 'recurring',
+            priority: 'low',
+            link: `/internships/${internship._id}`
+        });
+    } catch (notifyErr) {
+        console.warn('[Internship] Notification skipped:', notifyErr.message);
+    }
 
-    res.status(200).json(updatedInternship);
+    res.status(200).json({
+        success: true,
+        message: 'Internship updated successfully',
+        data: updatedInternship
+    });
 });
 
 // @desc    Delete internship

@@ -83,6 +83,18 @@ const userSchema = mongoose.Schema(
     profileCompletionPercentage: {
       type: Number,
       default: 0
+    },
+    googleId: {
+      type: String,
+      sparse: true,
+    },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpire: {
+      type: Date,
+      select: false,
     }
   },
   {

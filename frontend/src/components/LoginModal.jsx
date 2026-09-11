@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import AuthService from '../services/authService';
 import logo from '../assets/images/logo.png';
 
 const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false }) => {
+  const googleClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
+  const isGoogleConfigured = Boolean(googleClientId);
   const [activeTab, setActiveTab] = useState(initialTab);
   const [formData, setFormData] = useState({
     email: '',
@@ -20,6 +24,7 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
   const [showOtp, setShowOtp] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
   const { login, register, verifyOtp } = useAuth();
+  const navigate = useNavigate();
 
   // Update active tab when initialTab prop changes
   useEffect(() => {
@@ -196,8 +201,43 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
     }
   };
 
-  const handleGoogleAuth = () => {
-    alert("Google OAuth - Connecting... (Feature coming soon)");
+  const handleGoogleAuth = (credentialResponse) => {
+    // Real Google OAuth via @react-oauth/google — credentialResponse.credential = id_token (JWT)
+    const idToken = credentialResponse?.credential;
+    if (!idToken) {
+      setError('Google authentication failed. No credential received.');
+      return;
+    }
+    processGoogleLogin(idToken);
+  };
+
+  const processGoogleLogin = async (idToken) => {
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    try {
+      const result = await AuthService.googleLogin(idToken);
+      if (result?.success) {
+        setSuccess('Login successful!');
+        setTimeout(() => {
+          onClose?.();
+          if (result.role === 'admin' || result.role === 'super_admin') {
+            window.location.href = '/admin/dashboard';
+          } else if (result.role === 'partner') {
+            window.location.href = '/partner/dashboard';
+          } else {
+            window.location.href = '/dashboard';
+          }
+        }, 1000);
+      } else {
+        setError(result?.message || 'Google login failed. Please try again.');
+      }
+    } catch (err) {
+      console.error('[LoginModal] Google login error:', err);
+      setError(err?.message || 'Google login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatTimer = (seconds) => {
@@ -306,7 +346,12 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
                   <label className="checkbox-container">
                     <input type="checkbox" /> Remember me
                   </label>
-                  <a href="#" className="forgot-password" style={{ fontSize: '14px', color: '#666' }}>Forgot Password?</a>
+                  <a href="/forgot-password"
+                     onClick={(e) => { e.preventDefault(); onClose?.(); navigate('/forgot-password'); }}
+                     className="forgot-password"
+                     style={{ fontSize: '14px', color: '#666' }}>
+                    Forgot Password?
+                  </a>
                 </div>
                 <button type="submit" className="btn btn--primary btn--full-width" disabled={loading}>
                   {loading ? 'Logging in...' : 'Login'}
@@ -467,25 +512,35 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
           </div>
           
           <div className="social-auth">
-            <button 
-              className="social-btn google" 
-              onClick={handleGoogleAuth}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                padding: '12px',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-                backgroundColor: '#fff',
-                cursor: 'pointer',
-                width: '100%'
-              }}
-            >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{width: '20px'}} />
-              Continue with Google
-            </button>
+            <div style={{ width: '100%' }}>
+              {isGoogleConfigured ? (
+                <GoogleLogin
+                  onSuccess={handleGoogleAuth}
+                  onError={() => setError('Google authentication was cancelled or failed.')}
+                  useOneTap
+                  theme="outline"
+                  text="continue_with"
+                  shape="rectangular"
+                  width="100%"
+                  logo_alignment="left"
+                />
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="btn btn--outline btn--full-width"
+                  style={{ opacity: 0.7, cursor: 'not-allowed' }}
+                  title="Google OAuth is not configured yet"
+                >
+                  Continue with Google
+                </button>
+              )}
+            </div>
+            {!isGoogleConfigured && (
+              <p className="google-verification-notice" style={{ marginTop: '10px' }}>
+                <small>Google login is currently unavailable because `VITE_GOOGLE_CLIENT_ID` is not configured.</small>
+              </p>
+            )}
           </div>
         </div>
       </div>

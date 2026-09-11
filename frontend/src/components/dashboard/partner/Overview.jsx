@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../../ui/Card';
 import { api } from '../../../services/api';
 
 const Overview = () => {
+  const navigate = useNavigate();
   const [summary, setSummary] = useState({
     activeInternships: 0,
     totalApplications: 0,
@@ -72,16 +74,17 @@ const Overview = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">Loading...</td>
+                  <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">Loading...</td>
                 </tr>
               ) : internships.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">No internships found.</td>
+                  <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">No internships found.</td>
                 </tr>
               ) : (
                 internships.map((internship) => (
@@ -96,9 +99,21 @@ const Overview = () => {
                       {new Date(internship.deadline).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Active
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        (internship.status || 'active') === 'active' ? 'bg-green-100 text-green-800' :
+                        (internship.status || 'active') === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {(internship.status || 'Active').charAt(0).toUpperCase() + (internship.status || 'Active').slice(1)}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => navigate(`/partner/dashboard/post-internship?edit=${internship._id}`)}
+                        className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md transition-colors"
+                      >
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 ))

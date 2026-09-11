@@ -33,6 +33,7 @@ axiosInstance.interceptors.response.use(
     const customError = new Error(error.response?.data?.message || error.message || 'Request failed');
     customError.status = error.response?.status;
     customError.data = error.response?.data;
+    customError.response = error.response;
     return Promise.reject(customError);
   }
 );
