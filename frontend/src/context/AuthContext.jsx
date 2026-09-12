@@ -40,9 +40,22 @@ export const AuthProvider = ({ children }) => {
       if (data.success && data.token) {
         return persistSession(data);
       }
+      if (data.success && data.requiresOtp) {
+        return { success: true, requiresOtp: true, email: data.email, expiresIn: data.expiresIn };
+      }
       return { success: false, message: data.message || 'Login failed' };
     } catch (error) {
       return { success: false, message: error.data?.message || error.message || 'Login failed' };
+    }
+  };
+
+  const verifyLoginOtp = async (email, otp) => {
+    try {
+      const data = await AuthService.verifyLoginOtp(email, otp);
+      if (data.success && data.token) return persistSession(data);
+      return { success: false, message: data.message || 'Verification failed' };
+    } catch (error) {
+      return { success: false, message: error.data?.message || error.message || 'Verification failed' };
     }
   };
 
@@ -100,7 +113,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, loginAdmin, loginPartner, register, verifyOtp, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, loginAdmin, loginPartner, register, verifyOtp, verifyLoginOtp, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

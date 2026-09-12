@@ -19,6 +19,23 @@ const AuthService = {
     return data;
   },
 
+  verifyLoginOtp: async (email, otp) => {
+    const data = await api.post('/auth/verify-login-otp', { email, otp });
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      const user = { ...data };
+      delete user.token;
+      delete user.success;
+      delete user.message;
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+    return data;
+  },
+
+  sendLoginOtp: async (email) => {
+    return await api.post('/auth/resend-login-otp', { email });
+  },
+
   // Resend OTP
   sendOtp: async (email) => {
     return await api.post('/auth/send-otp', { email });

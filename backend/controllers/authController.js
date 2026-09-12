@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const TempUser = require('../models/TempUser');
+const LoginOtp = require('../models/LoginOtp');
 const ActivityLog = require('../models/ActivityLog');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/sendEmail');
@@ -30,6 +31,59 @@ const getFrontendOrigin = (req) => {
     }
 
     return 'http://localhost:3000';
+};
+
+const getUserPayload = (user, token, message) => {
+    const payload = {
+        success: true,
+        token,
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone || '',
+        profilePicture: user.profilePicture || '',
+        university: user.university || '',
+        course: user.course || '',
+        profileCompletionPercentage: user.profileCompletionPercentage ?? 0,
+        isVerified: user.isVerified,
+        message
+    };
+
+    if (user.role === 'partner') {
+        payload.partnerStatus = user.partnerStatus;
+        payload.partnerInfo = user.partnerInfo;
+    }
+
+    return payload;
+};
+
+const sendLoginOtp = async (user) => {
+    const otpLength = parseInt(process.env.OTP_LENGTH) || 6;
+    const otp = Math.floor(Math.pow(10, otpLength - 1) + Math.random() * (Math.pow(10, otpLength) - Math.pow(10, otpLength - 1))).toString();
+    const otpExpiryMinutes = parseInt(process.env.OTP_EXPIRY_MINUTES) || 5;
+    const otpExpires = Date.now() + otpExpiryMinutes * 60 * 1000;
+
+    await LoginOtp.findOneAndUpdate(
+        { email: user.email },
+        { user: user._id, email: user.email, otp, otpExpires, otpAttempts: 0, createdAt: new Date() },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    console.log(`[Auth] Login OTP generated for ${user.email}: ${otp} (expires in ${otpExpiryMinutes} min)`);
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'NEO GEN - Login Verification OTP',
+            message: `Dear ${user.name || 'User'},\n\nYour OTP for logging in to NEO GEN is: ${otp}\n\nThis code will expire in ${otpExpiryMinutes} minutes.`,
+            html: `<div style="font-family: Arial, sans-serif;"><h2>NEO GEN Login Verification</h2><p>Dear <strong>${user.name || 'User'}</strong>,</p><p>Your login verification OTP is:</p><h1 style="letter-spacing: 5px;">${otp}</h1><p>This code expires in ${otpExpiryMinutes} minutes.</p></div>`
+        });
+    } catch (error) {
+        console.error(`[Auth] Login OTP email failed for ${user.email}: ${error.message}`);
+        if (process.env.NODE_ENV === 'production') throw error;
+    }
+
+    return { email: user.email, expiresIn: otpExpiryMinutes };
 };
 
 // @desc    Register new user (Step 1: Save temp & Send OTP)
@@ -428,49 +482,53 @@ const loginUser = asyncHandler(async (req, res) => {
         }
     }
 
-    const activityByRole = {
-        admin: 'Super Admin Logged In',
-        partner: 'Partner Logged In',
-        student: 'Logged In',
-    };
+    const otp = await sendLoginOtp(user);
+    console.log(`[Auth] Password accepted for ${email} (${user.role}); OTP required`);
+    res.status(200).json({ success: true, requiresOtp: true, ...otp, message: 'OTP sent to your email. Verify it to complete login.' });
+});
 
+const verifyLoginOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+    const normalizedEmail = String(email || '').toLowerCase().trim();
+    const loginOtp = await LoginOtp.findOne({ email: normalizedEmail }).populate('user');
+
+    if (!normalizedEmail || !otp || !loginOtp || !loginOtp.user) {
+        res.status(400);
+        throw new Error('Email and valid login OTP are required');
+    }
+    if (Date.now() > loginOtp.otpExpires) {
+        await LoginOtp.deleteOne({ _id: loginOtp._id });
+        res.status(400);
+        throw new Error('OTP has expired. Please log in again to receive a new OTP.');
+    }
+    if (loginOtp.otp !== String(otp)) {
+        loginOtp.otpAttempts += 1;
+        if (loginOtp.otpAttempts >= 3) await LoginOtp.deleteOne({ _id: loginOtp._id });
+        else await loginOtp.save();
+        res.status(400);
+        throw new Error(loginOtp.otpAttempts >= 3 ? 'Too many failed OTP attempts. Please log in again.' : `Invalid OTP. ${3 - loginOtp.otpAttempts} attempts remaining.`);
+    }
+
+    const user = loginOtp.user;
+    await LoginOtp.deleteOne({ _id: loginOtp._id });
+    const activityAction = user.role === 'admin' || user.role === 'super_admin' ? 'Super Admin Logged In' : user.role === 'partner' ? 'Partner Logged In' : 'Logged In';
     try {
-        await ActivityLog.create({
-            user: user._id,
-            action: activityByRole[user.role] || 'Logged In',
-            details: user.role === 'partner'
-                ? { email: user.email, organization: user.partnerInfo?.organization }
-                : { email: user.email },
-            ip: req.ip,
-            userAgent: req.get('User-Agent')
-        });
-    } catch (err) {
-        console.error('Activity log error:', err);
+        await ActivityLog.create({ user: user._id, action: activityAction, details: { email: user.email }, ip: req.ip, userAgent: req.get('User-Agent') });
+    } catch (error) {
+        console.error('[Auth] Activity log error:', error);
     }
 
-    console.log(`[Auth] User ${email} (${user.role}) logged in successfully`);
+    res.status(200).json(getUserPayload(user, generateToken(user._id), 'Login successful'));
+});
 
-    const payload = {
-        success: true,
-        token: generateToken(user._id),
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone || '',
-        profilePicture: user.profilePicture || '',
-        university: user.university || '',
-        course: user.course || '',
-        profileCompletionPercentage: user.profileCompletionPercentage ?? 0,
-        message: 'Login successful',
-    };
-
-    if (user.role === 'partner') {
-        payload.partnerStatus = user.partnerStatus;
-        payload.partnerInfo = user.partnerInfo;
+const resendLoginOtp = asyncHandler(async (req, res) => {
+    const normalizedEmail = String(req.body.email || '').toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+        return res.status(200).json({ success: true, message: 'If the account exists, a new OTP has been sent.' });
     }
-
-    res.status(200).json(payload);
+    const otp = await sendLoginOtp(user);
+    res.status(200).json({ success: true, ...otp, message: 'A new login OTP has been sent.' });
 });
 
 // @desc    Authenticate super admin only
@@ -516,18 +574,9 @@ const loginSuperAdmin = asyncHandler(async (req, res) => {
         console.error('[Auth] Activity log error:', err);
     }
 
-    const token = generateToken(user._id);
-    console.log(`[Auth] Super Admin ${normalizedEmail} logged in successfully`);
-
-    res.status(200).json({
-        success: true,
-        token,
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        message: 'Super Admin login successful'
-    });
+    const otp = await sendLoginOtp(user);
+    console.log(`[Auth] Super Admin password accepted for ${normalizedEmail}; OTP required`);
+    res.status(200).json({ success: true, requiresOtp: true, ...otp, message: 'OTP sent to your email. Verify it to complete login.' });
 });
 
 // @desc    Authenticate partner only
@@ -583,20 +632,9 @@ const loginPartner = asyncHandler(async (req, res) => {
         console.error('[Auth] Activity log error:', err);
     }
 
-    const token = generateToken(user._id);
-    console.log(`[Auth] Partner ${normalizedEmail} logged in successfully`);
-
-    res.status(200).json({
-        success: true,
-        token,
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        partnerStatus: user.partnerStatus,
-        partnerInfo: user.partnerInfo,
-        message: 'Partner login successful'
-    });
+    const otp = await sendLoginOtp(user);
+    console.log(`[Auth] Partner password accepted for ${normalizedEmail}; OTP required`);
+    res.status(200).json({ success: true, requiresOtp: true, ...otp, message: 'OTP sent to your email. Verify it to complete login.' });
 });
 
 // ==============================================================
@@ -910,48 +948,8 @@ const googleLogin = asyncHandler(async (req, res) => {
             });
         }
 
-        // Log Activity - login
-        try {
-            const activityAction =
-                user.role === 'super_admin' || user.role === 'admin' ? 'Super Admin Logged In via Google'
-                : user.role === 'partner' ? 'Partner Logged In via Google'
-                : 'Logged In via Google';
-            await ActivityLog.create({
-                user: user._id,
-                action: activityAction,
-                details: user.role === 'partner'
-                    ? { email: user.email, organization: user.partnerInfo?.organization }
-                    : { email: user.email },
-                ip: req.ip,
-                userAgent: req.get('User-Agent')
-            });
-        } catch (err) {
-            console.warn('[Auth Google] Activity log error:', err);
-        }
-
-        // Build response payload (match loginUser format)
-        const payloadOut = {
-            success: true,
-            _id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            phone: user.phone || '',
-            profilePicture: user.profilePicture || picture || '',
-            university: user.university || '',
-            course: user.course || '',
-            profileCompletionPercentage: user.profileCompletionPercentage ?? 0,
-            isVerified: user.isVerified,
-            message: user.role === 'student' ? 'Login successful' : `${user.role} login successful`,
-            token: generateToken(user._id),
-        };
-
-        if (user.role === 'partner') {
-            payloadOut.partnerStatus = user.partnerStatus;
-            payloadOut.partnerInfo = user.partnerInfo;
-        }
-
-        res.json(payloadOut);
+        const otp = await sendLoginOtp(user);
+        res.json({ success: true, requiresOtp: true, ...otp, message: 'OTP sent to your email. Verify it to complete login.' });
 
     } catch (error) {
         console.error('Google Auth Error:', error);
@@ -963,6 +961,8 @@ const googleLogin = asyncHandler(async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
+    verifyLoginOtp,
+    resendLoginOtp,
     loginSuperAdmin,
     loginPartner,
     googleLogin,

@@ -23,7 +23,7 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
   const [success, setSuccess] = useState('');
   const [showOtp, setShowOtp] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
-  const { login, register, verifyOtp } = useAuth();
+  const { login, register, verifyOtp, verifyLoginOtp } = useAuth();
   const navigate = useNavigate();
 
   // Update active tab when initialTab prop changes
@@ -50,13 +50,29 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
 
     try {
       if (activeTab === 'login') {
-        // LOGIN FLOW
-        console.log('[LoginModal] Attempting login...');
-        const result = await login(formData.email, formData.password);
+        let result;
+        if (showOtp) {
+          if (!formData.otp) {
+            setError('Please enter the OTP');
+            setLoading(false);
+            return;
+          }
+          result = await verifyLoginOtp(formData.email, formData.otp);
+        } else {
+          console.log('[LoginModal] Attempting login...');
+          result = await login(formData.email, formData.password);
+        }
         
         console.log('[LoginModal] Login result:', result);
         
         if (result.success) {
+          if (result.requiresOtp) {
+            setSuccess('OTP sent to your email. Please verify it to complete login.');
+            setShowOtp(true);
+            setOtpTimer((result.expiresIn || 5) * 60);
+            return;
+          }
+
           setSuccess('Login successful!');
           
           // Reset form
@@ -187,7 +203,9 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
     setError('');
     setLoading(true);
     try {
-      const response = await AuthService.sendOtp(formData.email);
+      const response = activeTab === 'login'
+        ? await AuthService.sendLoginOtp(formData.email)
+        : await AuthService.sendOtp(formData.email);
       if (response && response.success) {
         setSuccess('New OTP sent to your email');
         setOtpTimer(300); // Reset to 5 minutes
@@ -218,6 +236,13 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
     try {
       const result = await AuthService.googleLogin(idToken);
       if (result?.success) {
+        if (result.requiresOtp) {
+          setFormData(prev => ({ ...prev, email: result.email, otp: '' }));
+          setShowOtp(true);
+          setOtpTimer((result.expiresIn || 5) * 60);
+          setSuccess('OTP sent to your email. Please verify it to complete login.');
+          return;
+        }
         setSuccess('Login successful!');
         setTimeout(() => {
           onClose?.();
@@ -316,46 +341,33 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
           {activeTab === 'login' && (
             <div id="loginTab" className="auth-form active">
               <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label className="form-label">Email</label>
-                  <input 
-                    type="email" 
-                    name="email"
-                    className="form-control" 
-                    placeholder="Enter your email" 
-                    required 
-                    value={formData.email}
-                    onChange={handleChange}
-                    autoComplete="email"
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Password</label>
-                  <input 
-                    type="password" 
-                    name="password"
-                    className="form-control" 
-                    placeholder="Enter your password" 
-                    required 
-                    value={formData.password}
-                    onChange={handleChange}
-                    autoComplete="current-password"
-                  />
-                </div>
-                <div className="form-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <label className="checkbox-container">
-                    <input type="checkbox" /> Remember me
-                  </label>
-                  <a href="/forgot-password"
-                     onClick={(e) => { e.preventDefault(); onClose?.(); navigate('/forgot-password'); }}
-                     className="forgot-password"
-                     style={{ fontSize: '14px', color: '#666' }}>
-                    Forgot Password?
-                  </a>
-                </div>
-                <button type="submit" className="btn btn--primary btn--full-width" disabled={loading}>
-                  {loading ? 'Logging in...' : 'Login'}
-                </button>
+                {!showOtp ? <>
+                  <div className="form-group">
+                    <label className="form-label">Email</label>
+                    <input type="email" name="email" className="form-control" placeholder="Enter your email" required value={formData.email} onChange={handleChange} autoComplete="email" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Password</label>
+                    <input type="password" name="password" className="form-control" placeholder="Enter your password" required value={formData.password} onChange={handleChange} autoComplete="current-password" />
+                  </div>
+                  <div className="form-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                    <label className="checkbox-container"><input type="checkbox" /> Remember me</label>
+                    <a href="/forgot-password" onClick={(e) => { e.preventDefault(); onClose?.(); navigate('/forgot-password'); }} className="forgot-password" style={{ fontSize: '14px', color: '#666' }}>Forgot Password?</a>
+                  </div>
+                  <button type="submit" className="btn btn--primary btn--full-width" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
+                </> : <>
+                  <div className="otp-verification-section" style={{ textAlign: 'center' }}>
+                    <h3>Verify Login</h3>
+                    <p style={{ color: '#666', fontSize: '14px' }}>Enter the OTP sent to <strong>{formData.email}</strong></p>
+                    <div className="form-group"><input type="text" name="otp" className="form-control" placeholder="000000" required value={formData.otp} onChange={handleChange} maxLength="6" style={{ textAlign: 'center', fontSize: '24px', letterSpacing: '10px', fontWeight: 'bold' }} /></div>
+                    <div style={{ marginBottom: '15px', color: '#666', fontSize: '14px' }}>{otpTimer > 0 ? <p>OTP expires in: <strong>{formatTimer(otpTimer)}</strong></p> : <p style={{ color: '#c33' }}>OTP has expired</p>}</div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button type="button" className="btn btn--outline btn--full-width" onClick={() => { setShowOtp(false); setFormData(prev => ({ ...prev, otp: '' })); }} disabled={loading}>Back</button>
+                      <button type="button" className="btn btn--outline btn--full-width" onClick={handleResendOtp} disabled={loading || otpTimer > 60}>{loading ? 'Resending...' : 'Resend OTP'}</button>
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn--primary btn--full-width" disabled={loading || otpTimer <= 0} style={{ marginTop: '15px' }}>{loading ? 'Verifying...' : 'Verify & Login'}</button>
+                </>}
               </form>
             </div>
           )}
