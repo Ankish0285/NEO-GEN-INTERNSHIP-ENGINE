@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, UploadCloud, GraduationCap, X, CheckCircle, ThumbsUp, Share2, Briefcase, Building2, User } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -36,10 +36,10 @@ const SuccessStoriesPublic = () => {
     try {
       setLoading(true);
       // Public view, might fetch only approved ones in a real system, but based on assignment, we fetch stories.
-      const res = await axios.get(`/api/stories?status=approved`);
-      let fetchedStories = res.data.data;
+      const res = await api.get('/stories?status=approved');
+      let fetchedStories = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
       if (filter === 'topRated') {
-        fetchedStories = fetchedStories.sort((a, b) => b.rating - a.rating);
+        fetchedStories = [...fetchedStories].sort((a, b) => (b?.rating || 0) - (a?.rating || 0));
       }
       setStories(fetchedStories);
     } catch (err) {
@@ -96,13 +96,13 @@ const SuccessStoriesPublic = () => {
       if (imageFile) {
         const uploadData = new FormData();
         uploadData.append('file', imageFile);
-        const uploadRes = await axios.post('/api/upload', uploadData, {
+        const uploadRes = await api.upload('/upload', uploadData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         imageUrl = uploadRes.data.filePath;
       }
 
-      await axios.post('/api/stories/add', { ...formData, image: imageUrl });
+      await api.post('/stories/add', { ...formData, image: imageUrl });
       toast.success('Story posted successfully! Waiting for approval.');
       setFormData({
         experience: '', rating: 0, name: '', college: '', company: '', image: ''
@@ -357,7 +357,7 @@ const SuccessStoriesPublic = () => {
           <div className="flex justify-center items-center py-20">
              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
           </div>
-        ) : stories.length === 0 ? (
+        ) : (Array.isArray(stories) ? stories : []).length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -372,7 +372,7 @@ const SuccessStoriesPublic = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence>
-              {stories.map((story, index) => (
+              {(Array.isArray(stories) ? stories : []).map((story, index) => (
                 <motion.div 
                   key={story._id}
                   id={story._id}
@@ -446,9 +446,9 @@ const SuccessStoriesPublic = () => {
 
                     <div className="flex-1 mb-6">
                       <p className={`text-slate-600 text-sm leading-relaxed ${expandedId === story._id ? '' : 'line-clamp-4'}`}>
-                        {story.experience || story.content /* fallback for old data */}
+                        {story.experience || story.content || 'No experience shared yet.'}
                       </p>
-                      {(story.experience?.length > 150 || story.content?.length > 150) && (
+                      {((story.experience?.length || 0) > 150 || (story.content?.length || 0) > 150) && (
                         <button 
                           onClick={() => setExpandedId(expandedId === story._id ? null : story._id)}
                           className="text-indigo-600 text-sm font-semibold mt-2 hover:text-indigo-800 transition-colors"

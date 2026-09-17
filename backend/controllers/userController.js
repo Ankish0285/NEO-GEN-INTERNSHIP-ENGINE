@@ -1,9 +1,11 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const Application = require('../models/Application');
+const Resume = require('../models/Resume');
 const { createAndNotify } = require('../utils/notificationHelper');
 const bcrypt = require('bcryptjs');
 
+const { deleteCloudinaryAsset } = require('../utils/cloudinaryCleanup');
 // @desc    Get all users (admin only)
 // @route   GET /api/users
 // @access  Private/Admin
@@ -121,13 +123,30 @@ const deleteUser = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
+    // Clean up student's Cloudinary profile picture.
+    if (user.profilePicture && /res\.cloudinary\.com/i.test(String(user.profilePicture))) {
+        await deleteCloudinaryAsset(user.profilePicture);
+    }
+
+    // Clean up all resumes owned by the student.
+    const resumes = await Resume.find({ user: user._id }).select('fileUrl');
+
+    for (const resume of resumes) {
+        if (resume.fileUrl && /res\.cloudinary\.com/i.test(String(resume.fileUrl))) {
+            await deleteCloudinaryAsset(resume.fileUrl);
+        }
+    }
+
     const applicationsDeleted = await Application.deleteMany({ student: user._id });
+    const resumesDeleted = await Resume.deleteMany({ user: user._id });
+
     await User.deleteOne({ _id: user._id });
 
     res.status(200).json({
         message: 'User deleted successfully',
         deletedUserId: user._id,
-        deletedApplications: applicationsDeleted.deletedCount || 0
+        deletedApplications: applicationsDeleted.deletedCount || 0,
+        deletedResumes: resumesDeleted.deletedCount || 0
     });
 });
 
@@ -142,18 +161,30 @@ const deleteMyAccount = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
-    // Delete related data
-    const applicationsDeleted = await Application.deleteMany({ student: user._id });
+    // Clean up student's Cloudinary profile picture.
+    if (user.profilePicture && /res\.cloudinary\.com/i.test(String(user.profilePicture))) {
+        await deleteCloudinaryAsset(user.profilePicture);
+    }
 
-    // TODO: Delete resume from Cloudinary if public_id is available or parsable
-    // currently we only store the URL string.
+    // Clean up all resumes owned by the student.
+    const resumes = await Resume.find({ user: user._id }).select('fileUrl');
+
+    for (const resume of resumes) {
+        if (resume.fileUrl && /res\.cloudinary\.com/i.test(String(resume.fileUrl))) {
+            await deleteCloudinaryAsset(resume.fileUrl);
+        }
+    }
+
+    const applicationsDeleted = await Application.deleteMany({ student: user._id });
+    const resumesDeleted = await Resume.deleteMany({ user: user._id });
 
     await User.deleteOne({ _id: user._id });
 
     res.status(200).json({
         message: 'Account deleted successfully',
         deletedUserId: user._id,
-        deletedApplications: applicationsDeleted.deletedCount || 0
+        deletedApplications: applicationsDeleted.deletedCount || 0,
+        deletedResumes: resumesDeleted.deletedCount || 0
     });
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../../../services/api';
 import { toast } from 'react-hot-toast';
 import { Star, Upload, Image as ImageIcon } from 'lucide-react';
 import { resolveStoryImageUrl } from '../../../utils/resolveStoryImageUrl';
@@ -19,9 +19,16 @@ const SuccessStories = () => {
 
   const fetchStories = async () => {
     try {
-      const res = await axios.get('/api/stories?status=approved');
-      setStories(res.data.data);
+      const res = await api.get('/stories?status=approved');
+
+      const fetchedStories = Array.isArray(res?.data)
+        ? res.data
+        : [];
+
+      setStories(fetchedStories);
     } catch (err) {
+      console.error('Failed to load stories:', err);
+      setStories([]);
       toast.error('Failed to load stories');
     }
   };
@@ -38,13 +45,13 @@ const SuccessStories = () => {
       if (image) {
         const formData = new FormData();
         formData.append('file', image);
-        const uploadRes = await axios.post('/api/upload', formData, {
+        const uploadRes = await api.upload('/upload', formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        imageUrl = uploadRes.data.filePath;
+        imageUrl = uploadRes.filePath;
       }
 
-      await axios.post('/api/stories/add', 
+      await api.post('/stories/add', 
         { experience, rating, image: imageUrl, college, company },
         { headers: { Authorization: `Bearer ${token}` }}
       );
@@ -79,7 +86,7 @@ const SuccessStories = () => {
               onChange={(e) => setExperience(e.target.value)}
               rows="4"
               className="w-full p-4 border border-navy/10 bg-white/50 rounded-lg focus:ring-2 focus:ring-saffron/20 focus:border-saffron transition-all outline-none resize-none"
-              placeholder="How did NEOGEN help you land your dream internship?"
+              placeholder="How did NEO GEN INTERNSHIP ENGINE help you land your dream internship?"
             ></textarea>
               </div>
           </div>
@@ -141,14 +148,14 @@ const SuccessStories = () => {
       {/* Published Stories Display */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-navy mb-6">Wall of Success</h2>
-        {stories.length === 0 ? (
+        {(Array.isArray(stories) ? stories : []).length === 0 ? (
           <div className="text-center py-12 bg-gradient-to-br from-saffron/5 to-white/40 rounded-xl border border-dashed border-saffron/20">
             <Star className="w-12 h-12 text-saffron/40 mx-auto mb-3" />
             <p className="text-navy/60 font-medium">No published stories yet. Be the first one!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {stories.map(story => (
+            {(Array.isArray(stories) ? stories : []).map(story => (
               <div key={story._id} className="glass-card p-6 flex flex-col items-center text-center">
                  {story.image ? (
                    <img

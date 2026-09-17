@@ -8,6 +8,7 @@ const fs = require('fs');
 const { extractResumeText } = require('../utils/parseResume');
 const { calculateATSScore, generateSuggestions, extractResumeInfo } = require('../utils/atsScoring');
 const cloudinary = require('../config/cloudinary');
+const { deleteCloudinaryAsset } = require('../utils/cloudinaryCleanup');
 const aiClient = require('../services/aiServiceClient');
 const { runAIPipelineForUser } = require('./aiController');
 
@@ -244,28 +245,39 @@ const getResumeScore = asyncHandler(async (req, res) => {
 // @access  Private
 const deleteResume = asyncHandler(async (req, res) => {
   const resume = await Resume.findById(req.params.resumeId);
+
   if (!resume) {
     res.status(404);
     throw new Error('Resume not found');
   }
+
   if (resume.user.toString() !== req.user.id) {
     res.status(403);
     throw new Error('Not authorized');
   }
 
-  if (!resume.fileUrl?.startsWith('http')) {
+  // Delete Cloudinary asset when the resume is stored remotely.
+  if (resume.fileUrl && /res\.cloudinary\.com/i.test(String(resume.fileUrl))) {
+    await deleteCloudinaryAsset(resume.fileUrl);
+  } else if (!resume.fileUrl?.startsWith('http')) {
     const filePath = path.join(__dirname, '../uploads/', resume.fileName);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
   }
 
   await Resume.findByIdAndDelete(req.params.resumeId);
+
   await ActivityLog.create({
     user: req.user.id,
     action: 'Deleted Resume',
     details: { fileName: resume.fileName },
   });
 
-  res.json({ success: true, message: 'Resume deleted successfully' });
+  res.json({
+    success: true,
+    message: 'Resume deleted successfully',
+  });
 });
 
 module.exports = {

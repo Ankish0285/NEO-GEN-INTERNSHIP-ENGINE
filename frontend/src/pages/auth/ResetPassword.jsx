@@ -225,7 +225,7 @@ const ResetPassword = () => {
         </div>
 
         <p style={{ textAlign: 'center', marginTop: '18px', fontSize: '12px', color: '#888' }}>
-          © 2026 NEO GEN Internship Engine
+          © 2026 NEO GEN INTERNSHIP ENGINE
         </p>
       </div>
     </div>

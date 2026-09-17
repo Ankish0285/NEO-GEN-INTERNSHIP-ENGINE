@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import axios from 'axios';
+
 import { Camera, Save, Loader2, X, User, Mail, Phone, BookOpen, GraduationCap, Award } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -96,10 +96,9 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('profilePicture', file);
       const token = localStorage.getItem('token');
-      const res = await axios.post('/api/profile/upload-picture', formData, {
+      const data = await api.upload('/profile/upload-picture', formData, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      const data = res.data;
       const url = data.profilePicture;
       if (!url) {
         throw new Error('No image URL returned from server');

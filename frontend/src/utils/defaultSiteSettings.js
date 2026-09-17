@@ -26,7 +26,7 @@ export const defaultSiteSettings = {
     titleHighlight1: 'NEO',
     titleHighlight2: 'GEN',
     intro:
-      "Empowering India's youth with government internship opportunities. NEO GEN is India's premier government internship portal, connecting talented students with meaningful opportunities.",
+      "Empowering India's youth with government internship opportunities. NEO GEN INTERNSHIP ENGINE is India's premier government internship portal, connecting talented students with meaningful opportunities.",
     missionTitle: 'Our Mission',
     missionText:
       'We believe in building the future of public service through technology and innovation, bridging the gap between talent and government administration.',
@@ -63,7 +63,7 @@ export const defaultSiteSettings = {
   footer: {
     description:
       'Empowering the next generation of professionals through meaningful internship opportunities with government and private organizations.',
-    copyright: 'Neo Gen Internship Engine. All rights reserved.',
+    copyright: 'NEO GEN INTERNSHIP ENGINE. All rights reserved.',
   },
   social: {
     facebook: '',
@@ -79,7 +79,7 @@ export const defaultSiteSettings = {
   },
   team: {
     title: 'Built By',
-    subtitle: 'Meet the team behind NEO GEN Internship Engine',
+    subtitle: 'Meet the team behind NEO GEN INTERNSHIP ENGINE',
     members: [],
   },
   policies: {
@@ -90,7 +90,7 @@ export const defaultSiteSettings = {
     },
     terms: {
       title: 'Terms of Service',
-      subtitle: 'Simple rules for using NEO GEN',
+      subtitle: 'Simple rules for using NEO GEN INTERNSHIP ENGINE',
       body: 'Use accurate information and respect application guidelines.',
     },
     cookies: {

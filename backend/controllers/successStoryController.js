@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const SuccessStory = require('../models/SuccessStory');
+const { deleteCloudinaryAsset } = require('../utils/cloudinaryCleanup');
 
 
 // @desc    Create a success story
@@ -55,12 +56,19 @@ const updateStory = asyncHandler(async (req, res) => {
 // @route   DELETE /api/stories/:id
 // @access  Private (Admin)
 const deleteStory = asyncHandler(async (req, res) => {
-    const story = await SuccessStory.findByIdAndDelete(req.params.id);
-    
+    const story = await SuccessStory.findById(req.params.id);
+
     if (!story) {
         res.status(404);
         throw new Error('Story not found');
     }
+
+    // Delete associated Cloudinary image before removing the DB record.
+    if (story.image && /res\.cloudinary\.com/i.test(String(story.image))) {
+        await deleteCloudinaryAsset(story.image);
+    }
+
+    await SuccessStory.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ success: true, data: {} });
 });

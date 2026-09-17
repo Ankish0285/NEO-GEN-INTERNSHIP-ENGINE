@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: `${import.meta.env.VITE_API_ORIGIN || ''}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -44,10 +44,17 @@ export const api = {
   put: (url, body, config) => axiosInstance.put(url, body, config),
   patch: (url, body, config) => axiosInstance.patch(url, body, config),
   delete: (url, config) => axiosInstance.delete(url, config),
-  upload: (url, formData, config = {}) => axiosInstance.post(url, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    ...config
-  }),
+  upload: (url, formData, config = {}) => {
+    const uploadConfig = {
+      ...config,
+      headers: {
+        ...(config.headers || {}),
+        'Content-Type': undefined,
+      },
+    };
+
+    return axiosInstance.post(url, formData, uploadConfig);
+  },
   
   // Notifications API
   getNotifications: () => axiosInstance.get('/notifications'),

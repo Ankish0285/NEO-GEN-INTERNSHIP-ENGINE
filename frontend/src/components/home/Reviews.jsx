@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Quote } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { api } from '../../services/api';
 import { resolveStoryImageUrl } from '../../utils/resolveStoryImageUrl';
 import MotionSection from '../ui/MotionSection';
 
@@ -10,8 +11,7 @@ const Reviews = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch('/api/stories?status=approved');
-        const result = await response.json();
+        const result = await api.get('/stories?status=approved');
         if (result.success && result.data?.length > 0) {
           setReviews(
             result.data.map((story) => {

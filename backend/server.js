@@ -37,7 +37,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: [
+      'http://3.111.79.3:3000',
+      'https://d19fkrmko4i5uh.cloudfront.net',
+      'http://neogen-internship-engine.s3-website.ap-south-1.amazonaws.com'
+    ], credentials: true,
     methods: ['GET', 'POST']
   }
 });

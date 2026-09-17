@@ -8,7 +8,7 @@ const FloatingChatbot = () => {
     {
       id: 1,
       type: 'bot',
-      text: 'Hi! 👋 Welcome to NEO GEN. How can I help you today?',
+      text: 'Hi! 👋 Welcome to NEO GEN INTERNSHIP ENGINE. How can I help you today?',
       timestamp: new Date()
     }
   ]);
@@ -25,8 +25,8 @@ const FloatingChatbot = () => {
   }, [messages]);
 
   const botResponses = {
-    'hello': 'Hello! Welcome to NEO GEN Internship Engine. How can I assist you?',
-    'hi': 'Hey there! 👋 What would you like to know about NEO GEN?',
+    'hello': 'Hello! Welcome to NEO GEN INTERNSHIP ENGINE. How can I assist you?',
+    'hi': 'Hey there! 👋 What would you like to know about NEO GEN INTERNSHIP ENGINE?',
     'help': 'I can help you with:\n• Finding internships\n• Understanding ATS scores\n• Application process\n• Profile setup\n• General questions',
     'internship': 'We connect talented students with internship opportunities across various government departments. You can explore opportunities based on your skills and interests!',
     'ats': 'ATS (Applicant Tracking System) optimization helps your resume get selected. Our tool analyzes your resume and provides improvement suggestions to increase your chances of selection.',
@@ -107,7 +107,7 @@ const FloatingChatbot = () => {
           {/* Header */}
           <div className="chatbot-header">
             <div className="chatbot-header-content">
-              <h3>NEO GEN Assistant</h3>
+              <h3>NEO GEN INTERNSHIP ENGINE Assistant</h3>
               <p className="status-indicator">
                 <span className="status-dot"></span>
                 Online

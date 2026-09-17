@@ -283,7 +283,7 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
     >
       <div className="modal-content" style={{ maxWidth: '450px', width: '90%' }}>
         <div className="modal-header">
-          <h2>Sign in to NEO GEN</h2>
+          <h2>SIGN IN TO NEO GEN INTERNSHIP ENGINE</h2>
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
         <div className="modal-body">

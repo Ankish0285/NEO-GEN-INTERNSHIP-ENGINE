@@ -346,9 +346,9 @@ const Contact = () => {
             </div>
 
             <div className="faq-card glass-card" style={{ padding: '30px', borderRadius: '16px' }}>
-              <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '10px', color: '#111827' }}>Is there a fee to use NEO GEN?</h4>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '10px', color: '#111827' }}>Is there a fee to use NEO GEN INTERNSHIP ENGINE?</h4>
               <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-                No, NEO GEN is completely free for students. We are a government initiative aimed at 
+                No, NEO GEN INTERNSHIP ENGINE is completely free for students. We are a government initiative aimed at 
                 making quality internship opportunities accessible to everyone.
               </p>
             </div>

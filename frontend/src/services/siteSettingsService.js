@@ -24,16 +24,9 @@ const SiteSettingsService = {
     const headers = {};
     if (token) headers.Authorization = `Bearer ${token}`;
 
-    const res = await fetch('/api/site-settings/upload', {
-      method: 'POST',
+    return await api.upload('/site-settings/upload', formData, {
       headers,
-      body: formData,
     });
-    const json = await res.json();
-    if (!res.ok) {
-      throw new Error(json.message || 'Upload failed');
-    }
-    return json;
   },
 };
 

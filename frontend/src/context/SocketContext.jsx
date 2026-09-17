@@ -11,65 +11,58 @@ export const SocketProvider = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Connect to socket server
-    const newSocket = io();
+    // Connect to backend Socket.IO server
+    const socketUrl =
+      import.meta.env.VITE_API_ORIGIN || window.location.origin;
+
+    const newSocket = io(socketUrl, {
+      transports: ['polling', 'websocket'],
+      withCredentials: true,
+    });
+
     setSocket(newSocket);
 
-    // Cleanup on unmount
-    return () => newSocket.close();
+    newSocket.on('connect', () => {
+      console.log('[Socket] Connected:', newSocket.id);
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('[Socket] Connection error:', error.message);
+    });
+
+    return () => {
+      newSocket.close();
+    };
   }, []);
 
   useEffect(() => {
     if (!socket) return;
 
-    // Listen for global notifications
-    socket.on('newNotification', (notification) => {
-      console.log('[Socket] New global notification received:', notification);
+    const handleNewNotification = (notification) => {
+      console.log(
+        '[Socket] New global notification received:',
+        notification
+      );
+
       toast.success(notification.title, {
         description: notification.message,
-        duration: 5000,
+        duration: 6000,
       });
-      // Optionally trigger a notification refresh in the UI
+
       window.dispatchEvent(new CustomEvent('refreshNotifications'));
-    });
+    };
 
-    // Listen for personal notifications if authenticated
-    if (isAuthenticated && user?._id) {
-      socket.emit('joinUser', user._id || user.id);
+    const handleTicketUpdated = () => {
+      window.dispatchEvent(new CustomEvent('refreshSupportUnread'));
+      window.dispatchEvent(new CustomEvent('refreshNotifications'));
+    };
 
-      socket.on('ai:analysis:complete', (payload) => {
-        toast.success(`AI analysis complete — ATS ${payload?.atsScore ?? ''}%`);
-        window.dispatchEvent(new CustomEvent('ai:refresh'));
-      });
-      socket.on('ai:recommendations:updated', () => {
-        window.dispatchEvent(new CustomEvent('ai:refresh'));
-      });
-
-      const personalEvent = `newNotification:${user._id}`;
-      socket.on(personalEvent, (notification) => {
-        console.log('[Socket] New personal notification received:', notification);
-        toast.success(notification.title, {
-          description: notification.message,
-          duration: 6000,
-        });
-        window.dispatchEvent(new CustomEvent('refreshNotifications'));
-      });
-
-      socket.on('ticket:updated', () => {
-        window.dispatchEvent(new CustomEvent('refreshSupportUnread'));
-        window.dispatchEvent(new CustomEvent('refreshNotifications'));
-      });
-
-      return () => {
-        socket.off('ai:analysis:complete');
-        socket.off('ai:recommendations:updated');
-        socket.off(personalEvent);
-        socket.off('ticket:updated');
-      };
-    }
+    socket.on('newNotification', handleNewNotification);
+    socket.on('ticket:updated', handleTicketUpdated);
 
     return () => {
-      socket.off('newNotification');
+      socket.off('newNotification', handleNewNotification);
+      socket.off('ticket:updated', handleTicketUpdated);
     };
   }, [socket, isAuthenticated, user]);
 
