@@ -859,103 +859,126 @@ const getMe = asyncHandler(async (req, res) => {
 // @route   POST /api/auth/google
 // @access  Public
 const googleLogin = asyncHandler(async (req, res) => {
-    const { token } = req.body; // ID Token from frontend
+    const { token } = req.body; // Google ID Token from frontend
 
     if (!token) {
         res.status(400);
         throw new Error('Google token is required');
     }
 
-    const expectedAud = (process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '').trim();
-    if (!expectedAud) {
+    const clientId = (
+        process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || ''
+    ).trim();
+
+    if (!clientId) {
         res.status(503);
-        throw new Error('Google login is not configured on the server. Set GOOGLE_CLIENT_ID before using Google authentication.');
+        throw new Error(
+            'Google login is not configured on this server. ' +
+            'Set GOOGLE_CLIENT_ID in backend/.env to enable Google authentication.'
+        );
     }
+
+    let email, name, googleId, picture;
 
     try {
-        // Verify token with Google (using public tokeninfo endpoint)
-        // NOTE: For production with google-auth-library this can be swapped for OAuth2Client.verifyIdToken for offline verification and AUDIENCE (CLIENT_ID check)
-        const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
-        
-        if (!response.ok) {
-             throw new Error('Invalid Google Token');
-        }
+        // ── Verify using google-auth-library (proper audience check, no external HTTP call) ──
+        const { OAuth2Client } = require('google-auth-library');
+        const client = new OAuth2Client(clientId);
 
-        const payload = await response.json();
-        const { email, name, sub: googleId, picture } = payload;
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: clientId,
+        });
 
-        if (!email) {
-            res.status(400);
-            throw new Error('Google account does not have an email');
-        }
+        const payload = ticket.getPayload();
+        email    = payload.email;
+        name     = payload.name;
+        googleId = payload.sub;
+        picture  = payload.picture || '';
 
-        if (!payload.aud || (payload.aud !== expectedAud && !(Array.isArray(payload.aud) && payload.aud.includes(expectedAud)))) {
+        if (!payload.email_verified) {
             res.status(401);
-            throw new Error('Google token audience mismatch. Please use the correct Google client configuration.');
+            throw new Error('Google account email is not verified.');
         }
 
-        // Check if user exists
-        let user = await User.findOne({ email: email.toLowerCase() });
-
-        if (user) {
-            // ----- EXISTING USER - LOGIN, PRESERVE EXISTING ROLE =====
-            // Link googleId if not yet linked
-            if (!user.googleId) {
-                user.googleId = googleId;
-                try { await user.save({ validateBeforeSave: false }); } catch (_) {}
-            }
-            if (!user.isVerified) {
-                user.isVerified = true;
-                try { await user.save({ validateBeforeSave: false }); } catch (_) {}
-            }
-            if (user.isBlocked) {
-                res.status(403);
-                throw new Error('Your account has been blocked. Please contact support.');
-            }
-            if (user.role === 'partner') {
-                if (user.partnerStatus === 'pending') {
-                    res.status(403);
-                    throw new Error('Your partner account is pending approval. Please contact the Super Admin.');
-                }
-                if (user.partnerStatus === 'rejected') {
-                    res.status(403);
-                    throw new Error('Your partner application was rejected. Please contact support.');
-                }
-            }
-        } else {
-            // ===== NEW USER - REGISTER VIA GOOGLE (default role: student) =====
-            const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-            
-            user = await User.create({
-                name: name || email.split('@')[0],
-                email: email.toLowerCase(),
-                password: randomPassword,
-                role: 'student',
-                active: true,
-                googleId: googleId,
-                isVerified: true,
-                profilePicture: picture || '',
-                resume: '',
-                profileCompletionPercentage: 25,
-            });
-            
-             await ActivityLog.create({
-                user: user._id,
-                action: 'Registered via Google',
-                details: { role: user.role },
-                ip: req.ip,
-                userAgent: req.get('User-Agent')
-            });
-        }
-
-        const otp = await sendLoginOtp(user);
-        res.json({ success: true, requiresOtp: true, ...otp, message: 'OTP sent to your email. Verify it to complete login.' });
-
-    } catch (error) {
-        console.error('Google Auth Error:', error);
-        res.status(error.statusCode || 401);
-        throw new Error(error.message || 'Google authentication failed');
+    } catch (verifyErr) {
+        console.error('[Auth] Google token verification failed:', verifyErr.message);
+        res.status(401);
+        throw new Error(
+            'Google authentication failed: ' +
+            (verifyErr.message.includes('Wrong number of segments') ||
+             verifyErr.message.includes('Invalid token')
+                ? 'Invalid or expired Google token. Please try signing in again.'
+                : verifyErr.message)
+        );
     }
+
+    if (!email) {
+        res.status(400);
+        throw new Error('Google account does not provide an email address.');
+    }
+
+    // ── Find or create user ──
+    let user = await User.findOne({ email: email.toLowerCase() });
+
+    if (user) {
+        // Existing user — link googleId if not yet linked
+        let dirty = false;
+        if (!user.googleId) { user.googleId = googleId; dirty = true; }
+        if (!user.isVerified) { user.isVerified = true; dirty = true; }
+        if (dirty) {
+            try { await user.save({ validateBeforeSave: false }); } catch (_) {}
+        }
+
+        if (user.isBlocked) {
+            res.status(403);
+            throw new Error('Your account has been blocked. Please contact support.');
+        }
+        if (user.role === 'partner') {
+            if (user.partnerStatus === 'pending') {
+                res.status(403);
+                throw new Error('Your partner account is pending approval. Please contact the Super Admin.');
+            }
+            if (user.partnerStatus === 'rejected') {
+                res.status(403);
+                throw new Error('Your partner application was rejected. Please contact support.');
+            }
+        }
+    } else {
+        // New user — register as student via Google
+        const randomPassword = crypto.randomBytes(16).toString('hex');
+        user = await User.create({
+            name:            name || email.split('@')[0],
+            email:           email.toLowerCase(),
+            password:        randomPassword,
+            role:            'student',
+            active:          true,
+            googleId,
+            isVerified:      true,
+            profilePicture:  picture,
+            profileCompletionPercentage: 25,
+        });
+
+        try {
+            await ActivityLog.create({
+                user:      user._id,
+                action:    'Registered via Google',
+                details:   { role: user.role, email: user.email },
+                ip:        req.ip,
+                userAgent: req.get('User-Agent'),
+            });
+        } catch (_) {}
+    }
+
+    // ── Send OTP for login (same as email/password flow) ──
+    const otp = await sendLoginOtp(user);
+    console.log(`[Auth] Google login: OTP required for ${user.email} (${user.role})`);
+    res.json({
+        success:     true,
+        requiresOtp: true,
+        ...otp,
+        message: 'OTP sent to your email. Verify it to complete login.',
+    });
 });
 
 module.exports = {
