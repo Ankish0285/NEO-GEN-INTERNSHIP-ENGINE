@@ -38,12 +38,19 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
+      // Local development
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173',
+      // Production
       'http://3.111.79.3:3000',
       'https://d19fkrmko4i5uh.cloudfront.net',
-      'http://neogen-internship-engine.s3-website.ap-south-1.amazonaws.com'
-    ], credentials: true,
-    methods: ['GET', 'POST']
-  }
+      'http://neogen-internship-engine.s3-website.ap-south-1.amazonaws.com',
+    ],
+    credentials: true,
+    methods: ['GET', 'POST'],
+  },
 });
 
 // Socket.io logic

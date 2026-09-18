@@ -211,29 +211,99 @@ const getApplicationById = asyncHandler(async (req, res) => {
   await attachResolvedResumeUrls([application]);
   res.status(200).json(application);
 });
-// @desc    Update application status (Admin)
+// @desc    Update application status (Admin/Partner)
 // @route   PUT /api/applications/:id/status
-// @access  Private/Admin
+// @access  Private/Admin or Private/Partner
 const updateApplicationStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
-  const application = await Application.findById(req.params.id).populate('internship', 'title organization');
+
+  // --- Valid statuses ---
+  const VALID_STATUSES = ['Applied', 'Shortlisted', 'Interview', 'Selected', 'Rejected'];
+
+  if (!VALID_STATUSES.includes(status)) {
+    res.status(400);
+    throw new Error(`Invalid status "${status}". Must be one of: ${VALID_STATUSES.join(', ')}`);
+  }
+
+  // --- Valid transitions (server-side enforcement) ---
+  const VALID_TRANSITIONS = {
+    'Applied':      ['Shortlisted', 'Rejected'],
+    'Viewed':       ['Shortlisted', 'Rejected'],              // legacy compat
+    'Under Review': ['Shortlisted', 'Rejected'],              // legacy compat
+    'Shortlisted':  ['Interview', 'Rejected'],
+    'Interview':    ['Selected', 'Rejected'],
+    'Accepted':     ['Interview', 'Selected', 'Rejected'],    // legacy compat — allow full forward path
+    'Selected':     ['Rejected'],
+    'Rejected':     [],                                       // terminal
+  };
+
+  const application = await Application.findById(req.params.id).populate('internship', 'title organization createdBy');
 
   if (!application) {
     res.status(404);
     throw new Error('Application not found');
   }
 
+  // --- Partner authorization: can only update applications for their own internships ---
+  const userRole = req.user.role;
+  if (userRole === 'partner') {
+    const internshipCreatorId = application.internship?.createdBy?.toString();
+    const partnerId = req.user._id.toString();
+    if (internshipCreatorId !== partnerId) {
+      res.status(403);
+      throw new Error('Forbidden - You can only manage applications for your own internships');
+    }
+  }
+
+  const currentStatus = application.status;
+  const allowed = VALID_TRANSITIONS[currentStatus] || [];
+
+  if (!allowed.includes(status)) {
+    res.status(400);
+    throw new Error(
+      `Cannot transition from "${currentStatus}" to "${status}". ` +
+      `Allowed next states: ${allowed.length ? allowed.join(', ') : 'none (terminal state)'}`
+    );
+  }
+
   application.status = status;
   await application.save();
 
-  // Notify student about application status update
+  // --- Status-specific notification messages ---
+  const internshipTitle = application.internship?.title || 'the internship';
+  const org = application.internship?.organization ? ` at ${application.internship.organization}` : '';
+
+  const notificationMessages = {
+    'Shortlisted': {
+      title: 'Application Shortlisted',
+      message: `Your application for "${internshipTitle}"${org} has been shortlisted! Stay tuned for next steps.`,
+    },
+    'Interview': {
+      title: 'Interview Stage',
+      message: `Congratulations! Your application for "${internshipTitle}"${org} has moved to the interview stage.`,
+    },
+    'Selected': {
+      title: 'Application Selected 🎉',
+      message: `Congratulations! You have been selected for "${internshipTitle}"${org}. The team will contact you shortly.`,
+    },
+    'Rejected': {
+      title: 'Application Update',
+      message: `Your application for "${internshipTitle}"${org} was not selected at this time. We encourage you to keep applying!`,
+    },
+  };
+
+  const notif = notificationMessages[status] || {
+    title: 'Application Status Updated',
+    message: `Your application for "${internshipTitle}"${org} has been updated to: ${status}.`,
+  };
+
   await createAndNotify(req.app, {
     recipient: application.student,
-    title: 'Application Status Updated',
-    message: `Your application for "${application.internship.title}" at ${application.internship.organization} has been marked as ${status}.`,
+    title: notif.title,
+    message: notif.message,
     type: 'personal',
-    priority: 'high',
-    link: '/dashboard/applications'
+    priority: status === 'Selected' ? 'high' : 'medium',
+    link: '/dashboard/applications',
   });
 
   res.status(200).json(application);

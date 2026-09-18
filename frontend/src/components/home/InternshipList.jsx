@@ -50,7 +50,11 @@ const InternshipList = () => {
       // Fetch applications
       const appData = await ApplicationService.getMyApplications();
       setMyApplications(appData);
-      const applied = new Set(appData.map(app => (app.internship._id || app.internship)));
+      const applied = new Set(
+        appData
+          .filter(app => app.internship) // guard against null internship (deleted)
+          .map(app => String(app.internship._id || app.internship))
+      );
       setAppliedInternships(applied);
 
       // Check localStorage first for resume data
@@ -168,6 +172,13 @@ const InternshipList = () => {
       return;
     }
 
+    // Only open modal if we actually have the internship data loaded
+    const internshipData = internships.find(i => String(i._id || i.id) === String(internshipId));
+    if (!internshipData) {
+      console.warn("Internship data not yet loaded for id:", internshipId);
+      return;
+    }
+
     setSelectedInternshipId(internshipId);
     setShowApplyForm(true);
   };
@@ -237,7 +248,7 @@ const InternshipList = () => {
                 />
               </div>
               
-              <div style={{ height: '30px', width: '1px', backgroundColor: '#e5e7eb', display: window.innerWidth > 768 ? 'block' : 'none' }}></div>
+              <div style={{ height: '30px', width: '1px', backgroundColor: '#e5e7eb', display: 'block' }}></div>
 
               <select 
                 className="form-control" 

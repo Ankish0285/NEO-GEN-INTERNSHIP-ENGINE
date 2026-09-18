@@ -30,7 +30,9 @@ const applicationSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Applied', 'Viewed', 'Under Review', 'Shortlisted', 'Accepted', 'Selected', 'Rejected'],
+      // Workflow: Applied → Shortlisted → Interview → Selected | Rejected
+      // Legacy values (Viewed, Under Review, Accepted) kept for backward-compat
+      enum: ['Applied', 'Viewed', 'Under Review', 'Shortlisted', 'Interview', 'Accepted', 'Selected', 'Rejected'],
       default: 'Applied',
     },
     resume: {

@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 
 const ResumeTemplates = () => {
   return (
-    <div className="page">
+    <div className="resume-templates-page">
       <Navbar />
       <div className="container" style={{ padding: '120px 20px 60px' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '20px' }}>Resume Templates</h1>

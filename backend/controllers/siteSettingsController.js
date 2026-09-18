@@ -1,10 +1,8 @@
-const fs = require('fs');
-const path = require('path');
 const asyncHandler = require('express-async-handler');
 const SiteSettings = require('../models/SiteSettings');
 const ActivityLog = require('../models/ActivityLog');
-const cloudinary = require('../config/cloudinary');
 const { defaultSiteSettings } = require('../utils/defaultSiteSettings');
+const { smartCloudinaryUpload, releaseCloudinaryAsset } = require('../utils/cloudinaryUpload');
 
 const SECTION_KEYS = [
   'branding',
@@ -95,6 +93,25 @@ function toPublicPayload(doc) {
   return obj;
 }
 
+/**
+ * Extract every Cloudinary image URL currently stored in a SiteSettings doc.
+ * Used to identify which old URLs need to be released after an update.
+ */
+function extractSiteImageUrls(doc) {
+  const urls = new Set();
+  const isCloud = (v) => v && typeof v === 'string' && /res\.cloudinary\.com/i.test(v);
+
+  if (isCloud(doc?.branding?.logoUrl))        urls.add(doc.branding.logoUrl);
+  if (isCloud(doc?.hero?.backgroundImage))    urls.add(doc.hero.backgroundImage);
+  if (Array.isArray(doc?.hero?.backgroundImages)) {
+    doc.hero.backgroundImages.forEach((u) => { if (isCloud(u)) urls.add(u); });
+  }
+  if (Array.isArray(doc?.team?.members)) {
+    doc.team.members.forEach((m) => { if (isCloud(m?.photoUrl)) urls.add(m.photoUrl); });
+  }
+  return urls;
+}
+
 // @desc    Get public site settings (website content)
 // @route   GET /api/site-settings
 // @access  Public
@@ -119,10 +136,12 @@ const updateSiteSettings = asyncHandler(async (req, res) => {
     incoming.hero.overlayOpacity = Number(incoming.hero.overlayOpacity);
   }
 
+  // Snapshot existing Cloudinary URLs BEFORE the merge
+  const urlsBefore = extractSiteImageUrls(doc.toObject ? doc.toObject() : doc);
+
   for (const section of SECTION_KEYS) {
     if (incoming[section] === undefined) continue;
 
-    // Team/builder list must fully replace (not deep-merge) so members persist correctly
     if (section === 'team') {
       doc.team = normalizeTeamSection(incoming.team);
       doc.markModified('team');
@@ -137,6 +156,17 @@ const updateSiteSettings = asyncHandler(async (req, res) => {
   doc.key = 'main';
   await doc.save();
 
+  // Snapshot URLs AFTER save, then release any that were removed
+  const urlsAfter = extractSiteImageUrls(doc.toObject ? doc.toObject() : doc);
+  for (const oldUrl of urlsBefore) {
+    if (!urlsAfter.has(oldUrl)) {
+      // Fire-and-forget — never blocks or throws
+      releaseCloudinaryAsset(oldUrl).catch((e) =>
+        console.warn('[SiteSettings] releaseCloudinaryAsset error:', e.message)
+      );
+    }
+  }
+
   try {
     await ActivityLog.create({
       user: req.user._id,
@@ -145,9 +175,7 @@ const updateSiteSettings = asyncHandler(async (req, res) => {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
     });
-  } catch (_) {
-    /* ignore */
-  }
+  } catch (_) { /* ignore */ }
 
   res.status(200).json({
     success: true,
@@ -175,20 +203,20 @@ const uploadSiteAsset = asyncHandler(async (req, res) => {
 
   if (cloudReady) {
     try {
-      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+      const uploadResult = await smartCloudinaryUpload(req.file, {
         folder: 'neo-gen/site-assets',
+        resourceType: 'image',
       });
-      resultUrl = uploadResult.secure_url;
+      resultUrl = uploadResult.url;
+      console.log(
+        uploadResult.reused
+          ? `[SiteSettings] Reused existing Cloudinary asset: ${resultUrl}`
+          : `[SiteSettings] Uploaded new asset to Cloudinary: ${resultUrl}`
+      );
     } catch (err) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (_) {}
       res.status(500);
       throw new Error(`Upload failed: ${err.message}`);
     }
-    try {
-      fs.unlinkSync(req.file.path);
-    } catch (_) {}
   } else {
     resultUrl = `/uploads/${req.file.filename}`;
   }

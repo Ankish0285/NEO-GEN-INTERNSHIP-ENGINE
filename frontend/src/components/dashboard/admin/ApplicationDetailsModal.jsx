@@ -90,10 +90,12 @@ const ApplicationDetailsModal = ({ isOpen, onClose, application, isLoading }) =>
             </div>
           </div>
           <div className={`px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1.5
-            ${application.status === 'Accepted' ? 'bg-green-100 text-green-700' : 
-              application.status === 'Rejected' ? 'bg-red-100 text-red-700' : 
+            ${application.status === 'Selected' || application.status === 'Accepted' ? 'bg-green-100 text-green-700' : 
+              application.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+              application.status === 'Shortlisted' ? 'bg-indigo-100 text-indigo-700' :
+              application.status === 'Interview' ? 'bg-violet-100 text-violet-700' :
               'bg-yellow-100 text-yellow-700'}`}>
-            {application.status === 'Accepted' && <CheckCircle size={14} />}
+            {(application.status === 'Selected' || application.status === 'Accepted') && <CheckCircle size={14} />}
             {application.status === 'Rejected' && <XCircle size={14} />}
             {application.status}
           </div>

@@ -3,8 +3,8 @@ const path = require('path');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
-const cloudinary = require('../config/cloudinary');
 const { validateProfileData, sanitizeInput } = require('../utils/validation');
+const { smartCloudinaryUpload, releaseCloudinaryAsset } = require('../utils/cloudinaryUpload');
 
 function isCloudinaryConfigured() {
   return ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'].every((key) => {
@@ -13,25 +13,12 @@ function isCloudinaryConfigured() {
   });
 }
 
-async function deleteStoredProfilePicture(storedUrl) {
+/** Delete a LOCAL (non-Cloudinary) upload from disk — safe, never throws. */
+function deleteLocalFile(storedUrl) {
   if (!storedUrl || typeof storedUrl !== 'string') return;
-  if (/res\.cloudinary\.com/i.test(storedUrl)) {
-    try {
-      const urlParts = storedUrl.split('/');
-      const versionIndex = urlParts.findIndex((p) => p.startsWith('v'));
-      if (versionIndex !== -1) {
-        const publicIdWithExt = urlParts.slice(versionIndex + 1).join('/');
-        const publicId = publicIdWithExt.split('.')[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-    } catch (err) {
-      console.log('[Profile] Could not delete Cloudinary image:', err.message);
-    }
-  } else if (storedUrl.startsWith('/uploads/')) {
+  if (storedUrl.startsWith('/uploads/')) {
     const diskPath = path.join(__dirname, '..', 'uploads', path.basename(storedUrl));
-    try {
-      fs.unlinkSync(diskPath);
-    } catch (_) {}
+    try { fs.unlinkSync(diskPath); } catch (_) {}
   }
 }
 
@@ -153,33 +140,38 @@ const uploadProfilePicture = asyncHandler(async (req, res) => {
   if (cloudReady) {
     let uploadResult;
     try {
-      uploadResult = await cloudinary.uploader.upload(req.file.path, {
+      uploadResult = await smartCloudinaryUpload(req.file, {
         folder: 'neo-gen/profile-pictures',
+        resourceType: 'image',
       });
     } catch (err) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (_) {}
       res.status(500);
       throw new Error(`Failed to upload profile picture: ${err.message}`);
     }
-    try {
-      fs.unlinkSync(req.file.path);
-    } catch (_) {}
-    resultUrl = uploadResult.secure_url;
-    console.log('[Profile] Uploaded to Cloudinary:', resultUrl);
+    resultUrl = uploadResult.url;
+    console.log(
+      uploadResult.reused
+        ? `[Profile] Reused existing Cloudinary asset: ${resultUrl}`
+        : `[Profile] Uploaded new asset to Cloudinary: ${resultUrl}`
+    );
   } else {
     resultUrl = `/uploads/${req.file.filename}`;
     console.log('[Profile] Stored locally:', resultUrl);
   }
 
   const previous = user.profilePicture;
-  if (previous) {
-    await deleteStoredProfilePicture(previous);
-  }
 
   user.profilePicture = resultUrl;
   await user.save();
+
+  // Release old asset AFTER successful DB save — safe, never throws
+  if (previous && previous !== resultUrl) {
+    if (/res\.cloudinary\.com/i.test(previous)) {
+      await releaseCloudinaryAsset(previous);
+    } else {
+      deleteLocalFile(previous);
+    }
+  }
 
   await ActivityLog.create({
     user: user._id,
@@ -213,10 +205,19 @@ const deleteProfilePicture = asyncHandler(async (req, res) => {
     throw new Error('No profile picture to delete');
   }
 
-  await deleteStoredProfilePicture(user.profilePicture);
+  const pictureToRelease = user.profilePicture;
 
   user.profilePicture = undefined;
   await user.save();
+
+  // Release AFTER successful DB save
+  if (pictureToRelease) {
+    if (/res\.cloudinary\.com/i.test(pictureToRelease)) {
+      await releaseCloudinaryAsset(pictureToRelease);
+    } else {
+      deleteLocalFile(pictureToRelease);
+    }
+  }
 
   // Log activity
   await ActivityLog.create({

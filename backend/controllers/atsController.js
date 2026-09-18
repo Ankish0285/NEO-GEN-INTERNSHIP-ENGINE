@@ -9,6 +9,7 @@ const { extractResumeText } = require('../utils/parseResume');
 const { calculateATSScore, generateSuggestions, extractResumeInfo } = require('../utils/atsScoring');
 const cloudinary = require('../config/cloudinary');
 const { deleteCloudinaryAsset } = require('../utils/cloudinaryCleanup');
+const { releaseCloudinaryAsset } = require('../utils/cloudinaryUpload');
 const aiClient = require('../services/aiServiceClient');
 const { runAIPipelineForUser } = require('./aiController');
 
@@ -51,6 +52,10 @@ const uploadResume = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error('Resume is too short or could not be parsed.');
     }
+
+    // Capture previous resume URL BEFORE uploading the new one
+    const previousResume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 }).select('fileUrl');
+    const oldResumeUrl = previousResume?.fileUrl || null;
 
     let uploadResult;
     try {
@@ -149,6 +154,11 @@ const uploadResume = asyncHandler(async (req, res) => {
     runAIPipelineForUser(req.user.id, parsedText, req).catch((e) =>
       console.warn('AI pipeline:', e.message)
     );
+
+    // Release the old resume from Cloudinary AFTER all DB writes succeeded
+    if (oldResumeUrl && oldResumeUrl !== secureUrl) {
+      await releaseCloudinaryAsset(oldResumeUrl);
+    }
 
     res.status(201).json({
       success: true,
@@ -256,13 +266,13 @@ const deleteResume = asyncHandler(async (req, res) => {
     throw new Error('Not authorized');
   }
 
-  // Delete Cloudinary asset when the resume is stored remotely.
-  if (resume.fileUrl && /res\.cloudinary\.com/i.test(String(resume.fileUrl))) {
-    await deleteCloudinaryAsset(resume.fileUrl);
-  } else if (!resume.fileUrl?.startsWith('http')) {
-    const filePath = path.join(__dirname, '../uploads/', resume.fileName);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+  // Release the Cloudinary asset safely (checks refcount before deleting)
+  if (resume.fileUrl) {
+    if (/res\.cloudinary\.com/i.test(String(resume.fileUrl))) {
+      await releaseCloudinaryAsset(resume.fileUrl);
+    } else if (!resume.fileUrl.startsWith('http')) {
+      const filePath = path.join(__dirname, '../uploads/', resume.fileName);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
   }
 

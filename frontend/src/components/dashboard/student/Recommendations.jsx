@@ -81,27 +81,42 @@ const Recommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [aiOnline, setAiOnline] = useState(false);
+  const [error, setError] = useState(null);
 
   const load = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await getAIRecommendations(12);
-      setRecommendations(res.recommendations || []);
+      const recs = Array.isArray(res?.recommendations) ? res.recommendations : [];
+      setRecommendations(recs);
       setAiOnline(true);
-    } catch {
-      setRecommendations(dashboardData?.recommendedInternships || []);
+    } catch (err) {
+      console.warn('[Recommendations] AI fetch failed, using fallback:', err?.message);
+      // Safe fallback — dashboardData may not have recommendedInternships
+      const fallback = Array.isArray(dashboardData?.recommendedInternships)
+        ? dashboardData.recommendedInternships
+        : [];
+      setRecommendations(fallback);
       setAiOnline(false);
+      // Only set an error state if we also have no fallback data
+      if (fallback.length === 0) {
+        setError(err?.message || 'Could not load recommendations');
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  // Run only once on mount — DO NOT put dashboardData in the dep array.
+  // dashboardData is a new object on every context render, which caused an
+  // infinite loop: load() → re-render → new dashboardData ref → load() again.
   useEffect(() => {
     load();
     const onRefresh = () => load();
     window.addEventListener('ai:refresh', onRefresh);
     return () => window.removeEventListener('ai:refresh', onRefresh);
-  }, [dashboardData]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-6">
@@ -124,6 +139,21 @@ const Recommendations = () => {
             <InternshipCard key={i} loading />
           ))}
         </div>
+      ) : error && recommendations.length === 0 ? (
+        <motion.div className="neo-cta neo-glass text-center py-12">
+          <Briefcase size={40} className="mx-auto text-red-400/60 mb-4" />
+          <h3 className="text-xl font-bold text-[#111827]">Could not load recommendations</h3>
+          <p className="neo-lead mt-2 max-w-md mx-auto text-red-500">
+            {error}
+          </p>
+          <button
+            type="button"
+            onClick={load}
+            className="mt-4 neo-btn neo-btn-primary !min-h-[40px] text-sm"
+          >
+            Retry
+          </button>
+        </motion.div>
       ) : recommendations.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recommendations.map((job, idx) => (
