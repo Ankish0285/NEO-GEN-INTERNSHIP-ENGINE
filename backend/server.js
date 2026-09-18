@@ -31,6 +31,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const ensureAdminExists = require('./utils/ensureAdmin');
+const seedSubscriptionPlans = require('./utils/seedSubscriptionPlans');
 const { startAIServer } = require('./services/aiServiceClient');
 
 const app = express();
@@ -83,7 +84,14 @@ io.on('connection', (socket) => {
 app.set('io', io);
 
 // Middleware
-app.use(express.json());
+app.use(express.json({
+  verify: (req, _res, buf) => {
+    // Capture raw body for Razorpay webhook signature verification
+    if (req.path && req.path.includes('/webhook')) {
+      req.rawBody = buf.toString();
+    }
+  },
+}));
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
@@ -106,6 +114,7 @@ app.use('/api/stories', require('./routes/successStoryRoutes'));
 app.use('/api/site-settings', require('./routes/siteSettingsRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/support-tickets', require('./routes/supportTicketRoutes'));
+app.use('/api/subscriptions', require('./routes/subscriptionRoutes'));
 console.log('[Routes] Support tickets API → /api/support-tickets'.cyan);
 
 // Serve static files from the uploads directory
@@ -123,6 +132,7 @@ const PORT = process.env.PORT || 5000;
         console.log('[Bootstrap] Initializing database connection...'.yellow);
 		await connectDB();
 		await ensureAdminExists();
+		await seedSubscriptionPlans();
 		startAIServer();
 		server.listen(PORT, () => console.log(`Server started on port ${PORT}`.green.bold));
 	} catch (err) {

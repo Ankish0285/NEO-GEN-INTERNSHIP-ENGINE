@@ -10,6 +10,7 @@ const { calculateATSScore, generateSuggestions, extractResumeInfo } = require('.
 const cloudinary = require('../config/cloudinary');
 const { deleteCloudinaryAsset } = require('../utils/cloudinaryCleanup');
 const { releaseCloudinaryAsset } = require('../utils/cloudinaryUpload');
+const { incrementUsage } = require('../middleware/subscriptionMiddleware');
 const aiClient = require('../services/aiServiceClient');
 const { runAIPipelineForUser } = require('./aiController');
 
@@ -32,12 +33,15 @@ const mapAiToScoreData = (aiAts, parsedText) => ({
 
 // @desc    Upload resume and analyze with ATS
 // @route   POST /api/resume/upload
-// @access  Private
+// @access  Private  (checkResumeAccess middleware runs before this)
 const uploadResume = asyncHandler(async (req, res) => {
   if (!req.file) {
     res.status(400);
     throw new Error('Please upload a file');
   }
+
+  // ── OWNERSHIP: always bind to the authenticated user. Never trust body/query. ──
+  const authenticatedUserId = (req.user._id || req.user.id).toString();
 
   try {
     let parsedText = '';
@@ -54,7 +58,16 @@ const uploadResume = asyncHandler(async (req, res) => {
     }
 
     // Capture previous resume URL BEFORE uploading the new one
-    const previousResume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 }).select('fileUrl');
+    const previousResume = await Resume.findOne({ user: authenticatedUserId })
+      .sort({ createdAt: -1 })
+      .select('fileUrl user');
+
+    // ── OWNERSHIP GUARD on existing resume (belt-and-suspenders) ──────────────
+    if (previousResume && previousResume.user.toString() !== authenticatedUserId) {
+      res.status(403);
+      throw new Error('You can only analyze your own resume.');
+    }
+
     const oldResumeUrl = previousResume?.fileUrl || null;
 
     let uploadResult;
@@ -102,26 +115,24 @@ const uploadResume = asyncHandler(async (req, res) => {
     }
 
     const resumeInfo = extractResumeInfo(parsedText);
-    
-    // Check if this might be someone else's resume, but don't block upload - just log it
-    const user = await User.findById(req.user.id).select('name email');
-    
-    // Log resume info for debugging
+
+    const user = await User.findById(authenticatedUserId).select('name email');
     console.log('Resume upload info:', {
-        userName: user.name,
-        userEmail: user.email,
-        resumeName: resumeInfo.name,
-        resumeEmail: resumeInfo.email
+      userName: user.name,
+      userEmail: user.email,
+      resumeName: resumeInfo.name,
+      resumeEmail: resumeInfo.email,
     });
 
     if (resumeInfo.skills?.length) {
-      await User.findByIdAndUpdate(req.user.id, {
+      await User.findByIdAndUpdate(authenticatedUserId, {
         $addToSet: { skills: { $each: resumeInfo.skills } },
       });
     }
 
+    // ── Create Resume record — always owned by the authenticated user ──────────
     const resume = await Resume.create({
-      user: req.user.id,
+      user: authenticatedUserId,       // NEVER from req.body
       fileName: req.file.originalname,
       fileUrl: secureUrl,
       parsedText,
@@ -138,20 +149,24 @@ const uploadResume = asyncHandler(async (req, res) => {
       aiConfidenceScore,
     });
 
-    await User.findByIdAndUpdate(req.user.id, {
+    await User.findByIdAndUpdate(authenticatedUserId, {
       resumeUploaded: true,
       atsScore: scoreData.score,
     });
 
     await ActivityLog.create({
-      user: req.user.id,
+      user: authenticatedUserId,
       action: 'Uploaded Resume',
       details: { fileName: req.file.originalname, score: scoreData.score },
       ip: req.ip,
       userAgent: req.get('User-Agent'),
     });
 
-    runAIPipelineForUser(req.user.id, parsedText, req).catch((e) =>
+    // ── Increment usage AFTER successful DB write ─────────────────────────────
+    const isSubscribed = req.resumeAccess?.isSubscribed ?? false;
+    await incrementUsage(authenticatedUserId, isSubscribed);
+
+    runAIPipelineForUser(authenticatedUserId, parsedText, req).catch((e) =>
       console.warn('AI pipeline:', e.message)
     );
 
@@ -159,6 +174,15 @@ const uploadResume = asyncHandler(async (req, res) => {
     if (oldResumeUrl && oldResumeUrl !== secureUrl) {
       await releaseCloudinaryAsset(oldResumeUrl);
     }
+
+    // ── Include updated usage in the response so the frontend can update UI ───
+    const usageAfter = req.resumeAccess?.usage
+      ? {
+          freeUsed:  isSubscribed ? req.resumeAccess.freeUsed : req.resumeAccess.freeUsed + 1,
+          freeLimit: req.resumeAccess.freeLimit,
+          isSubscribed,
+        }
+      : null;
 
     res.status(201).json({
       success: true,
@@ -193,6 +217,7 @@ const uploadResume = asyncHandler(async (req, res) => {
       secure_url: secureUrl,
       matchPercentage,
       aiConfidenceScore,
+      usage: usageAfter,
     });
   } catch (error) {
     if (req.file && fs.existsSync(req.file.path)) {
@@ -206,6 +231,7 @@ const uploadResume = asyncHandler(async (req, res) => {
 // @route   GET /api/resume/score
 // @access  Private
 const getResumeScore = asyncHandler(async (req, res) => {
+  // Only return THIS user's resume — ownership enforced by query filter
   const resume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 });
 
   if (resume) {
@@ -248,6 +274,35 @@ const getResumeScore = asyncHandler(async (req, res) => {
       sections: {},
     });
   }
+});
+
+// @desc    Get resume usage (free checks used, limit, subscription status)
+// @route   GET /api/resume/usage
+// @access  Private
+const getResumeUsage = asyncHandler(async (req, res) => {
+  const { getOrCreateUsage, getActiveSubscription } = require('../middleware/subscriptionMiddleware');
+  const userId = req.user._id || req.user.id;
+
+  const [usage, activeSub] = await Promise.all([
+    getOrCreateUsage(userId),
+    getActiveSubscription(userId),
+  ]);
+
+  res.json({
+    success: true,
+    freeUsed:     usage.freeUsed,
+    freeLimit:    usage.freeLimit,
+    premiumUsed:  usage.premiumUsed,
+    isSubscribed: !!activeSub,
+    subscription: activeSub
+      ? {
+          planName:  activeSub.planSnapshot?.name || activeSub.planId?.name || 'Pro',
+          status:    activeSub.status,
+          expiresAt: activeSub.expiresAt,
+          features:  activeSub.planId?.features || activeSub.planSnapshot?.features || {},
+        }
+      : null,
+  });
 });
 
 // @desc    Delete resume
@@ -293,5 +348,6 @@ const deleteResume = asyncHandler(async (req, res) => {
 module.exports = {
   uploadResume,
   getResumeScore,
+  getResumeUsage,
   deleteResume,
 };

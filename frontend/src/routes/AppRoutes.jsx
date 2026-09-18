@@ -36,6 +36,7 @@ import AdminAnalytics from '../components/dashboard/admin/Analytics';
 import AdminSettings from '../components/dashboard/admin/Settings';
 import AdminSuccessStories from '../components/dashboard/admin/SuccessStories';
 import WebsiteCMS from '../components/dashboard/admin/WebsiteCMS';
+import SubscriptionManagement from '../components/dashboard/admin/SubscriptionManagement';
 
 // Partner Components
 import PartnerOverview from '../components/dashboard/partner/Overview';
@@ -83,6 +84,7 @@ const AppRoutes = () => {
         <Route path="users" element={<AdminUsers />} />
         <Route path="internships" element={<AdminInternships />} />
         <Route path="applications" element={<AdminApplications />} />
+        <Route path="subscriptions" element={<SubscriptionManagement />} />
         <Route path="success-stories" element={<AdminSuccessStories />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="settings" element={<AdminSettings />} />

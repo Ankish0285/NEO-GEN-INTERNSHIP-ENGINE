@@ -12,7 +12,8 @@ import {
     Globe2,
     Brain,
     Headphones,
-    LifeBuoy
+    LifeBuoy,
+    CreditCard,
 } from 'lucide-react';
 
 export const roleConfig = {
@@ -50,6 +51,7 @@ export const roleConfig = {
             { path: '/admin/dashboard/users', label: 'Users', icon: Users },
             { path: '/admin/dashboard/internships', label: 'Internships', icon: Briefcase },
             { path: '/admin/dashboard/applications', label: 'Applications', icon: FileText },
+            { path: '/admin/dashboard/subscriptions', label: 'Subscriptions', icon: CreditCard },
             { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
@@ -70,6 +72,7 @@ export const roleConfig = {
             { path: '/admin/dashboard/users', label: 'Users', icon: Users },
             { path: '/admin/dashboard/internships', label: 'Internships', icon: Briefcase },
             { path: '/admin/dashboard/applications', label: 'Applications', icon: FileText },
+            { path: '/admin/dashboard/subscriptions', label: 'Subscriptions', icon: CreditCard },
             { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },

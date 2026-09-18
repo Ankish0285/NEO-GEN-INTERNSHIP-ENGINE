@@ -159,10 +159,12 @@ const getAIProfile = asyncHandler(async (req, res) => {
 
 // @route GET /api/ai/intelligence
 const getAIIntelligence = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id).lean();
-  const profile = await AIStudentProfile.findOne({ user: req.user.id }).lean();
-  const resume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 });
-  const applications = await getApplicationsContext(req.user.id);
+  const authenticatedUserId = (req.user._id || req.user.id).toString();
+  const user = await User.findById(authenticatedUserId).lean();
+  const profile = await AIStudentProfile.findOne({ user: authenticatedUserId }).lean();
+  // Ownership: always query by authenticated user only
+  const resume = await Resume.findOne({ user: authenticatedUserId }).sort({ createdAt: -1 });
+  const applications = await getApplicationsContext(authenticatedUserId);
   const internships = await Internship.find({
     status: { $in: ['active', 'published'] },
   }).lean();
@@ -190,7 +192,7 @@ const getAIIntelligence = asyncHandler(async (req, res) => {
     topK: 15,
   });
 
-  await persistAIProfile(req.user.id, data, user);
+  await persistAIProfile(authenticatedUserId, data, user);
 
   res.json({
     success: true,
@@ -207,16 +209,25 @@ const getAIIntelligence = asyncHandler(async (req, res) => {
 // @route POST /api/ai/analyze
 const analyzeResumeAI = asyncHandler(async (req, res) => {
   const { jobDescription } = req.body;
-  const resume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 });
+  const authenticatedUserId = (req.user._id || req.user.id).toString();
+
+  // Ownership: always look up resume by the authenticated user only
+  const resume = await Resume.findOne({ user: authenticatedUserId }).sort({ createdAt: -1 });
   if (!resume?.parsedText) {
     res.status(400);
     throw new Error('Upload a resume first');
   }
 
+  // Belt-and-suspenders ownership check
+  if (resume.user.toString() !== authenticatedUserId) {
+    res.status(403);
+    throw new Error('You can only analyze your own resume.');
+  }
+
   let analysis;
   if (await aiClient.isAvailable()) {
     analysis = await aiClient.analyzeATS(resume.parsedText, jobDescription || '');
-    const pipeline = await runAIPipelineForUser(req.user.id, resume.parsedText, req);
+    const pipeline = await runAIPipelineForUser(authenticatedUserId, resume.parsedText, req);
     analysis.recommendations = pipeline?.recommendations;
     analysis.recommendation_groups = pipeline?.recommendation_groups;
     analysis.student_profile = pipeline?.profile;
@@ -238,6 +249,11 @@ const analyzeResumeAI = asyncHandler(async (req, res) => {
   resume.aiAnalysis = analysis;
   resume.atsScore = analysis.ats_score || resume.atsScore;
   await resume.save();
+
+  // Increment usage after successful analysis
+  const { incrementUsage } = require('../middleware/subscriptionMiddleware');
+  const isSubscribed = req.resumeAccess?.isSubscribed ?? false;
+  await incrementUsage(authenticatedUserId, isSubscribed);
 
   res.json({ success: true, data: analysis });
 });
