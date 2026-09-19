@@ -95,15 +95,17 @@ const checkResumeAccess = (feature = FEATURE_ATS) => async (req, res, next) => {
   try {
     const userId = req.user._id || req.user.id;
 
+    // ── 0. Check if admin has hard-required subscription for this feature ─────
+    const forceRequired = await SubscriptionSettings.featureRequiresSubscription(feature);
+
     // ── 1. Check active subscription ─────────────────────────────────────────
     const activeSub = await getActiveSubscription(userId);
 
     if (activeSub) {
       const planFeatures = activeSub.planId?.features || activeSub.planSnapshot?.features || {};
-      const hasFeature   = planFeatures[feature] !== false; // default true if not explicitly false
+      const hasFeature   = planFeatures[feature] !== false;
 
       if (hasFeature) {
-        // Subscribed + feature allowed
         const usage = await getOrCreateUsage(userId);
         req.resumeAccess = {
           isSubscribed: true,
@@ -114,14 +116,24 @@ const checkResumeAccess = (feature = FEATURE_ATS) => async (req, res, next) => {
         };
         return next();
       }
-      // Subscribed but feature not in this plan — fall through to free-tier check
     }
 
-    // ── 2. Free tier check ────────────────────────────────────────────────────
+    // ── 2. If admin forced subscription for this feature — block free tier ────
+    if (forceRequired) {
+      return res.status(403).json({
+        success: false,
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: 'This feature requires an active Premium subscription.',
+        freeUsed:  0,
+        freeLimit: 0,
+        requiresSubscription: true,
+      });
+    }
+
+    // ── 3. Free tier check ────────────────────────────────────────────────────
     const usage = await getOrCreateUsage(userId);
 
     if (usage.freeUsed < usage.freeLimit) {
-      // Free checks remaining
       req.resumeAccess = {
         isSubscribed: false,
         subscription: null,
@@ -132,7 +144,7 @@ const checkResumeAccess = (feature = FEATURE_ATS) => async (req, res, next) => {
       return next();
     }
 
-    // ── 3. No access ──────────────────────────────────────────────────────────
+    // ── 4. No access ──────────────────────────────────────────────────────────
     return res.status(403).json({
       success: false,
       code: 'SUBSCRIPTION_REQUIRED',
@@ -146,7 +158,6 @@ const checkResumeAccess = (feature = FEATURE_ATS) => async (req, res, next) => {
 
   } catch (err) {
     console.error('[subscriptionMiddleware] checkResumeAccess error:', err.message);
-    // On unexpected error — deny access (security-first)
     return res.status(500).json({
       success: false,
       message: 'Access check failed. Please try again.',

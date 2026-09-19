@@ -621,7 +621,17 @@ const adminGetSettings = asyncHandler(async (req, res) => {
 
 // PUT /api/subscriptions/admin/settings
 const adminUpdateSettings = asyncHandler(async (req, res) => {
-  const { freeResumeLimit, atsRequiresSubscription, aiRequiresSubscription } = req.body;
+  const {
+    freeResumeLimit,
+    // per-feature subscription gates
+    feature_atsAnalysis,
+    feature_aiResumeAnalysis,
+    feature_aiReport,
+    feature_premiumRecommendations,
+    feature_aiChat,
+    feature_aiMatch,
+  } = req.body;
+
   const update = {};
 
   if (freeResumeLimit != null) {
@@ -629,8 +639,15 @@ const adminUpdateSettings = asyncHandler(async (req, res) => {
     if (isNaN(n) || n < 0) { res.status(400); throw new Error('freeResumeLimit must be a non-negative integer'); }
     update.freeResumeLimit = n;
   }
-  if (atsRequiresSubscription != null) update.atsRequiresSubscription = !!atsRequiresSubscription;
-  if (aiRequiresSubscription  != null) update.aiRequiresSubscription  = !!aiRequiresSubscription;
+
+  // Boolean feature gates — each can be true (subscription required) or false (free tier applies)
+  const featureKeys = {
+    feature_atsAnalysis, feature_aiResumeAnalysis, feature_aiReport,
+    feature_premiumRecommendations, feature_aiChat, feature_aiMatch,
+  };
+  for (const [k, v] of Object.entries(featureKeys)) {
+    if (v != null) update[k] = !!v;
+  }
 
   const settings = await subscriptionSettings.updateSettings(update);
   res.json({ success: true, settings });

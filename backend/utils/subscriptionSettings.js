@@ -2,23 +2,35 @@
  * subscriptionSettings.js
  * ─────────────────────────────────────────────────────────────────────────────
  * Lightweight in-process cache for global subscription configuration.
- * Super Admin can call updateSettings() via the admin API; value is persisted
- * in SiteSettings (reuses the existing key:'main' document under a new field)
- * and cached in-memory so every request doesn't hit MongoDB.
+ * Super Admin can toggle any AI feature on/off from the admin panel.
  *
- * Fields managed here:
- *   freeResumeLimit (default 2)  — how many free ATS analyses each student gets
- *   atsRequiresSubscription      — if true, even the first check needs a sub (default false)
- *   aiRequiresSubscription       — if true, all AI analysis needs a sub (default false)
+ * Per-feature subscription flags:
+ *   feature_atsAnalysis           — ATS resume upload/score
+ *   feature_aiResumeAnalysis      — POST /api/ai/analyze
+ *   feature_aiReport              — GET  /api/ai/intelligence
+ *   feature_premiumRecommendations — GET  /api/ai/recommendations
+ *   feature_aiChat                — POST /api/ai/chat
+ *   feature_aiMatch               — POST /api/ai/match/:id
+ *
+ *   When a feature flag is TRUE  → subscription required (no free tier)
+ *   When a feature flag is FALSE → free tier still applies (freeResumeLimit)
+ *
+ *   freeResumeLimit  — how many free analyses before subscription required
  */
 
 const SiteSettings = require('../models/SiteSettings');
 
 // ── In-memory defaults ────────────────────────────────────────────────────────
 let _cache = {
-  freeResumeLimit:          2,
-  atsRequiresSubscription:  false,
-  aiRequiresSubscription:   false,
+  freeResumeLimit: 2,
+
+  // Feature-level subscription gates — false = use free tier, true = always require sub
+  feature_atsAnalysis:            false,
+  feature_aiResumeAnalysis:       false,
+  feature_aiReport:               false,
+  feature_premiumRecommendations: false,
+  feature_aiChat:                 false,
+  feature_aiMatch:                false,
 };
 
 let _loaded = false;
@@ -46,11 +58,20 @@ async function getSettings() {
   return { ..._cache };
 }
 
+/**
+ * Returns true if the given featureKey requires a subscription RIGHT NOW
+ * (i.e. the admin has turned on the gate for it).
+ */
+async function featureRequiresSubscription(featureKey) {
+  await _load();
+  const flag = `feature_${featureKey}`;
+  return _cache[flag] === true;
+}
+
 async function updateSettings(newValues) {
   _cache = { ..._cache, ...newValues };
   _loaded = true;
 
-  // Persist to SiteSettings document
   try {
     await SiteSettings.findOneAndUpdate(
       { key: 'main' },
@@ -64,9 +85,8 @@ async function updateSettings(newValues) {
   return { ..._cache };
 }
 
-/** Call this after server restart to bust the cache and re-read from DB. */
 function invalidateCache() {
   _loaded = false;
 }
 
-module.exports = { getFreeLimit, getSettings, updateSettings, invalidateCache };
+module.exports = { getFreeLimit, getSettings, featureRequiresSubscription, updateSettings, invalidateCache };

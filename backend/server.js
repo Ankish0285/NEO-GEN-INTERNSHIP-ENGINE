@@ -115,6 +115,7 @@ app.use('/api/site-settings', require('./routes/siteSettingsRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/support-tickets', require('./routes/supportTicketRoutes'));
 app.use('/api/subscriptions', require('./routes/subscriptionRoutes'));
+app.use('/api/resume-templates', require('./routes/resumeTemplateRoutes'));
 console.log('[Routes] Support tickets API → /api/support-tickets'.cyan);
 
 // Serve static files from the uploads directory
