@@ -18,6 +18,8 @@ const subscriptionPlanSchema = new mongoose.Schema(
       aiResumeAnalysis:        { type: Boolean, default: true },
       aiReport:                { type: Boolean, default: true },
       premiumRecommendations:  { type: Boolean, default: true },
+      aiChat:                  { type: Boolean, default: true },   // AI coaching assistant
+      aiMatch:                 { type: Boolean, default: true },   // semantic internship match
       maxAnalysesPerMonth:     { type: Number,  default: 0 },  // 0 = unlimited
     },
     displayOrder: { type: Number, default: 0 },

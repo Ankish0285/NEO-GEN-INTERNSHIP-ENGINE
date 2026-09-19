@@ -5,7 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import { SocketProvider } from './context/SocketContext';
 import AppRoutes from './routes/AppRoutes';
-import FloatingChatbot from './components/ui/FloatingChatbot';
+import GlobalAIChat from './components/ai/GlobalAIChat';
 
 function App() {
   return (
@@ -15,7 +15,8 @@ function App() {
         <SocketProvider>
           <Toaster position="top-right" />
           <AppRoutes />
-          <FloatingChatbot />
+          {/* Single global AI chatbot — only renders for authenticated students */}
+          <GlobalAIChat />
         </SocketProvider>
         </SiteSettingsProvider>
       </AuthProvider>

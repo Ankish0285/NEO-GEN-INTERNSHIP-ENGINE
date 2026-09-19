@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Clock, DollarSign, Briefcase, Star, ArrowRight, Sparkles, Brain } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Briefcase, Star, ArrowRight, Sparkles, Brain, Lock, Crown } from 'lucide-react';
 import { Skeleton } from '../../ui/Skeleton';
 import { motion } from 'framer-motion';
 import { getAIRecommendations } from '../../../services/aiService';
 import { useStudentDashboard } from '../../../context/StudentDashboardContext';
+import { useSubscription } from '../../../context/SubscriptionContext';
+import UpgradeModal from '../../ui/UpgradeModal';
 
 const InternshipCard = ({ job, loading, index }) => {
   const navigate = useNavigate();
@@ -78,30 +80,43 @@ const InternshipCard = ({ job, loading, index }) => {
 
 const Recommendations = () => {
   const { dashboardData } = useStudentDashboard();
+  const {
+    isSubscribed, isBlocked, freeUsed, freeLimit,
+    subscription, openUpgrade, closeUpgrade, showUpgrade, refresh: refreshSub,
+  } = useSubscription();
+
   const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading,  setLoading]  = useState(true);
   const [aiOnline, setAiOnline] = useState(false);
-  const [error, setError] = useState(null);
+  const [error,    setError]    = useState(null);
+  // true when the backend explicitly returned 403 SUBSCRIPTION_REQUIRED
+  const [subBlocked, setSubBlocked] = useState(false);
 
   const load = async () => {
     setLoading(true);
     setError(null);
+    setSubBlocked(false);
     try {
       const res = await getAIRecommendations(12);
       const recs = Array.isArray(res?.recommendations) ? res.recommendations : [];
       setRecommendations(recs);
       setAiOnline(true);
     } catch (err) {
-      console.warn('[Recommendations] AI fetch failed, using fallback:', err?.message);
-      // Safe fallback — dashboardData may not have recommendedInternships
-      const fallback = Array.isArray(dashboardData?.recommendedInternships)
-        ? dashboardData.recommendedInternships
-        : [];
-      setRecommendations(fallback);
-      setAiOnline(false);
-      // Only set an error state if we also have no fallback data
-      if (fallback.length === 0) {
-        setError(err?.message || 'Could not load recommendations');
+      // 403 = subscription gate triggered by backend
+      if (err?.status === 403 || err?.response?.status === 403) {
+        setSubBlocked(true);
+        setRecommendations([]);
+        setAiOnline(false);
+      } else {
+        console.warn('[Recommendations] AI fetch failed, using fallback:', err?.message);
+        const fallback = Array.isArray(dashboardData?.recommendedInternships)
+          ? dashboardData.recommendedInternships
+          : [];
+        setRecommendations(fallback);
+        setAiOnline(false);
+        if (fallback.length === 0) {
+          setError(err?.message || 'Could not load recommendations');
+        }
       }
     } finally {
       setLoading(false);
@@ -120,6 +135,14 @@ const Recommendations = () => {
 
   return (
     <div className="space-y-6">
+      {/* Shared upgrade modal */}
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={closeUpgrade}
+        onSubscribed={() => { refreshSub(); load(); }}
+        featureLabel="AI Recommendations"
+      />
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="neo-h2 flex items-center gap-2">
@@ -133,7 +156,60 @@ const Recommendations = () => {
         </div>
       </div>
 
-      {loading ? (
+      {/* ── Subscription status bar ── */}
+      {!loading && (
+        isSubscribed && subscription ? (
+          <div className="flex items-center gap-3 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl">
+            <Crown size={16} className="text-emerald-600 shrink-0" />
+            <p className="text-sm font-bold text-emerald-800 flex-1">{subscription.planName || 'Premium'} — Active</p>
+            {subscription.expiresAt && (
+              <p className="text-xs text-emerald-600">
+                Until {new Date(subscription.expiresAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+              </p>
+            )}
+          </div>
+        ) : !subBlocked ? (
+          <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border ${isBlocked ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200'}`}>
+            <span className={`text-xs font-semibold ${isBlocked ? 'text-red-600' : 'text-gray-600'}`}>
+              Free AI Analyses: <strong>{freeUsed} / {freeLimit}</strong>
+            </span>
+            {isBlocked && (
+              <button onClick={openUpgrade}
+                className="ml-auto text-xs px-3 py-1 bg-[#FF9933] text-white rounded-full font-semibold hover:bg-[#e68a2e]">
+                Upgrade
+              </button>
+            )}
+          </div>
+        ) : null
+      )}
+
+      {/* ── Subscription-blocked banner ── */}
+      {subBlocked && !isSubscribed && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl border-2 border-[#FF9933]/30 bg-[#fff8f0] p-8 text-center"
+        >
+          <Lock size={36} className="mx-auto text-[#FF9933]/60 mb-3" />
+          <h3 className="text-lg font-black text-gray-900 mb-1">Premium AI Recommendations</h3>
+          <p className="text-sm text-gray-500 mb-5 max-w-sm mx-auto">
+            You have used all {freeLimit} free AI analyses. Upgrade to unlock personalized AI recommendations with match scores, selection probability, and career insights.
+          </p>
+          <button
+            type="button"
+            onClick={openUpgrade}
+            className="px-6 py-2.5 rounded-xl text-sm font-bold text-white"
+            style={{ background: 'linear-gradient(135deg,#FF9933,#e68a2e)' }}
+          >
+            <Crown size={15} className="inline mr-2 mb-0.5" />
+            View Premium Plans
+          </button>
+        </motion.div>
+      )}
+
+      {!subBlocked && (
+        <>
+          {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
             <InternshipCard key={i} loading />
@@ -168,6 +244,8 @@ const Recommendations = () => {
             Upload your resume in ATS Resume or open AI Intelligence to generate matches.
           </p>
         </motion.div>
+      )}
+        </>
       )}
     </div>
   );

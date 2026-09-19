@@ -194,6 +194,11 @@ const getAIIntelligence = asyncHandler(async (req, res) => {
 
   await persistAIProfile(authenticatedUserId, data, user);
 
+  // Increment usage AFTER successful analysis (mirrors analyzeResumeAI)
+  const { incrementUsage } = require('../middleware/subscriptionMiddleware');
+  const isSubscribed = req.resumeAccess?.isSubscribed ?? false;
+  await incrementUsage(authenticatedUserId, isSubscribed);
+
   res.json({
     success: true,
     data: {

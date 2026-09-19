@@ -32,6 +32,8 @@ const FEATURE_ATS             = 'atsAnalysis';
 const FEATURE_AI_ANALYSIS     = 'aiResumeAnalysis';
 const FEATURE_AI_REPORT       = 'aiReport';
 const FEATURE_RECOMMENDATIONS = 'premiumRecommendations';
+const FEATURE_AI_CHAT         = 'aiChat';        // AI coaching assistant
+const FEATURE_AI_MATCH        = 'aiMatch';       // single-internship semantic match
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -229,4 +231,6 @@ module.exports = {
   FEATURE_AI_ANALYSIS,
   FEATURE_AI_REPORT,
   FEATURE_RECOMMENDATIONS,
+  FEATURE_AI_CHAT,
+  FEATURE_AI_MATCH,
 };

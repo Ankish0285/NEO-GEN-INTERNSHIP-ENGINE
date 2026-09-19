@@ -6,15 +6,18 @@ import { Toaster } from 'react-hot-toast';
 import DashboardLayout from '../../components/dashboard/common/DashboardLayout';
 import ProtectedRoute from '../../components/dashboard/common/ProtectedRoute';
 import { StudentDashboardProvider } from '../../context/StudentDashboardContext';
+import { SubscriptionProvider } from '../../context/SubscriptionContext';
 
 const StudentDashboard = () => {
     return (
         <ProtectedRoute allowedRoles={['student']}>
             <StudentDashboardProvider>
-                <DashboardLayout role="student">
-                    <Toaster position="top-right" />
-                    <Outlet />
-                </DashboardLayout>
+                <SubscriptionProvider>
+                    <DashboardLayout role="student">
+                        <Toaster position="top-right" />
+                        <Outlet />
+                    </DashboardLayout>
+                </SubscriptionProvider>
             </StudentDashboardProvider>
         </ProtectedRoute>
     );

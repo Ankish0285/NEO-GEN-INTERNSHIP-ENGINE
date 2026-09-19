@@ -10,16 +10,18 @@ import './styles/neo-design-system.css'
 import './styles/dashboard-admin.css'
 
 const googleClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
-const app = <App />;
+// Only wrap with GoogleOAuthProvider when a real client ID is configured.
+// Passing an empty string causes @react-oauth/google to emit errors in the console.
+const app = googleClientId ? (
+  <GoogleOAuthProvider clientId={googleClientId}>
+    <App />
+  </GoogleOAuthProvider>
+) : (
+  <App />
+);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {googleClientId ? (
-      <GoogleOAuthProvider clientId={googleClientId}>
-        {app}
-      </GoogleOAuthProvider>
-    ) : (
-      app
-    )}
+    {app}
   </StrictMode>,
 )

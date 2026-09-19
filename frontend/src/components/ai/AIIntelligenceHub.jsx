@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Brain, Target, TrendingUp, AlertTriangle, Sparkles, RefreshCw, Zap,
-  GraduationCap, Route, BarChart3,
+  GraduationCap, Route, BarChart3, Lock, Crown, Shield,
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart,
@@ -13,7 +13,8 @@ import {
   getAIIntelligence, getAIProfile, analyzeResumeAI, getAIRecommendations,
 } from '../../services/aiService';
 import { useStudentDashboard } from '../../context/StudentDashboardContext';
-import AIChatAssistant from './AIChatAssistant';
+import { useSubscription } from '../../context/SubscriptionContext';
+import UpgradeModal from '../ui/UpgradeModal';
 
 const TABS = [
   { id: 'best', label: 'Best Match' },
@@ -24,15 +25,23 @@ const TABS = [
 
 const AIIntelligenceHub = () => {
   const { atsScoreData, refreshDashboard, refreshAtsScore } = useStudentDashboard();
-  const [profile, setProfile] = useState(null);
-  const [intel, setIntel] = useState(null);
-  const [groups, setGroups] = useState({});
-  const [recTab, setRecTab] = useState('best');
-  const [loading, setLoading] = useState(true);
+  const {
+    isSubscribed, isBlocked, freeUsed, freeLimit,
+    subscription, openUpgrade, closeUpgrade, showUpgrade, refresh: refreshSub,
+  } = useSubscription();
+
+  const [profile,   setProfile]   = useState(null);
+  const [intel,     setIntel]     = useState(null);
+  const [groups,    setGroups]    = useState({});
+  const [recTab,    setRecTab]    = useState('best');
+  const [loading,   setLoading]   = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
+  // Track whether the last fetch was blocked (403)
+  const [subBlocked, setSubBlocked] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setSubBlocked(false);
     try {
       const profRes = await getAIProfile();
       setProfile(profRes.profile);
@@ -40,10 +49,24 @@ const AIIntelligenceHub = () => {
         const intRes = await getAIIntelligence();
         setIntel(intRes.data);
         setGroups(intRes.data?.groups || {});
-      } catch {
-        const recRes = await getAIRecommendations(8);
-        setGroups(recRes.groups || {});
-        setIntel({ recommendations: recRes.recommendations });
+      } catch (intErr) {
+        // 403 SUBSCRIPTION_REQUIRED — don't crash, show upgrade UI
+        if (intErr?.status === 403 || intErr?.response?.status === 403) {
+          setSubBlocked(true);
+          // Still try recommendations (same gate) but suppress if blocked too
+          try {
+            const recRes = await getAIRecommendations(8);
+            setGroups(recRes.groups || {});
+            setIntel({ recommendations: recRes.recommendations });
+          } catch { /* blocked too — that's fine */ }
+        } else {
+          // Non-auth error — try recommendations as fallback
+          try {
+            const recRes = await getAIRecommendations(8);
+            setGroups(recRes.groups || {});
+            setIntel({ recommendations: recRes.recommendations });
+          } catch { /* ignore */ }
+        }
       }
     } catch (e) {
       console.error(e);
@@ -60,6 +83,7 @@ const AIIntelligenceHub = () => {
   }, [load]);
 
   const runAnalysis = async () => {
+    if (isBlocked) { openUpgrade(); return; }
     setAnalyzing(true);
     try {
       await analyzeResumeAI();
@@ -68,7 +92,13 @@ const AIIntelligenceHub = () => {
       await load();
       refreshDashboard?.();
     } catch (e) {
-      toast.error(e.message || 'Analysis failed');
+      // 403 means subscription required
+      if (e?.status === 403 || e?.response?.status === 403) {
+        setSubBlocked(true);
+        openUpgrade();
+      } else {
+        toast.error(e.message || 'Analysis failed');
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -119,6 +149,15 @@ const AIIntelligenceHub = () => {
 
   return (
     <div className="space-y-8">
+      {/* Upgrade modal — shared component */}
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={closeUpgrade}
+        onSubscribed={() => { refreshSub(); load(); }}
+        featureLabel="AI Intelligence"
+      />
+
+      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="neo-h2 flex items-center gap-2">
@@ -139,6 +178,67 @@ const AIIntelligenceHub = () => {
           {analyzing ? 'Analyzing...' : 'Run AI Analysis'}
         </button>
       </div>
+
+      {/* ── Subscription status bar ── */}
+      {!loading && (
+        isSubscribed && subscription ? (
+          <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+            <Crown size={18} className="text-emerald-600 shrink-0" />
+            <p className="text-sm font-bold text-emerald-800">
+              {subscription.planName || 'Premium'} — Active
+            </p>
+            {subscription.expiresAt && (
+              <p className="text-xs text-emerald-600 ml-auto">
+                Valid until {new Date(subscription.expiresAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${isBlocked ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200'}`}>
+            <Shield size={15} className={isBlocked ? 'text-red-500 shrink-0' : 'text-indigo-400 shrink-0'} />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-semibold text-gray-700">Free AI Analyses</span>
+                <span className={`text-xs font-bold ${isBlocked ? 'text-red-600' : 'text-gray-600'}`}>{freeUsed} / {freeLimit} used</span>
+              </div>
+              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${isBlocked ? 'bg-red-500' : freeUsed / freeLimit >= 0.5 ? 'bg-amber-500' : 'bg-indigo-500'}`}
+                  style={{ width: `${freeLimit > 0 ? Math.min(100, (freeUsed / freeLimit) * 100) : 100}%` }}
+                />
+              </div>
+            </div>
+            {isBlocked ? (
+              <button onClick={openUpgrade}
+                className="text-xs px-3 py-1.5 bg-[#FF9933] text-white rounded-lg font-semibold hover:bg-[#e68a2e] shrink-0 whitespace-nowrap">
+                Upgrade Now
+              </button>
+            ) : (
+              <span className="text-xs text-gray-500 shrink-0">{Math.max(0, freeLimit - freeUsed)} left</span>
+            )}
+          </div>
+        )
+      )}
+
+      {/* ── Subscription required banner (shown when backend blocked the last request) ── */}
+      {subBlocked && !isSubscribed && (
+        <div className="rounded-xl border-2 border-[#FF9933]/30 bg-[#fff8f0] p-6 text-center">
+          <Lock size={36} className="mx-auto text-[#FF9933]/60 mb-3" />
+          <h3 className="text-lg font-black text-gray-900 mb-1">Premium AI Feature</h3>
+          <p className="text-sm text-gray-500 mb-4 max-w-sm mx-auto">
+            You have used all {freeLimit} free AI analyses. Upgrade to run full AI Intelligence, career prediction, and advanced recommendations.
+          </p>
+          <button
+            type="button"
+            onClick={openUpgrade}
+            className="px-6 py-2.5 rounded-xl text-sm font-bold text-white"
+            style={{ background: 'linear-gradient(135deg,#FF9933,#e68a2e)' }}
+          >
+            <Crown size={15} className="inline mr-2 mb-0.5" />
+            View Premium Plans
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {[
@@ -322,8 +422,6 @@ const AIIntelligenceHub = () => {
           </div>
         )}
       </div>
-
-      <AIChatAssistant />
     </div>
   );
 };
