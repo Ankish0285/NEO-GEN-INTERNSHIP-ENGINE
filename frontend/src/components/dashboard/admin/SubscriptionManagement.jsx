@@ -4,7 +4,7 @@ import Card from '../../ui/Card';
 import {
   CreditCard, Users, BarChart2, Settings, Plus, Edit2,
   Trash2, CheckCircle, XCircle, RefreshCw, AlertCircle,
-  TrendingUp, Shield, Zap, Star, Crown, Clock, Tag, DollarSign,
+  TrendingUp, Shield, Zap, Star, Crown, Clock, Tag, DollarSign, FileText,
 } from 'lucide-react';
 
 // ─── Tiny helpers ─────────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@ const badge = (status) => {
   return <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${map[status] || 'bg-gray-100 text-gray-600'}`}>{status}</span>;
 };
 
-const TABS = ['Plans', 'Promos', 'Payments', 'Subscriptions', 'Analytics', 'Settings'];
+const TABS = ['Plans', 'Promos', 'Payments', 'Subscriptions', 'Templates', 'Analytics', 'Settings'];
 
 // ═══════════════════════════════════════════════════════════════════
 // Plans Tab
@@ -515,6 +515,107 @@ const PaymentsTab = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════
+// Templates Tab — Super Admin controls which templates are FREE/PREMIUM
+// ═══════════════════════════════════════════════════════════════════
+const TemplatesTab = () => {
+  const [templates, setTemplates] = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [saving,    setSaving]    = useState(null); // templateId being saved
+  const [toast,     setToast]     = useState(null);
+
+  const showToast = (msg, type = 'success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3500); };
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const r = await api.get('/resume-templates/admin/config');
+      setTemplates(r.templates || []);
+    } catch { showToast('Failed to load template config','error'); }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const toggle = async (templateId, currentAccess) => {
+    const newAccess = currentAccess === 'FREE' ? 'PREMIUM' : 'FREE';
+    setSaving(templateId);
+    try {
+      await api.put(`/resume-templates/admin/config/${templateId}`, { access: newAccess });
+      setTemplates(prev => prev.map(t => t.templateId === templateId ? { ...t, access: newAccess } : t));
+      showToast(`"${templateId}" is now ${newAccess}`);
+    } catch (err) { showToast(err?.data?.message || 'Update failed','error'); }
+    finally { setSaving(null); }
+  };
+
+  return (
+    <div className="space-y-4">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-emerald-600'}`}>{toast.msg}</div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2"><FileText size={18}/> Resume Template Access</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Toggle which templates are FREE (no subscription) vs PREMIUM (subscription required).</p>
+        </div>
+        <button onClick={load} className="p-1.5 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50"><RefreshCw size={15}/></button>
+      </div>
+
+      <Card className="overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200 text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              {['#','Template','Current Access','Action'].map(h => (
+                <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-100">
+            {loading ? (
+              <tr><td colSpan={4} className="px-5 py-8 text-center text-gray-400">Loading…</td></tr>
+            ) : templates.map(t => (
+              <tr key={t.templateId} className="hover:bg-gray-50">
+                <td className="px-5 py-3 text-gray-500 font-medium">{t.displayOrder}</td>
+                <td className="px-5 py-3">
+                  <p className="font-semibold text-gray-900">{t.name}</p>
+                  <p className="text-xs text-gray-400 font-mono">{t.templateId}</p>
+                </td>
+                <td className="px-5 py-3">
+                  {t.access === 'FREE' ? (
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">FREE</span>
+                  ) : (
+                    <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 flex items-center gap-1 w-fit">
+                      <Crown size={10}/> PREMIUM
+                    </span>
+                  )}
+                </td>
+                <td className="px-5 py-3">
+                  <button
+                    disabled={saving === t.templateId}
+                    onClick={() => toggle(t.templateId, t.access)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors disabled:opacity-50 ${
+                      t.access === 'FREE'
+                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                    }`}
+                  >
+                    {saving === t.templateId ? 'Saving…' : t.access === 'FREE' ? 'Make Premium' : 'Make Free'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+        <strong>Note:</strong> Changes take effect immediately for all students. The backend is the source of truth — frontend config in <code>resumeTemplates.js</code> shows default badges but the backend config overrides access control.
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════
 // Subscriptions Tab
 // ═══════════════════════════════════════════════════════════════════
 const SubscriptionsTab = () => {
@@ -694,7 +795,7 @@ const SettingsTab = () => {
   const [saving,   setSaving]   = useState(false);
   const [toast,    setToast]    = useState(null);
 
-  const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
+  const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3500); };
 
   useEffect(() => {
     api.get('/subscriptions/admin/settings')
@@ -714,22 +815,48 @@ const SettingsTab = () => {
     finally { setSaving(false); }
   };
 
+  // Toggle a single feature gate
+  const toggleFeature = async (key) => {
+    const newVal = !settings[key];
+    const optimistic = { ...settings, [key]: newVal };
+    setSettings(optimistic);
+    try {
+      const r = await api.put('/subscriptions/admin/settings', { [key]: newVal });
+      setSettings(r.settings);
+      showToast(`${key.replace('feature_','')} → ${newVal ? 'SUBSCRIPTION REQUIRED' : 'FREE TIER'}`);
+    } catch (err) {
+      setSettings(settings); // revert
+      showToast(err?.data?.message || 'Toggle failed','error');
+    }
+  };
+
   if (loading) return <div className="text-center py-16 text-gray-400">Loading settings…</div>;
 
+  // All AI feature gates
+  const FEATURE_GATES = [
+    { key: 'feature_atsAnalysis',            label: 'ATS Resume Analysis',         desc: 'POST /api/resume/upload — ATS score on uploaded resume',             icon: '📄' },
+    { key: 'feature_aiResumeAnalysis',       label: 'AI Resume Analysis',           desc: 'POST /api/ai/analyze — full AI analysis pipeline',                   icon: '🤖' },
+    { key: 'feature_aiReport',               label: 'AI Intelligence Report',       desc: 'GET  /api/ai/intelligence — career prediction & section scores',      icon: '📊' },
+    { key: 'feature_premiumRecommendations', label: 'AI Internship Recommendations',desc: 'GET  /api/ai/recommendations — semantic internship matching',          icon: '🎯' },
+    { key: 'feature_aiChat',                 label: 'AI Chat Assistant',            desc: 'POST /api/ai/chat — NeoGen AI coaching chatbot',                      icon: '💬' },
+    { key: 'feature_aiMatch',                label: 'AI Internship Match',          desc: 'POST /api/ai/match/:id — single-internship semantic compatibility',   icon: '🔍' },
+  ];
+
   return (
-    <div className="space-y-4 max-w-lg">
+    <div className="space-y-6 max-w-2xl">
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-emerald-600'}`}>{toast.msg}</div>
       )}
-      <h2 className="text-lg font-bold text-gray-900">Subscription Settings</h2>
 
-      <Card className="p-6">
-        <form onSubmit={save} className="space-y-5">
+      {/* ── Free limit ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <form onSubmit={save} className="space-y-4">
+          <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-3">Free Tier Limit</h3>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Free Resume Checks per Student
+              Free AI Analyses per Student
             </label>
-            <p className="text-xs text-gray-500 mb-2">Number of free ATS/AI analyses before subscription is required.</p>
+            <p className="text-xs text-gray-400 mb-2">Number of free attempts before subscription is required (per feature gate below).</p>
             <input
               type="number" min="0" max="100"
               value={settings?.freeResumeLimit ?? 2}
@@ -737,41 +864,61 @@ const SettingsTab = () => {
               className="w-32 border border-gray-300 rounded-lg px-3 py-2 text-sm font-semibold"
             />
           </div>
-
-          <div className="space-y-3">
-            <p className="text-sm font-semibold text-gray-700">Feature Gates</p>
-
-            <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-              <input type="checkbox"
-                checked={!!settings?.atsRequiresSubscription}
-                onChange={e => setSettings(s => ({...s, atsRequiresSubscription: e.target.checked}))}
-                className="w-4 h-4 accent-indigo-600"
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-800">ATS Analysis Requires Subscription</p>
-                <p className="text-xs text-gray-500">If enabled, even the first ATS check requires a paid plan (overrides free limit).</p>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-              <input type="checkbox"
-                checked={!!settings?.aiRequiresSubscription}
-                onChange={e => setSettings(s => ({...s, aiRequiresSubscription: e.target.checked}))}
-                className="w-4 h-4 accent-indigo-600"
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-800">AI Resume Analysis Requires Subscription</p>
-                <p className="text-xs text-gray-500">If enabled, AI intelligence and full analysis always require a paid plan.</p>
-              </div>
-            </label>
-          </div>
-
           <button type="submit" disabled={saving}
-            className="w-full bg-indigo-600 text-white rounded-lg py-2.5 text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">
-            {saving ? 'Saving…' : 'Save Settings'}
+            className="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">
+            {saving ? 'Saving…' : 'Save Free Limit'}
           </button>
         </form>
-      </Card>
+      </div>
+
+      {/* ── Per-feature AI subscription gates ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-50">
+          <h3 className="text-sm font-bold text-gray-900">AI Feature Subscription Gates</h3>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Toggle ON → subscription required for that feature (free tier bypass disabled).<br/>
+            Toggle OFF → free tier still applies (students get {settings?.freeResumeLimit ?? 2} free attempts).
+          </p>
+        </div>
+        <div className="divide-y divide-gray-50">
+          {FEATURE_GATES.map(({ key, label, desc, icon }) => {
+            const isOn = !!settings?.[key];
+            return (
+              <div key={key} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50">
+                <span className="text-xl flex-shrink-0">{icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">{label}</p>
+                  <p className="text-xs text-gray-400 truncate">{desc}</p>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
+                    isOn ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  }`}>
+                    {isOn ? '🔒 Sub Required' : '✓ Free Tier'}
+                  </span>
+                  {/* Toggle switch */}
+                  <button
+                    type="button"
+                    onClick={() => toggleFeature(key)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      isOn ? 'bg-amber-500' : 'bg-gray-200'
+                    }`}
+                    aria-label={`Toggle ${label}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      isOn ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-700">
+        <strong>Note:</strong> Changes take effect immediately — no restart required. Backend reads these settings from the database on every request.
+      </div>
     </div>
   );
 };
@@ -800,7 +947,7 @@ const SubscriptionManagement = () => {
       {/* Tab bar */}
       <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
         {TABS.map(tab => {
-          const TIcon = { Plans: CreditCard, Promos: Tag, Payments: DollarSign, Subscriptions: Users, Analytics: BarChart2, Settings: Settings }[tab];
+          const TIcon = { Plans: CreditCard, Promos: Tag, Payments: DollarSign, Subscriptions: Users, Templates: FileText, Analytics: BarChart2, Settings: Settings }[tab];
           return (
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all
@@ -816,6 +963,7 @@ const SubscriptionManagement = () => {
       {activeTab === 'Promos'        && <PromosTab />}
       {activeTab === 'Payments'      && <PaymentsTab />}
       {activeTab === 'Subscriptions' && <SubscriptionsTab />}
+      {activeTab === 'Templates'     && <TemplatesTab />}
       {activeTab === 'Analytics'     && <AnalyticsTab />}
       {activeTab === 'Settings'      && <SettingsTab />}
     </div>

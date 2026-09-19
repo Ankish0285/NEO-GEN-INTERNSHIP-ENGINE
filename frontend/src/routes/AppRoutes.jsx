@@ -8,6 +8,7 @@ import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import FindInternship from '../pages/FindInternship';
 import ResumeTemplates from '../pages/ResumeTemplates';
+import ResumeBuilder from '../pages/ResumeBuilder';
 import SuccessStoriesPublic from '../pages/SuccessStoriesPublic';
 
 // Dashboard Wrappers
@@ -60,6 +61,7 @@ const AppRoutes = () => {
       <Route path="/partner/login" element={<Navigate to="/login" replace />} />
       <Route path="/find-internship" element={<FindInternship />} />
       <Route path="/resources/resume-templates" element={<ResumeTemplates />} />
+      <Route path="/resume-builder/:templateId" element={<ResumeBuilder />} />
       <Route path="/success-stories" element={<SuccessStoriesPublic />} />
 
       {/* Student Routes */}
