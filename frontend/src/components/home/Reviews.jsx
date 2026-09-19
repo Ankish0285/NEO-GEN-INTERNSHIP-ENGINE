@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Quote } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { api } from '../../services/api';
 import { resolveStoryImageUrl } from '../../utils/resolveStoryImageUrl';
@@ -25,6 +25,8 @@ const Reviews = () => {
                 department: story.company || story.college,
                 text: story.experience || story.content || '',
                 image: resolved || fallback,
+                rating: story.ratingAverage || 0,  // Extract rating from API
+                ratingCount: story.ratingCount || 0  // Extract rating count
               };
             })
           );
@@ -33,9 +35,9 @@ const Reviews = () => {
         }
       } catch {
         setReviews([
-          { id: 1, name: 'Kovina Sen', role: 'Intern', department: 'Ministry of Finance', text: 'A very good industry-focused internship experience through NeoGen.', image: 'https://i.pravatar.cc/100?u=kovina' },
-          { id: 2, name: 'Eenid', role: 'Employer', department: 'NITI Aayog', text: 'Seamless recruitment and strong outreach to talented students nationwide.', image: 'https://i.pravatar.cc/100?u=eenid' },
-          { id: 3, name: 'Sonision Dorote', role: 'Employer', department: 'Skill India', text: 'NeoGen made hiring interns efficient and transparent for our organization.', image: 'https://i.pravatar.cc/100?u=sonision' },
+          { id: 1, name: 'Kovina Sen', role: 'Intern', department: 'Ministry of Finance', text: 'A very good industry-focused internship experience through NeoGen.', image: 'https://i.pravatar.cc/100?u=kovina', rating: 5, ratingCount: 1 },
+          { id: 2, name: 'Eenid', role: 'Employer', department: 'NITI Aayog', text: 'Seamless recruitment and strong outreach to talented students nationwide.', image: 'https://i.pravatar.cc/100?u=eenid', rating: 5, ratingCount: 1 },
+          { id: 3, name: 'Sonision Dorote', role: 'Employer', department: 'Skill India', text: 'NeoGen made hiring interns efficient and transparent for our organization.', image: 'https://i.pravatar.cc/100?u=sonision', rating: 5, ratingCount: 1 },
         ]);
       }
     };
@@ -80,6 +82,27 @@ const Reviews = () => {
                   )}
                 </div>
               </div>
+
+              {/* Star Rating Display */}
+              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-[#138808]/10">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      size={16}
+                      className={`${
+                        star <= Math.round(review.rating)
+                          ? 'fill-amber-400 text-amber-400'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs font-medium text-[#4B5563]">
+                  {review.rating > 0 ? `${review.rating}` : 'Not rated'}
+                </span>
+              </div>
+
               <p className="text-[#4B5563] leading-relaxed italic">&ldquo;{review.text}&rdquo;</p>
             </motion.div>
           ))}
