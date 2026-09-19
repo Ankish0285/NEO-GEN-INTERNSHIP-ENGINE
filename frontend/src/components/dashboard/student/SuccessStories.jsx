@@ -9,6 +9,7 @@ const SuccessStories = () => {
   const [image, setImage] = useState(null);
   const [college, setCollege] = useState('');
   const [company, setCompany] = useState('');
+  const [rating, setRating] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [stories, setStories] = useState([]);
   const [storiesLoading, setStoriesLoading] = useState(true);
@@ -32,9 +33,14 @@ const SuccessStories = () => {
     try {
       setStoriesLoading(true);
       const res = await api.get('/stories/me');
-      const fetchedStories = Array.isArray(res?.data)
+      console.log('Fetched stories response:', res);
+      // Backend returns { success: true, count: X, data: [...] }
+      const fetchedStories = Array.isArray(res?.data?.data)
+        ? res.data.data
+        : Array.isArray(res?.data)
         ? res.data
         : [];
+      console.log('Parsed stories:', fetchedStories);
       setStories(fetchedStories);
     } catch (err) {
       console.error('Failed to load stories:', err);
@@ -62,16 +68,31 @@ const SuccessStories = () => {
         imageUrl = uploadRes.filePath;
       }
 
-      await api.post('/stories/add', 
+      const submitRes = await api.post('/stories/add', 
         { experience, image: imageUrl, college, company }
       );
-      toast.success('Story submitted! Pending admin approval.');
+      console.log('Story submitted:', submitRes);
+      toast.success('Story submitted successfully!');
+      
+      // If user gave rating, save it
+      if (rating > 0) {
+        try {
+          await api.post(`/stories/${submitRes.data.data._id}/rate`, { rating });
+          console.log('Rating saved:', rating);
+        } catch (ratingErr) {
+          console.error('Failed to save rating:', ratingErr);
+        }
+      }
+      
       setExperience('');
       setImage(null);
       setCollege('');
       setCompany('');
-      fetchUserStories();
+      setRating(0);
+      // Re-fetch stories to show the new story
+      await fetchUserStories();
     } catch (err) {
+      console.error('Submit story error:', err);
       toast.error(err.response?.data?.message || 'Failed to submit story');
     } finally {
       setIsLoading(false);
@@ -250,6 +271,32 @@ const SuccessStories = () => {
                 onChange={(e) => setImage(e.target.files[0])}
                 className="w-full bg-transparent outline-none text-sm file:cursor-pointer file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-saffron-light file:text-saffron-hover hover:file:bg-saffron/30"
               />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-navy mb-2">Rate Your Experience</label>
+            <div className="flex gap-2 items-center">
+              {[1, 2, 3, 4, 5].map((starValue) => (
+                <button
+                  key={starValue}
+                  onClick={() => setRating(starValue)}
+                  type="button"
+                  className="focus:outline-none transition hover:scale-110"
+                >
+                  <Star 
+                    size={28}
+                    className={`${
+                      starValue <= rating
+                        ? 'fill-saffron text-saffron'
+                        : 'text-gray-300'
+                    }`}
+                  />
+                </button>
+              ))}
+              {rating > 0 && (
+                <span className="ml-2 text-sm font-semibold text-saffron">{rating} ⭐</span>
+              )}
             </div>
           </div>
 

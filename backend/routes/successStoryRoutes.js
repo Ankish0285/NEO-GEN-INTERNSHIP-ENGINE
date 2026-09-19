@@ -1,20 +1,33 @@
 const express = require('express');
 const router = express.Router();
-const { createStory, getStories, updateStory, deleteStory } = require('../controllers/successStoryController');
-const { protect, admin, optionalAuth } = require('../middleware/authMiddleware');
+const {
+    createStory,
+    getUserStories,
+    getPublicStories,
+    updateStory,
+    deleteStory,
+    updateUserStory,
+    deleteUserStory,
+    rateStory,
+    getUserRating
+} = require('../controllers/successStoryController');
+const { protect, admin } = require('../middleware/authMiddleware');
 
-router.route('/')
-    .get(getStories);
+// Public endpoints
+router.get('/', getPublicStories);  // Get all approved/public stories
 
-router.route('/add')
-    .post(optionalAuth, createStory);
+// User stories (authenticated)
+router.post('/add', protect, createStory);  // Create story
+router.get('/me', protect, getUserStories);  // Get current user's stories
+router.put('/user/:id', protect, updateUserStory);  // Update own story
+router.delete('/user/:id', protect, deleteUserStory);  // Delete own story
 
-router.route('/:id')
-    .put(protect, admin, updateStory)
-    .delete(protect, admin, deleteStory);
+// Rating endpoints (authenticated)
+router.post('/:id/rate', protect, rateStory);  // Submit or update rating
+router.get('/:id/my-rating', protect, getUserRating);  // Get user's rating
 
-// To handle requests without Auth for now if public can submit
-// In production, the client can use an authenticated POST or unauthenticated one
-// It's handled gracefully in the controller if req.user is absent.
+// Admin endpoints
+router.put('/:id', protect, admin, updateStory);  // Update story (admin)
+router.delete('/:id', protect, admin, deleteStory);  // Delete story (admin)
 
 module.exports = router;
