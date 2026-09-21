@@ -1,0 +1,194 @@
+import React, { useState, useEffect } from 'react';
+import { api } from '../../../services/api';
+import { toast } from 'react-hot-toast';
+import { Star, Upload, Image as ImageIcon } from 'lucide-react';
+import { resolveStoryImageUrl } from '../../../utils/resolveStoryImageUrl';
+
+const SuccessStories = () => {
+  const [experience, setExperience] = useState('');
+  const [rating, setRating] = useState(5);
+  const [image, setImage] = useState(null);
+  const [college, setCollege] = useState('');
+  const [company, setCompany] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [stories, setStories] = useState([]);
+
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
+  const fetchStories = async () => {
+    try {
+      const res = await api.get('/stories?status=approved');
+
+      const fetchedStories = Array.isArray(res?.data)
+        ? res.data
+        : [];
+
+      setStories(fetchedStories);
+    } catch (err) {
+      console.error('Failed to load stories:', err);
+      setStories([]);
+      toast.error('Failed to load stories');
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!experience) return toast.error('Please write your experience');
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      let imageUrl = '';
+
+      if (image) {
+        const formData = new FormData();
+        formData.append('file', image);
+        const uploadRes = await api.upload('/upload', formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        imageUrl = uploadRes.data.filePath;
+      }
+
+      await api.post('/stories/add', 
+        { experience, rating, image: imageUrl, college, company },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success('Feedback submitted! Pending admin approval.');
+      setExperience('');
+      setImage(null);
+      setCollege('');
+      setCompany('');
+      setRating(5);
+      fetchStories();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to submit feedback');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto p-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-navy border-b-4 border-saffron pb-2 pb-2">Share Your Story</h1>
+      </div>
+
+      {/* Share Story Card */}
+      <div className="glass-card shadow-lg p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+              <div className="flex-1">
+              <label className="block text-sm font-semibold text-navy mb-1">Your Experience</label>
+            <textarea
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
+              rows="4"
+              className="w-full p-4 border border-navy/10 bg-white/50 rounded-lg focus:ring-2 focus:ring-saffron/20 focus:border-saffron transition-all outline-none resize-none"
+              placeholder="How did NEO GEN INTERNSHIP ENGINE help you land your dream internship?"
+            ></textarea>
+              </div>
+          </div>
+          
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-navy mb-1">College</label>
+              <input type="text" value={college} onChange={(e) => setCollege(e.target.value)} className="w-full p-2 border border-navy/10 bg-white/50 rounded-lg focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none" placeholder="College Name" />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-navy mb-1">Company</label>
+              <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} className="w-full p-2 border border-navy/10 bg-white/50 rounded-lg focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none" placeholder="Company Name" />
+            </div>
+          </div>
+
+          <div className="flex gap-8 items-center">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    className={`p-1 rounded-full transition-colors ${rating >= star ? 'text-saffron drop-shadow-md' : 'text-gray-300 hover:text-saffron-light'}`}
+                  >
+                    <Star className="w-8 h-8 fill-current" />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1">
+              <label className="block text-sm font-bold text-navy mb-2">Attached Image (Optional)</label>
+              <div className="flex items-center gap-2 border border-navy/10 rounded-lg px-3 py-1.5 bg-white/40 focus-within:bg-white focus-within:ring-2 focus-within:ring-saffron/20 transition-all">
+                <ImageIcon className="text-saffron w-5 h-5" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  className="w-full bg-transparent outline-none text-sm file:cursor-pointer file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-saffron-light file:text-saffron-hover hover:file:bg-saffron/30"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-navy/5 flex justify-end">
+            <button
+              disabled={isLoading}
+              className="btn-primary flex items-center gap-2"
+            >
+              {isLoading ? 'Submitting...' : 'Submit Story'}
+              {!isLoading && <Upload className="w-4 h-4" />}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Published Stories Display */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-navy mb-6">Wall of Success</h2>
+        {(Array.isArray(stories) ? stories : []).length === 0 ? (
+          <div className="text-center py-12 bg-gradient-to-br from-saffron/5 to-white/40 rounded-xl border border-dashed border-saffron/20">
+            <Star className="w-12 h-12 text-saffron/40 mx-auto mb-3" />
+            <p className="text-navy/60 font-medium">No published stories yet. Be the first one!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {(Array.isArray(stories) ? stories : []).map(story => (
+              <div key={story._id} className="glass-card p-6 flex flex-col items-center text-center">
+                 {story.image ? (
+                   <img
+                     src={resolveStoryImageUrl(story.image)}
+                     alt="Student Profile"
+                     className="w-20 h-20 rounded-full object-cover border-4 border-saffron-light mb-4 shadow-sm"
+                     onError={(e) => {
+                       const name = story.name || story.studentId?.name || 'S';
+                       e.currentTarget.onerror = null;
+                       e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+                     }}
+                   />
+                 ) : (
+                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-saffron to-[#ffad5c] flex items-center justify-center border-4 border-saffron-light mb-4 shadow-sm">
+                     <span className="text-2xl text-white font-bold">{(story.name || story.studentId?.name || 'S').charAt(0)}</span>
+                   </div>
+                 )}
+                 <h3 className="font-bold text-navy">{story.name || story.studentId?.name || 'Anonymous'}</h3>
+                 <p className="text-sm text-sub">{story.college || story.studentId?.course || 'Student'}</p>
+                 <div className="flex gap-1 my-3">
+                   {[...Array(story.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-saffron text-saffron" />
+                   ))}
+                 </div>
+                 <p className="text-navy/80 italic flex-1 font-medium bg-white/40 p-3 rounded-lg border border-navy/5 shadow-inner">"{story.experience || story.content}"</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+};
+
+export default SuccessStories;
