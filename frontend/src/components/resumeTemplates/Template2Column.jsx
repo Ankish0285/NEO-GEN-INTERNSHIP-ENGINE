@@ -46,6 +46,9 @@ const RSection = ({ title }) => (
     paddingBottom: '3px',
     marginBottom: '8px',
     marginTop: '14px',
+    /* Keep heading glued to whatever comes directly after it */
+    breakAfter: 'avoid',
+    pageBreakAfter: 'avoid',
   }}>
     {title}
   </div>
@@ -257,17 +260,36 @@ const Template2Column = ({ data = {} }) => {
           </div>
         )}
 
-        {/* ── Certifications (abbreviated in left) ── */}
+        {/* ── Certifications ── */}
         {certifications.length > 0 && (
           <div>
             <LSection title="Certifications" />
             {certifications.map((c, i) => {
-              const cname = typeof c === 'string' ? c : c.name || '';
-              const cissuer = typeof c === 'object' ? c.issuer || '' : '';
+              const cname      = typeof c === 'string' ? c : c.name       || '';
+              const cissuer    = typeof c === 'object' ? c.issuer         || '' : '';
+              const cdate      = typeof c === 'object' ? c.issueDate      || '' : '';
+              const cexpiry    = typeof c === 'object' ? c.expiryDate     || '' : '';
+              const ccredUrl   = typeof c === 'object' ? c.credUrl        || '' : '';
+              const ccredId    = typeof c === 'object' ? c.credId         || '' : '';
               return (
-                <div key={i} style={{ fontSize: '8pt', marginBottom: '5px' }}>
-                  <div style={{ fontWeight: '600', lineHeight: '1.3' }}>{cname}</div>
-                  {cissuer && <div style={{ opacity: 0.75, fontSize: '7.5pt' }}>{cissuer}</div>}
+                <div key={i} style={{ fontSize: '8pt', marginBottom: '7px' }}>
+                  <div style={{ fontWeight: '700', lineHeight: '1.3' }}>{cname}</div>
+                  {cissuer && <div style={{ opacity: 0.8, fontSize: '7.5pt', marginTop: '1px' }}>{cissuer}</div>}
+                  {(cdate || cexpiry) && (
+                    <div style={{ opacity: 0.65, fontSize: '7pt', marginTop: '1px', fontStyle: 'italic' }}>
+                      {cdate}{cdate && cexpiry ? ' – ' : ''}{cexpiry}
+                    </div>
+                  )}
+                  {ccredId && (
+                    <div style={{ opacity: 0.65, fontSize: '7pt', marginTop: '1px' }}>
+                      ID: {ccredId}
+                    </div>
+                  )}
+                  {ccredUrl && (
+                    <div style={{ opacity: 0.7, fontSize: '7pt', marginTop: '1px', wordBreak: 'break-all' }}>
+                      🔗 {ccredUrl}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -279,14 +301,16 @@ const Template2Column = ({ data = {} }) => {
           <div>
             <LSection title="Volunteering" />
             {volunteering.map((v, i) => {
-              const role = typeof v === 'string' ? v : v.role || '';
-              const org  = typeof v === 'object' ? v.org || '' : '';
+              const role = typeof v === 'string' ? v    : v.role || '';
+              const org  = typeof v === 'object' ? v.org  || '' : '';
               const date = typeof v === 'object' ? v.date || '' : '';
+              const desc = typeof v === 'object' ? v.description || '' : '';
               return (
-                <div key={i} style={{ fontSize: '8pt', marginBottom: '6px' }}>
+                <div key={i} style={{ fontSize: '8pt', marginBottom: '7px' }}>
                   <div style={{ fontWeight: '700' }}>{role}</div>
-                  {org  && <div style={{ opacity: 0.8 }}>{org}</div>}
-                  {date && <div style={{ opacity: 0.65, fontStyle: 'italic', fontSize: '7.5pt' }}>{date}</div>}
+                  {org  && <div style={{ opacity: 0.8, fontSize: '7.5pt', marginTop: '1px' }}>{org}</div>}
+                  {date && <div style={{ opacity: 0.65, fontSize: '7pt', fontStyle: 'italic', marginTop: '1px' }}>{date}</div>}
+                  {desc && <div style={{ opacity: 0.85, fontSize: '7.5pt', marginTop: '2px', lineHeight: '1.35' }}>{desc}</div>}
                 </div>
               );
             })}
@@ -326,10 +350,18 @@ const Template2Column = ({ data = {} }) => {
 
         {/* ── Experience ── */}
         {experience.length > 0 && (
-          <div>
+          <div style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <RSection title="Work Experience" />
+            {/* First entry is wrapped with heading to prevent orphan heading */}
             {experience.map((exp, i) => (
-              <div key={i} style={{ marginBottom: '10px', pageBreakInside: 'avoid' }}>
+              <div key={i} style={{
+                marginBottom: '10px',
+                breakInside: 'avoid',
+                pageBreakInside: 'avoid',
+                /* First entry must not be separated from the heading above */
+                breakBefore: i === 0 ? 'avoid' : 'auto',
+                pageBreakBefore: i === 0 ? 'avoid' : 'auto',
+              }}>
                 <EntryHeader
                   title={exp.title || ''}
                   sub={exp.company || ''}
@@ -345,14 +377,20 @@ const Template2Column = ({ data = {} }) => {
 
         {/* ── Internships ── */}
         {internships.length > 0 && (
-          <div>
+          <div style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <RSection title="Internships" />
             {internships.map((int, i) => (
-              <div key={i} style={{ marginBottom: '10px', pageBreakInside: 'avoid' }}>
+              <div key={i} style={{
+                marginBottom: '10px',
+                breakInside: 'avoid',
+                pageBreakInside: 'avoid',
+                breakBefore: i === 0 ? 'avoid' : 'auto',
+                pageBreakBefore: i === 0 ? 'avoid' : 'auto',
+              }}>
                 <EntryHeader
                   title={int.role || int.title || ''}
                   sub={int.org || int.company || ''}
-                  date={dateRange(int.startDate, int.endDate) || int.duration || ''}
+                  date={dateRange(int.startDate, int.endDate, int.current) || int.duration || ''}
                   location={[int.type, int.location].filter(Boolean).join(' · ')}
                 />
                 {int.tech && (
@@ -369,10 +407,16 @@ const Template2Column = ({ data = {} }) => {
 
         {/* ── Education ── */}
         {education.length > 0 && (
-          <div>
+          <div style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <RSection title="Education" />
             {education.map((edu, i) => (
-              <div key={i} style={{ marginBottom: '10px', pageBreakInside: 'avoid' }}>
+              <div key={i} style={{
+                marginBottom: '10px',
+                breakInside: 'avoid',
+                pageBreakInside: 'avoid',
+                breakBefore: i === 0 ? 'avoid' : 'auto',
+                pageBreakBefore: i === 0 ? 'avoid' : 'auto',
+              }}>
                 <EntryHeader
                   title={edu.degree || edu.title || ''}
                   sub={edu.institution || edu.company || ''}
@@ -409,10 +453,16 @@ const Template2Column = ({ data = {} }) => {
 
         {/* ── Projects ── */}
         {projects.length > 0 && (
-          <div>
+          <div style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <RSection title="Projects" />
             {projects.map((p, i) => (
-              <div key={i} style={{ marginBottom: '10px', pageBreakInside: 'avoid' }}>
+              <div key={i} style={{
+                marginBottom: '10px',
+                breakInside: 'avoid',
+                pageBreakInside: 'avoid',
+                breakBefore: i === 0 ? 'avoid' : 'auto',
+                pageBreakBefore: i === 0 ? 'avoid' : 'auto',
+              }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
                   <span style={{ fontSize: '9.5pt', fontWeight: '700', color: C.dark }}>
                     {p.name || p.title || ''}
@@ -444,7 +494,7 @@ const Template2Column = ({ data = {} }) => {
 
         {/* ── Achievements ── */}
         {achievements.length > 0 && (
-          <div>
+          <div style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <RSection title="Achievements" />
             {achievements.map((a, i) => {
               const atitle = typeof a === 'string' ? a : a.title || '';
@@ -453,7 +503,13 @@ const Template2Column = ({ data = {} }) => {
               const aprize = typeof a === 'object' ? a.prize || '' : '';
               const adesc  = typeof a === 'object' ? a.description || '' : '';
               return (
-                <div key={i} style={{ marginBottom: '7px', pageBreakInside: 'avoid' }}>
+                <div key={i} style={{
+                  marginBottom: '7px',
+                  breakInside: 'avoid',
+                  pageBreakInside: 'avoid',
+                  breakBefore: i === 0 ? 'avoid' : 'auto',
+                  pageBreakBefore: i === 0 ? 'avoid' : 'auto',
+                }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                     <span style={{ fontSize: '8.5pt', fontWeight: '700', color: C.dark }}>{atitle}</span>
                     {adate && <span style={{ fontSize: '7.5pt', color: C.textLight, whiteSpace: 'nowrap' }}>{adate}</span>}
@@ -472,18 +528,26 @@ const Template2Column = ({ data = {} }) => {
 
         {/* ── Training ── */}
         {training.length > 0 && (
-          <div>
+          <div style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <RSection title="Training & Courses" />
             {training.map((t, i) => {
-              const tname = typeof t === 'string' ? t : t.name || '';
-              const torg  = typeof t === 'object' ? t.org   || '' : '';
-              const tdate = typeof t === 'object' ? t.date  || '' : '';
-              const tsk   = typeof t === 'object' ? t.skills || '' : '';
+              const tname     = typeof t === 'string' ? t : t.name     || '';
+              const torg      = typeof t === 'object' ? t.org          || '' : '';
+              const tduration = typeof t === 'object' ? t.duration     || '' : '';
+              const tdate     = typeof t === 'object' ? t.date         || '' : '';
+              const tsk       = typeof t === 'object' ? t.skills       || '' : '';
+              const tdisplay  = [tduration, tdate].filter(Boolean).join(' · ');
               return (
-                <div key={i} style={{ marginBottom: '6px', pageBreakInside: 'avoid' }}>
+                <div key={i} style={{
+                  marginBottom: '6px',
+                  breakInside: 'avoid',
+                  pageBreakInside: 'avoid',
+                  breakBefore: i === 0 ? 'avoid' : 'auto',
+                  pageBreakBefore: i === 0 ? 'avoid' : 'auto',
+                }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                     <span style={{ fontSize: '8.5pt', fontWeight: '700', color: C.dark }}>{tname}</span>
-                    {tdate && <span style={{ fontSize: '7.5pt', color: C.textLight, whiteSpace: 'nowrap' }}>{tdate}</span>}
+                    {tdisplay && <span style={{ fontSize: '7.5pt', color: C.textLight, whiteSpace: 'nowrap', fontStyle: 'italic' }}>{tdisplay}</span>}
                   </div>
                   {torg && <div style={{ fontSize: '8pt', color: C.accent, fontWeight: '600' }}>{torg}</div>}
                   {tsk  && <div style={{ fontSize: '7.5pt', color: C.textLight, fontStyle: 'italic' }}>{tsk}</div>}
@@ -495,10 +559,16 @@ const Template2Column = ({ data = {} }) => {
 
         {/* ── Positions of Responsibility ── */}
         {positions.length > 0 && (
-          <div>
+          <div style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <RSection title="Positions of Responsibility" />
             {positions.map((p, i) => (
-              <div key={i} style={{ marginBottom: '9px', pageBreakInside: 'avoid' }}>
+              <div key={i} style={{
+                marginBottom: '9px',
+                breakInside: 'avoid',
+                pageBreakInside: 'avoid',
+                breakBefore: i === 0 ? 'avoid' : 'auto',
+                pageBreakBefore: i === 0 ? 'avoid' : 'auto',
+              }}>
                 <EntryHeader
                   title={p.position || p.title || ''}
                   sub={p.org || p.organization || ''}

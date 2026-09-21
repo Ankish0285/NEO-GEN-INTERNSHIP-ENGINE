@@ -148,6 +148,17 @@ function ensurePrintStyles() {
         display: table-cell !important;
         overflow: visible !important;
         height: auto !important;
+        vertical-align: top !important;
+      }
+
+      /* ── Section wrappers inside right column — no clipping ── */
+      #resume-print-root > *:last-child > div {
+        overflow: visible !important;
+      }
+
+      /* ── Prevent any individual entry from being clipped ── */
+      #resume-print-root * {
+        overflow: visible !important;
       }
 
       /* ── Images ── */
@@ -541,11 +552,23 @@ const ResumeBuilderInner = () => {
                     <F label="Employment Type"   value={exp.type}        onChange={e => update('experience', i, { type: e.target.value })}        placeholder="Full-time / Part-time / Contract" />
                     <F label="Location"          value={exp.location}    onChange={e => update('experience', i, { location: e.target.value })}    placeholder="Bengaluru, India" />
                     <F label="Start Date"        value={exp.startDate}   onChange={e => update('experience', i, { startDate: e.target.value })}   placeholder="Jan 2022" />
-                    <F label="End Date"          value={exp.endDate}     onChange={e => update('experience', i, { endDate: e.target.value })}     placeholder="Present" />
+                    <F label="End Date"          value={exp.current ? '' : (exp.endDate || '')} onChange={e => update('experience', i, { endDate: e.target.value })}     placeholder="Present" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '10px' }}>
+                      <input
+                        type="checkbox"
+                        id={`exp-current-${i}`}
+                        checked={!!exp.current}
+                        onChange={e => update('experience', i, { current: e.target.checked, endDate: e.target.checked ? '' : exp.endDate })}
+                        style={{ width: '14px', height: '14px', accentColor: '#FF9933', cursor: 'pointer', flexShrink: 0 }}
+                      />
+                      <label htmlFor={`exp-current-${i}`} style={{ fontSize: '11px', fontWeight: '600', color: '#374151', cursor: 'pointer' }}>
+                        Currently working here
+                      </label>
+                    </div>
                     <F label="Responsibilities / Achievements" value={exp.description} onChange={e => update('experience', i, { description: e.target.value })} multiline placeholder="Key contributions, achievements, technologies used…" />
                   </ItemCard>
                 ))}
-                <AddBtn label="Add Experience" onClick={() => add('experience', { title: '', company: '', type: '', location: '', startDate: '', endDate: '', description: '' })} />
+                <AddBtn label="Add Experience" onClick={() => add('experience', { title: '', company: '', type: '', location: '', startDate: '', endDate: '', current: false, description: '' })} />
               </>
             )}
 
@@ -559,12 +582,24 @@ const ResumeBuilderInner = () => {
                     <F label="Internship Type"    value={int.type}        onChange={e => update('internships', i, { type: e.target.value })}         placeholder="Remote / On-site / Hybrid" />
                     <F label="Location"           value={int.location}    onChange={e => update('internships', i, { location: e.target.value })}     placeholder="Mumbai, India" />
                     <F label="Start Date"         value={int.startDate}   onChange={e => update('internships', i, { startDate: e.target.value })}    placeholder="Jun 2023" />
-                    <F label="End Date"           value={int.endDate}     onChange={e => update('internships', i, { endDate: e.target.value })}      placeholder="Aug 2023" />
+                    <F label="End Date"           value={int.current ? '' : (int.endDate || '')} onChange={e => update('internships', i, { endDate: e.target.value })}      placeholder="Aug 2023" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '10px' }}>
+                      <input
+                        type="checkbox"
+                        id={`int-current-${i}`}
+                        checked={!!int.current}
+                        onChange={e => update('internships', i, { current: e.target.checked, endDate: e.target.checked ? '' : int.endDate })}
+                        style={{ width: '14px', height: '14px', accentColor: '#FF9933', cursor: 'pointer', flexShrink: 0 }}
+                      />
+                      <label htmlFor={`int-current-${i}`} style={{ fontSize: '11px', fontWeight: '600', color: '#374151', cursor: 'pointer' }}>
+                        Currently interning here
+                      </label>
+                    </div>
                     <F label="Technologies"       value={int.tech}        onChange={e => update('internships', i, { tech: e.target.value })}         placeholder="React, Node.js, MongoDB" />
                     <F label="Description"        value={int.description} onChange={e => update('internships', i, { description: e.target.value })} multiline placeholder="Responsibilities, projects, outcomes…" />
                   </ItemCard>
                 ))}
-                <AddBtn label="Add Internship" onClick={() => add('internships', { role: '', org: '', type: '', location: '', startDate: '', endDate: '', tech: '', description: '' })} />
+                <AddBtn label="Add Internship" onClick={() => add('internships', { role: '', org: '', type: '', location: '', startDate: '', endDate: '', current: false, tech: '', description: '' })} />
               </>
             )}
 
