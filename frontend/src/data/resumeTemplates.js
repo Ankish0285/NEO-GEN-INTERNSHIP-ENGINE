@@ -69,6 +69,16 @@ export const RESUME_TEMPLATES = [
     color: '#b45309',
     previewBg: '#fffbeb',
   },
+  {
+    templateId: '2-column',
+    displayOrder: 7,
+    access: 'FREE',
+    name: '2-Column Professional',
+    description: 'Modern two-column layout with dark sidebar — clean, ATS-friendly, and visually balanced.',
+    tags: ['ATS-Friendly', '2-Column', 'Modern'],
+    color: '#1e2a3a',
+    previewBg: '#f1f5f9',
+  },
 ];
 
 /** Sorted by displayOrder (deterministic). */
