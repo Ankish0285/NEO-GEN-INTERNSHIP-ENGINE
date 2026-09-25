@@ -21,6 +21,13 @@ const mapInternshipForAI = (doc) => ({
   description: doc.description,
   eligibility: doc.eligibility,
   skills: doc.skills || [],
+  requiredSkills: doc.requiredSkills || doc.skills || [],
+  preferredSkills: doc.preferredSkills || [],
+  degreeRequirements: doc.degreeRequirements || [],
+  branchRequirements: doc.branchRequirements || [],
+  yearRequirements: doc.yearRequirements || [],
+  experienceRequirements: doc.experienceRequirements,
+  eligibilityConditions: doc.eligibilityConditions || [],
   deadline: doc.deadline,
 });
 
@@ -110,6 +117,9 @@ const runAIPipelineForUser = async (userId, resumeText, req = null) => {
         skills: user?.skills || [],
         course: user?.course,
         university: user?.university,
+        academic_year: user?.currentYear,
+        semester: user?.semester,
+        graduation_year: user?.graduationYear,
         preferredLocation: user?.preferredLocation,
         atsScore: user?.atsScore,
         interests: user?.interests || [],
@@ -184,6 +194,10 @@ const getAIIntelligence = asyncHandler(async (req, res) => {
     userData: {
       skills: user?.skills || [],
       course: user?.course,
+      university: user?.university,
+      academic_year: user?.currentYear,
+      semester: user?.semester,
+      graduation_year: user?.graduationYear,
       interests: user?.interests || [],
       ats_history: buildMemoryFromProfile(profile, user).past_ats_scores,
     },
@@ -280,6 +294,10 @@ const getAIRecommendations = asyncHandler(async (req, res) => {
       userData: {
         skills: user.skills,
         course: user.course,
+        university: user.university,
+        academic_year: user.currentYear,
+        semester: user.semester,
+        graduation_year: user.graduationYear,
         preferredLocation: user.preferredLocation,
         atsScore: user.atsScore,
       },
@@ -329,6 +347,17 @@ const getAIRecommendations = asyncHandler(async (req, res) => {
     selectionTier: r.selection_tier,
     matchedSkills: r.matched_skills,
     missingSkills: r.missing_skills,
+    partialMatches: r.partial_matches,
+    relevantProjects: r.relevant_projects,
+    eligibilityStatus: r.eligibility_status,
+    eligibilityReasons: r.eligibility_reasons,
+    internshipProfile: r.internship_profile,
+    matching: r.matching,
+    score: r.score,
+    scoreBreakdown: r.score_breakdown,
+    skillGap: r.skill_gap,
+    recommendation: r.recommendation,
+    aiConfidenceScore: r.ai_confidence_score,
     atsScore: r.ats_score,
     aiExplanation: r.ai_explanation,
     recommendedImprovements: r.recommended_improvements,
@@ -345,6 +374,9 @@ const getAIRecommendations = asyncHandler(async (req, res) => {
       company: r.company,
       matchScore: r.match_percentage,
       selectionProbability: r.selection_probability,
+      eligibilityStatus: r.eligibility_status,
+      recommendation: r.recommendation,
+      scoreBreakdown: r.score_breakdown,
     }));
 
   res.json({
@@ -547,6 +579,73 @@ const getAdminAIInsights = asyncHandler(async (req, res) => {
   });
 });
 
+// @route GET /api/ai/admin/rank/:internshipId
+// @desc Rank candidates for one internship using eligibility-first deterministic scoring
+const rankStudentsForInternship = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+    res.status(403);
+    throw new Error('Admin only');
+  }
+  if (!(await aiClient.isAvailable())) {
+    res.status(503);
+    throw new Error('AI service offline');
+  }
+
+  const internship = await Internship.findById(req.params.internshipId).lean();
+  if (!internship) {
+    res.status(404);
+    throw new Error('Internship not found');
+  }
+
+  const resumes = await Resume.find({ parsedText: { $exists: true, $ne: '' } })
+    .sort({ createdAt: -1 })
+    .limit(500)
+    .lean();
+  const ranked = [];
+  for (const resume of resumes) {
+    const user = await User.findById(resume.user).lean();
+    if (!user) continue;
+    const pipeline = await aiClient.fullPipeline({
+      resumeText: resume.parsedText,
+      internships: [mapInternshipForAI(internship)],
+      userData: {
+        skills: user.skills || [],
+        course: user.course,
+        university: user.university,
+        academic_year: user.currentYear,
+        preferredLocation: user.preferredLocation,
+      },
+      applications: [],
+      topK: 1,
+    });
+    const recommendation = pipeline?.recommendations?.[0];
+    if (recommendation) {
+      ranked.push({
+        studentId: user._id,
+        studentName: user.name,
+        internshipId: internship._id,
+        eligibilityStatus: recommendation.eligibility_status,
+        eligibilityReasons: recommendation.eligibility_reasons,
+        matchPercentage: recommendation.match_percentage,
+        score: recommendation.score,
+        matching: recommendation.matching,
+        recommendation: recommendation.recommendation,
+      });
+    }
+  }
+
+  ranked.sort((a, b) => (
+    Number(b.eligibilityStatus === 'eligible') - Number(a.eligibilityStatus === 'eligible')
+    || (b.matchPercentage || 0) - (a.matchPercentage || 0)
+  ));
+  res.json({
+    success: true,
+    internship: { id: internship._id, title: internship.title },
+    count: ranked.length,
+    rankings: ranked.map((item, index) => ({ ...item, rank: index + 1 })),
+  });
+});
+
 module.exports = {
   getAIStatus,
   getAIProfile,
@@ -556,5 +655,6 @@ module.exports = {
   matchSingleInternship,
   aiChat,
   getAdminAIInsights,
+  rankStudentsForInternship,
   runAIPipelineForUser,
 };

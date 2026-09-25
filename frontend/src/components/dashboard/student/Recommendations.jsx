@@ -19,6 +19,15 @@ const InternshipCard = ({ job, loading, index }) => {
     );
   }
 
+  const safeJob = job && typeof job === 'object' ? job : {};
+  const eligibilityValue = safeJob.eligibilityStatus || safeJob.eligibility_status;
+  const eligibilityStatus = typeof eligibilityValue === 'string' ? eligibilityValue : '';
+  const scoreBreakdown = safeJob.scoreBreakdown || safeJob.score_breakdown;
+  const matchedValue = safeJob.matchedSkills || safeJob.matched_skills;
+  const missingValue = safeJob.missingSkills || safeJob.missing_skills;
+  const matchedSkills = Array.isArray(matchedValue) ? matchedValue : [];
+  const missingSkills = Array.isArray(missingValue) ? missingValue : [];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -29,48 +38,79 @@ const InternshipCard = ({ job, loading, index }) => {
     >
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="font-bold text-[#111827] line-clamp-1">{job.title}</h3>
-          <p className="text-[#4B5563] text-sm">{job.company}</p>
+          <h3 className="font-bold text-[#111827] line-clamp-1">{safeJob.title || 'Internship opportunity'}</h3>
+          <p className="text-[#4B5563] text-sm">{safeJob.company || safeJob.organization || 'Organization not provided'}</p>
         </div>
-        {job.matchScore != null && (
+        {(safeJob.matchScore ?? safeJob.match_percentage) != null && (
           <span className="bg-[#e8f5e6] text-[#138808] text-xs font-bold px-2.5 py-1 rounded-full flex items-center border border-[#138808]/20">
             <Star size={12} className="mr-1 fill-current" />
-            {job.matchScore}% Match
+            {safeJob.matchScore ?? safeJob.match_percentage}% Match
           </span>
         )}
       </div>
 
-      {job.aiExplanation && (
-        <p className="text-xs text-[#6B7280] mb-4 line-clamp-2">{job.aiExplanation}</p>
+      {eligibilityStatus && (
+        <span className={`inline-flex mb-3 px-2 py-1 rounded-full text-xs font-bold ${
+          eligibilityStatus === 'eligible'
+            ? 'bg-emerald-50 text-emerald-700'
+            : eligibilityStatus === 'unknown'
+              ? 'bg-amber-50 text-amber-700'
+              : 'bg-red-50 text-red-700'
+        }`}>
+          {eligibilityStatus.replace('_', ' ')}
+        </span>
+      )}
+
+      {(safeJob.aiExplanation || safeJob.ai_explanation) && (
+        <p className="text-xs text-[#6B7280] mb-4 line-clamp-2">{safeJob.aiExplanation || safeJob.ai_explanation}</p>
+      )}
+
+      {scoreBreakdown && (
+        <div className="grid grid-cols-3 gap-2 mb-4 text-[11px] text-[#4B5563]">
+          <span>Skills {scoreBreakdown.skill_match}/40</span>
+          <span>Projects {scoreBreakdown.project_match}/25</span>
+          <span>ATS {scoreBreakdown.ats_quality}/10</span>
+        </div>
+      )}
+
+      {(matchedSkills.length > 0 || missingSkills.length > 0) && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {matchedSkills.slice(0, 4).map((skill) => (
+            <span key={`matched-${skill}`} className="px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[11px]">{skill}</span>
+          ))}
+          {missingSkills.slice(0, 3).map((skill) => (
+            <span key={`missing-${skill}`} className="px-2 py-1 rounded-md bg-red-50 text-red-700 text-[11px]">Missing: {skill}</span>
+          ))}
+        </div>
       )}
 
       <div className="flex flex-wrap gap-2 mb-4 text-sm text-[#4B5563]">
-        {job.location && (
+        {safeJob.location && (
           <span className="flex items-center bg-white/60 px-2 py-1 rounded-lg border border-black/5">
-            <MapPin size={14} className="mr-1 text-[#FF9933]" /> {job.location}
+            <MapPin size={14} className="mr-1 text-[#FF9933]" /> {safeJob.location}
           </span>
         )}
-        {job.duration && (
+        {safeJob.duration && (
           <span className="flex items-center bg-white/60 px-2 py-1 rounded-lg border border-black/5">
-            <Clock size={14} className="mr-1 text-[#FF9933]" /> {job.duration}
+            <Clock size={14} className="mr-1 text-[#FF9933]" /> {safeJob.duration}
           </span>
         )}
-        {job.stipend && (
+        {safeJob.stipend && (
           <span className="flex items-center bg-white/60 px-2 py-1 rounded-lg border border-black/5">
-            <DollarSign size={14} className="mr-1 text-[#FF9933]" /> {job.stipend}
+            <DollarSign size={14} className="mr-1 text-[#FF9933]" /> {safeJob.stipend}
           </span>
         )}
       </div>
 
-      {job.selectionProbability != null && (
+      {(safeJob.selectionProbability ?? safeJob.selection_probability) != null && (
         <p className="text-xs text-[#138808] mb-3">
-          Selection probability: <strong>{job.selectionProbability}%</strong>
+          Selection probability: <strong>{safeJob.selectionProbability ?? safeJob.selection_probability}%</strong>
         </p>
       )}
 
       <div className="flex justify-between items-center pt-4 border-t border-black/5">
-        <span className="text-xs text-[#9CA3AF]">{job.postedAt || 'AI matched'}</span>
-        <button type="button" className="neo-btn neo-btn-primary !min-h-[40px] text-sm" onClick={() => navigate('/find-internship')}>
+        <span className="text-xs text-[#9CA3AF]">{safeJob.postedAt || 'AI matched'}</span>
+        <button type="button" className="neo-btn neo-btn-primary min-h-10! text-sm" onClick={() => navigate('/find-internship')}>
           View <ArrowRight size={16} className="inline ml-1" />
         </button>
       </div>
@@ -99,7 +139,7 @@ const Recommendations = () => {
     try {
       const res = await getAIRecommendations(12);
       const recs = Array.isArray(res?.recommendations) ? res.recommendations : [];
-      setRecommendations(recs);
+      setRecommendations(recs.filter((item) => item && typeof item === 'object'));
       setAiOnline(true);
     } catch (err) {
       // 403 = subscription gate triggered by backend
@@ -112,7 +152,7 @@ const Recommendations = () => {
         const fallback = Array.isArray(dashboardData?.recommendedInternships)
           ? dashboardData.recommendedInternships
           : [];
-        setRecommendations(fallback);
+        setRecommendations(fallback.filter((item) => item && typeof item === 'object'));
         setAiOnline(false);
         if (fallback.length === 0) {
           setError(err?.message || 'Could not load recommendations');
@@ -225,7 +265,7 @@ const Recommendations = () => {
           <button
             type="button"
             onClick={load}
-            className="mt-4 neo-btn neo-btn-primary !min-h-[40px] text-sm"
+            className="mt-4 neo-btn neo-btn-primary min-h-10! text-sm"
           >
             Retry
           </button>

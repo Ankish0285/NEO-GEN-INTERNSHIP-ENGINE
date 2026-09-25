@@ -58,6 +58,9 @@ const userSchema = mongoose.Schema(
     profilePicture: { type: String }, // Cloudinary URL
     university: { type: String },
     course: { type: String },
+    currentYear: { type: String },
+    semester: { type: String },
+    graduationYear: { type: String },
     preferredLocation: { type: String }, // For recommendation engine
     skills: { type: [String], default: [] },
     experience: [{

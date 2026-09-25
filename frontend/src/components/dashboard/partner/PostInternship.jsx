@@ -19,6 +19,12 @@ const PostInternship = () => {
     type: 'Remote',
     workMode: '',
     skills: '',
+    requiredSkills: '',
+    preferredSkills: '',
+    degreeRequirements: '',
+    branchRequirements: '',
+    yearRequirements: '',
+    experienceRequirements: '',
     description: '',
     eligibility: '',
     requirements: '',
@@ -57,6 +63,12 @@ const PostInternship = () => {
           type: internship.type || 'Remote',
           workMode: internship.workMode || '',
           skills: Array.isArray(internship.skills) ? internship.skills.join(', ') : (internship.skills || ''),
+          requiredSkills: Array.isArray(internship.requiredSkills) ? internship.requiredSkills.join(', ') : '',
+          preferredSkills: Array.isArray(internship.preferredSkills) ? internship.preferredSkills.join(', ') : '',
+          degreeRequirements: Array.isArray(internship.degreeRequirements) ? internship.degreeRequirements.join(', ') : '',
+          branchRequirements: Array.isArray(internship.branchRequirements) ? internship.branchRequirements.join(', ') : '',
+          yearRequirements: Array.isArray(internship.yearRequirements) ? internship.yearRequirements.join(', ') : '',
+          experienceRequirements: internship.experienceRequirements || '',
           description: internship.description || '',
           eligibility: internship.eligibility || '',
           requirements: internship.requirements || '',
@@ -94,9 +106,10 @@ const PostInternship = () => {
     try {
       const internshipData = {
         ...formData,
-        skills: typeof formData.skills === 'string'
-          ? formData.skills.split(',').map(f => f.trim()).filter(Boolean)
-          : (formData.skills || [])
+        ...Object.fromEntries(
+          ['skills', 'requiredSkills', 'preferredSkills', 'degreeRequirements', 'branchRequirements', 'yearRequirements']
+            .map((field) => [field, String(formData[field] || '').split(',').map((item) => item.trim()).filter(Boolean)])
+        )
       };
       if (editingId) {
         const response = await api.put(`/internships/${editingId}`, internshipData);

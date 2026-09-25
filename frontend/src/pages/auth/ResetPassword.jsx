@@ -55,7 +55,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4">
+    <div className="neo-auth-page min-h-screen flex items-center justify-center py-12 px-4">
       <div style={{ maxWidth: '450px', width: '100%' }}>
         <div className="modal-content" style={{ width: '100%' }}>
           <div className="modal-header">

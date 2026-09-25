@@ -4,6 +4,8 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import AuthService from '../services/authService';
 import logo from '../assets/images/logo.png';
+import { useSiteSettings } from '../context/SiteSettingsContext';
+import { resolveStoryImageUrl } from '../utils/resolveStoryImageUrl';
 
 const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false }) => {
   const googleClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
@@ -24,6 +26,13 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
   const [showOtp, setShowOtp] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
   const { login, register, verifyOtp, verifyLoginOtp } = useAuth();
+  const { settings } = useSiteSettings();
+  const { branding } = settings;
+  const logoSrc = branding.logoUrl
+    ? resolveStoryImageUrl(branding.logoUrl) || branding.logoUrl
+    : logo;
+  const primaryColor = branding.primaryColor || '#FF9933';
+  const secondaryColor = branding.secondaryColor || '#138808';
   const navigate = useNavigate();
 
   // Update active tab when initialTab prop changes
@@ -282,8 +291,25 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
       style={wrapperStyle}
     >
       <div className="modal-content" style={{ maxWidth: '450px', width: '90%' }}>
-        <div className="modal-header">
-          <h2>SIGN IN TO NEO GEN INTERNSHIP ENGINE</h2>
+        <div className="modal-header" style={{ alignItems: 'flex-start' }}>
+          <div className="neo-auth-brand" aria-label={`${branding.brandNameLine1 || 'NEO'} ${branding.brandNameLine2 || 'GEN'} Internship Engine`}>
+            <img
+              src={logoSrc}
+              alt="NEO GEN logo"
+              className="neo-auth-brand__logo"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = logo;
+              }}
+            />
+            <div>
+              <h2 className="neo-auth-brand__name">
+                <span style={{ color: primaryColor }}>{branding.brandNameLine1 || 'NEO'}</span>{' '}
+                <span style={{ color: secondaryColor }}>{branding.brandNameLine2 || 'GEN'}</span>
+              </h2>
+              <p className="neo-auth-brand__subtitle">{branding.brandSubtitle || 'INTERNSHIP ENGINE'}</p>
+            </div>
+          </div>
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
         <div className="modal-body">

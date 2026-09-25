@@ -18,6 +18,12 @@ const Internships = () => {
     type: 'Remote',
     workMode: '',
     skills: '',
+    requiredSkills: '',
+    preferredSkills: '',
+    degreeRequirements: '',
+    branchRequirements: '',
+    yearRequirements: '',
+    experienceRequirements: '',
     description: '',
     eligibility: '',
     requirements: '',
@@ -79,6 +85,12 @@ const Internships = () => {
       type: internship.type || 'Remote',
       workMode: internship.workMode || '',
       skills: Array.isArray(internship.skills) ? internship.skills.join(', ') : (internship.skills || ''),
+      requiredSkills: Array.isArray(internship.requiredSkills) ? internship.requiredSkills.join(', ') : '',
+      preferredSkills: Array.isArray(internship.preferredSkills) ? internship.preferredSkills.join(', ') : '',
+      degreeRequirements: Array.isArray(internship.degreeRequirements) ? internship.degreeRequirements.join(', ') : '',
+      branchRequirements: Array.isArray(internship.branchRequirements) ? internship.branchRequirements.join(', ') : '',
+      yearRequirements: Array.isArray(internship.yearRequirements) ? internship.yearRequirements.join(', ') : '',
+      experienceRequirements: internship.experienceRequirements || '',
       description: internship.description || '',
       eligibility: internship.eligibility || '',
       requirements: internship.requirements || '',
@@ -107,9 +119,10 @@ const Internships = () => {
     try {
       const internshipData = {
         ...newInternship,
-        skills: typeof newInternship.skills === 'string'
-          ? newInternship.skills.split(',').map(f => f.trim()).filter(Boolean)
-          : (newInternship.skills || [])
+        ...Object.fromEntries(
+          ['skills', 'requiredSkills', 'preferredSkills', 'degreeRequirements', 'branchRequirements', 'yearRequirements']
+            .map((field) => [field, String(newInternship[field] || '').split(',').map((item) => item.trim()).filter(Boolean)])
+        )
       };
       if (editingId) {
         // UPDATE existing internship
@@ -189,6 +202,37 @@ const Internships = () => {
                   onChange={handleInputChange}
                   required
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+
+              {[
+                ['requiredSkills', 'Required skills (comma separated)'],
+                ['preferredSkills', 'Preferred skills (comma separated)'],
+                ['degreeRequirements', 'Degree requirements (comma separated)'],
+                ['branchRequirements', 'Branch requirements (comma separated)'],
+                ['yearRequirements', 'Academic year requirements (comma separated)'],
+              ].map(([name, label]) => (
+                <div className="sm:col-span-3" key={name}>
+                  <label className="block text-sm font-medium text-gray-700">{label}</label>
+                  <input
+                    type="text"
+                    name={name}
+                    value={newInternship[name]}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm"
+                  />
+                </div>
+              ))}
+
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium text-gray-700">Minimum experience</label>
+                <input
+                  type="text"
+                  name="experienceRequirements"
+                  value={newInternship.experienceRequirements}
+                  onChange={handleInputChange}
+                  placeholder="0 or 1 year"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm"
                 />
               </div>
 

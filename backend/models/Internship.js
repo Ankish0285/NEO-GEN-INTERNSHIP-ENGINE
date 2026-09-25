@@ -42,6 +42,13 @@ const internshipSchema = mongoose.Schema(
       type: [String],
       required: [true, 'Please add at least one skill'],
     },
+    requiredSkills: { type: [String], default: undefined },
+    preferredSkills: { type: [String], default: [] },
+    degreeRequirements: { type: [String], default: [] },
+    branchRequirements: { type: [String], default: [] },
+    yearRequirements: { type: [String], default: [] },
+    experienceRequirements: { type: String },
+    eligibilityConditions: { type: [String], default: [] },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

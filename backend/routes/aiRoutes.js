@@ -18,6 +18,7 @@ const {
   matchSingleInternship,
   aiChat,
   getAdminAIInsights,
+  rankStudentsForInternship,
 } = require('../controllers/aiController');
 
 // ── Public / read-only ────────────────────────────────────────────────────────
@@ -25,6 +26,7 @@ router.get('/status', getAIStatus);
 
 // ── Admin only (no usage gate — internal analytics) ───────────────────────────
 router.get('/admin/insights', protect, getAdminAIInsights);
+router.get('/admin/rank/:internshipId', protect, rankStudentsForInternship);
 
 // ── Authenticated, no usage gate (profile read is always free) ───────────────
 router.get('/profile', protect, getAIProfile);

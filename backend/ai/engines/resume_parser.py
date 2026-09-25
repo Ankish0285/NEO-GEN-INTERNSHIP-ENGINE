@@ -45,7 +45,16 @@ def parse_resume(text: str) -> dict[str, Any]:
     project_hits = len(re.findall(r'\b(project|built|developed|implemented)\b', text, re.I))
 
     exp_match = re.search(r'(\d+)\+?\s*(years?|yrs)\s+(of\s+)?experience', text, re.I)
-    experience_years = int(exp_match.group(1)) if exp_match else (1 if project_hits >= 3 else 0)
+    experience_years = int(exp_match.group(1)) if exp_match else 0
+
+    project_lines = [
+        line.strip() for line in text.splitlines()
+        if line.strip() and re.search(r'\b(project|built|developed|implemented|created)\b', line, re.I)
+    ]
+    achievement_lines = [
+        line.strip() for line in text.splitlines()
+        if line.strip() and re.search(r'\b(achieved|award|won|increased|reduced|improved)\b', line, re.I)
+    ]
 
     sections = {
         'has_summary': _has_section(text, ['summary', 'objective', 'profile']),
@@ -74,6 +83,8 @@ def parse_resume(text: str) -> dict[str, Any]:
         'soft_skills': soft,
         'education': list(dict.fromkeys(edu_patterns[:5])),
         'certifications': list(dict.fromkeys(cert_patterns[:5])),
+        'projects': project_lines[:10],
+        'achievements': achievement_lines[:10],
         'projects_detected': min(project_hits, 10),
         'experience_years': experience_years,
         'sections': sections,

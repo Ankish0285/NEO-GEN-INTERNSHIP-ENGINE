@@ -7,8 +7,11 @@ from typing import Any
 from engines.ats_engine import analyze_ats
 from engines.embeddings import rank_by_similarity, semantic_similarity
 from engines.profile_engine import build_student_profile
+from engines.resume_parser import parse_resume
+from engines.scoring_engine import calculate_score, extract_internship_requirements
 from engines.selection_engine import predict_selection
 from engines.skills_db import COURSE_SUGGESTIONS
+from engines.structured_extraction import extract_resume_evidence
 from engines.vector_store import semantic_search
 
 
@@ -49,7 +52,17 @@ def recommend_internships(
     ats_result: dict | None = None,
     profile: dict | None = None,
 ) -> dict[str, Any]:
+    parsed_resume = extract_resume_evidence(resume_text or '', parse_resume(resume_text or ''))
     profile = profile or build_student_profile(resume_text, user_data, applications)
+    profile = {
+        **profile,
+        'skills': profile.get('skill_profile', []),
+        'projects': parsed_resume.get('projects', profile.get('projects', [])),
+        'education': parsed_resume.get('education', profile.get('education', [])),
+        'certifications': parsed_resume.get('certifications', profile.get('certifications', [])),
+        'achievements': parsed_resume.get('achievements', profile.get('achievements', [])),
+        'experience': parsed_resume.get('experience', profile.get('experience', [])),
+    }
     student_skills = profile['skill_profile']
     student_blob = resume_text + ' ' + ' '.join(student_skills)
     ats_base = ats_result or (analyze_ats(resume_text, '') if resume_text else {'ats_score': 50})
@@ -73,6 +86,17 @@ def recommend_internships(
 
         ats_for_job = analyze_ats(resume_text, job_doc) if resume_text else ats_base
         ats_score = ats_for_job.get('ats_score', ats_base.get('ats_score', 50))
+        requirements = extract_internship_requirements(job)
+        deterministic = calculate_score(
+            profile,
+            requirements,
+            ats_score,
+            parsed_resume,
+        )
+        eligibility = deterministic['eligibility']
+        matched = deterministic['matching']['matched_skills']
+        missing = deterministic['matching']['missing_required_skills']
+        skill_pct = deterministic['matching']['percentage']
 
         apps_on_job = sum(
             1 for a in (applications or [])
@@ -88,14 +112,18 @@ def recommend_internships(
             employability=profile.get('employability_score', 50),
         )
 
-        ai_compatibility = round(
-            skill_pct * 0.30 + semantic * 0.25 + vector_score * 0.25 + ats_score * 0.20, 2
-        )
-        match_percentage = round(
-            (ai_compatibility + sel['selection_probability']) / 2, 2
-        )
+        ai_compatibility = deterministic['score']['final_score']
+        match_percentage = ai_compatibility
         sel['selection_probability'] = round(
             min(95, match_percentage * 0.7 + sel['selection_probability'] * 0.3), 2
+        )
+        confidence_score = ats_for_job.get('ai_confidence_score', 75)
+        recommendation_status = (
+            'not_eligible' if eligibility['status'] == 'not_eligible'
+            else 'strong_match' if match_percentage >= 90
+            else 'good_match' if match_percentage >= 80
+            else 'moderate_match' if match_percentage >= 70
+            else 'weak_match'
         )
 
         recommendations.append({
@@ -109,6 +137,23 @@ def recommend_internships(
             'skills': job_skills,
             'matched_skills': matched,
             'missing_skills': missing,
+            'partial_matches': deterministic['matching']['partial_matches'],
+            'relevant_projects': deterministic['matching']['relevant_projects'],
+            'eligibility_status': eligibility['status'],
+            'eligibility_reasons': eligibility['reasons'],
+            'eligibility': eligibility,
+            'internship_profile': requirements,
+            'matching': {
+                **deterministic['matching'],
+                'relevant_experience': profile.get('experience', []),
+            },
+            'score_breakdown': deterministic['score'],
+            'score': deterministic['score'],
+            'skill_gap': deterministic['skill_gap'],
+            'recommendation': {
+                'status': recommendation_status,
+                'confidence': 'high' if confidence_score >= 80 else 'medium' if confidence_score >= 60 else 'low',
+            },
             'match_percentage': match_percentage,
             'ai_compatibility_score': ai_compatibility,
             'selection_probability': sel['selection_probability'],
@@ -120,12 +165,10 @@ def recommend_internships(
             'vector_similarity': vector_score,
             'recommended_improvements': (ats_for_job.get('improvement_tips') or [])[:3]
                 + [f'Add skill: {s}' for s in missing[:2]],
-            'ai_explanation': (
-                f'{match_percentage}% match · {len(matched)} skills align · '
-                f'{sel["selection_tier"]} selection chance ({sel["selection_probability"]}%). '
-                f'Interview est. {sel["interview_probability"]}%.'
+            'ai_explanation': _build_explanation(
+                match_percentage, matched, deterministic, sel, parsed_resume
             ),
-            'ai_confidence_score': ats_for_job.get('ai_confidence_score', 75),
+            'ai_confidence_score': confidence_score,
             'skill_gap_courses': [
                 {'skill': s, 'course': COURSE_SUGGESTIONS.get(s.lower(), f'Learn {s}')}
                 for s in missing[:3]
@@ -133,7 +176,10 @@ def recommend_internships(
             'category_tags': [],
         })
 
-    recommendations.sort(key=lambda x: x['match_percentage'], reverse=True)
+    recommendations.sort(
+        key=lambda x: (x['eligibility_status'] == 'eligible', x['match_percentage']),
+        reverse=True,
+    )
     for r in recommendations:
         tags = []
         if r['match_percentage'] >= 75:
@@ -147,10 +193,15 @@ def recommend_internships(
         r['category_tags'] = tags
 
     top = recommendations[:top_k]
+    ranked = lambda key: sorted(
+        recommendations,
+        key=lambda x: (x['eligibility_status'] == 'eligible', x[key]),
+        reverse=True,
+    )
     groups = {
-        'best_match': sorted(recommendations, key=lambda x: x['match_percentage'], reverse=True)[:5],
-        'highest_match': sorted(recommendations, key=lambda x: x['ai_compatibility_score'], reverse=True)[:5],
-        'easiest_selection': sorted(recommendations, key=lambda x: x['selection_probability'], reverse=True)[:5],
+        'best_match': ranked('match_percentage')[:5],
+        'highest_match': ranked('ai_compatibility_score')[:5],
+        'easiest_selection': ranked('selection_probability')[:5],
         'skill_based': [r for r in recommendations if 'skill_based' in r.get('category_tags', [])][:5],
     }
 
@@ -160,3 +211,27 @@ def recommend_internships(
         'student_profile': profile,
         'count': len(top),
     }
+
+
+def _build_explanation(
+    match_percentage: float,
+    matched: list[str],
+    deterministic: dict[str, Any],
+    selection: dict[str, Any],
+    parsed_resume: dict[str, Any],
+) -> str:
+    eligibility = deterministic['eligibility']
+    if eligibility['status'] == 'not_eligible':
+        return f'Not eligible: {"; ".join(eligibility["reasons"][:2])}'
+    experience = parsed_resume.get('experience_years', 0)
+    experience_note = (
+        'No prior experience; no penalty applied.'
+        if not experience else f'{experience} year(s) of relevant experience found.'
+    )
+    return (
+        f'{match_percentage}% evidence-based match. '
+        f'{len(matched)} required skill(s) align and '
+        f'{len(deterministic["matching"]["relevant_projects"])} project(s) are relevant. '
+        f'Eligibility is {eligibility["status"]}. {experience_note} '
+        f'Selection estimate: {selection["selection_probability"]}%.'
+    )

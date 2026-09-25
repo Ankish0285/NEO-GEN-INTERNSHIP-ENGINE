@@ -53,7 +53,7 @@ const UsageBar = ({ freeUsed, freeLimit, isSubscribed, subscription, onViewPlans
     )}>
       <div className="flex justify-between items-center mb-1.5">
         <span className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-          <Shield size={15} className={exhausted ? 'text-red-500' : 'text-indigo-500'} />
+          <Shield size={15} className={exhausted ? 'text-red-500' : 'text-[#FF9933]'} />
           Free Resume Checks
         </span>
         <span className={clsx('text-xs font-bold', exhausted ? 'text-red-600' : 'text-gray-600')}>
@@ -65,14 +65,14 @@ const UsageBar = ({ freeUsed, freeLimit, isSubscribed, subscription, onViewPlans
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.6 }}
-          className={clsx('h-full rounded-full', exhausted ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-indigo-500')}
+          className={clsx('h-full rounded-full', exhausted ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-[#FF9933]')}
         />
       </div>
       {exhausted ? (
         <div className="flex items-center justify-between">
           <p className="text-xs text-red-600 font-medium">All free checks used. Subscribe to continue.</p>
           <button onClick={onViewPlans}
-            className="text-xs px-3 py-1 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 ml-2 shrink-0">
+            className="text-xs px-3 py-1 bg-[#FF9933] text-white rounded-full font-semibold hover:bg-[#e68a2e] ml-2 shrink-0">
             View Plans
           </button>
         </div>
@@ -602,8 +602,8 @@ const ATSResume = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-navy flex items-center gap-2">
-              <FileText className="w-8 h-8 text-saffron" />
+            <h1 className="text-3xl font-bold text-[#111827] flex items-center gap-2">
+              <FileText className="w-8 h-8 text-[#FF9933]" />
               ATS Resume Checker
             </h1>
             <p className="text-sub mt-2 text-lg">
@@ -638,7 +638,7 @@ const ATSResume = () => {
           <motion.div variants={itemVariants} className="lg:col-span-2">
             {isBlocked ? (
               /* ── Paywall state — blocked upload area ── */
-              <div className="glass-card p-10 flex flex-col items-center justify-center h-full min-h-[350px] border-2 border-dashed border-gray-200 bg-gray-50/50 text-center">
+              <div className="glass-card p-10 flex flex-col items-center justify-center h-full min-h-87.5 border-2 border-dashed border-gray-200 bg-gray-50/50 text-center">
                 <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mb-6">
                   <Lock size={40} className="text-gray-400" />
                 </div>
@@ -662,8 +662,8 @@ const ATSResume = () => {
               /* ── Normal upload area ── */
               <div
                 className={clsx(
-                  'glass-card p-10 flex flex-col items-center justify-center h-full min-h-[350px] relative group border-2 border-dashed',
-                  dragActive ? 'border-saffron bg-saffron/5' : 'border-saffron/30 hover:border-saffron hover:bg-gradient-to-br hover:from-saffron/5 hover:to-green-primary/5',
+                  'glass-card p-10 flex flex-col items-center justify-center h-full min-h-87.5 relative group border-2 border-dashed',
+                  dragActive ? 'border-[#FF9933] bg-[#fff4e8]' : 'border-[rgba(255,153,51,0.3)] hover:border-[#FF9933] hover:bg-linear-to-br hover:from-[#fff4e8] hover:to-[#e8f5e6]',
                   isUploading ? 'opacity-75 pointer-events-none' : ''
                 )}
                 onDragEnter={handleDrag} onDragLeave={handleDrag}
@@ -672,20 +672,20 @@ const ATSResume = () => {
                 {isUploading ? (
                   <div className="flex flex-col items-center z-10">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-saffron-light rounded-full animate-ping opacity-75" />
-                      <div className="relative bg-gradient-to-br from-saffron/10 to-white/60 backdrop-blur-md p-4 rounded-full shadow-sm border border-saffron/20">
-                        <Loader2 size={48} className="text-saffron animate-spin" />
+                      <div className="absolute inset-0 bg-[#fff0e0] rounded-full animate-ping opacity-75" />
+                      <div className="relative bg-linear-to-br from-[#fff4e8] to-white/60 backdrop-blur-md p-4 rounded-full shadow-sm border border-[rgba(255,153,51,0.2)]">
+                        <Loader2 size={48} className="text-[#FF9933] animate-spin" />
                       </div>
                     </div>
-                    <p className="text-xl font-bold text-navy mt-6">Analyzing your resume…</p>
+                    <p className="text-xl font-bold text-[#111827] mt-6">Analyzing your resume…</p>
                     <p className="text-sub mt-2 font-medium">This usually takes a few seconds.</p>
                   </div>
                 ) : (
                   <>
-                    <div className="w-20 h-20 bg-saffron-light text-saffron rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-white/50 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-20 h-20 bg-[#fff0e0] text-[#FF9933] rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-white/50 group-hover:scale-110 transition-transform duration-300">
                       <Upload size={40} />
                     </div>
-                    <h3 className="text-2xl font-bold text-navy mb-2">Upload your resume</h3>
+                    <h3 className="text-2xl font-bold text-[#111827] mb-2">Upload your resume</h3>
                     <p className="text-sub mb-8 max-w-sm text-center leading-relaxed font-medium">
                       Drag and drop your resume here, or click to browse.<br />
                       <span className="mt-2 block text-xs font-semibold uppercase tracking-wider text-slate-600">
@@ -699,7 +699,7 @@ const ATSResume = () => {
                         value={jobDescription}
                         onChange={e => setJobDescription(e.target.value)}
                         placeholder="Optional: paste job description for better matching"
-                        className="w-full text-sm border border-saffron/20 rounded-xl px-4 py-2 bg-white/60 focus:outline-none focus:border-saffron"
+                        className="w-full text-sm border border-[rgba(255,153,51,0.2)] rounded-xl px-4 py-2 bg-white/60 focus:outline-none focus:border-[#FF9933]"
                         onClick={e => e.stopPropagation()}
                       />
                     </div>
@@ -725,8 +725,8 @@ const ATSResume = () => {
           {/* Score card — always show (shows 0 if no upload yet) */}
           <motion.div variants={itemVariants} className="glass-card p-8 flex flex-col relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-5"><Target size={160} /></div>
-            <h3 className="text-xl font-bold text-navy mb-6 flex items-center gap-2 relative z-10">
-              <Award className="text-saffron" size={24} /> ATS Score
+            <h3 className="text-xl font-bold text-[#111827] mb-6 flex items-center gap-2 relative z-10">
+              <Award className="text-[#FF9933]" size={24} /> ATS Score
             </h3>
             <div className="flex-1 flex flex-col items-center justify-center mb-6">
               <div className="relative w-56 h-56">
@@ -762,11 +762,11 @@ const ATSResume = () => {
             </div>
 
             <div className="space-y-5 relative z-10">
-              {[['Technical Skills', 'technical', 'bg-green-primary'], ['Formatting', 'formatting', 'bg-saffron']].map(([label, key, color]) => (
+              {[['Technical Skills', 'technical', 'bg-[#138808]'], ['Formatting', 'formatting', 'bg-[#FF9933]']].map(([label, key, color]) => (
                 <div key={key} className="space-y-2">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-navy/70 font-semibold">{label}</span>
-                    <span className="font-bold text-navy">{atsScoreData?.breakdown?.[key] || 0}%</span>
+                    <span className="text-[#111827]/70 font-semibold">{label}</span>
+                    <span className="font-bold text-[#111827]">{atsScoreData?.breakdown?.[key] || 0}%</span>
                   </div>
                   <div className="w-full bg-navy/5 rounded-full h-2.5 overflow-hidden shadow-inner">
                     <motion.div key={`bar-${key}-${atsScoreData?.breakdown?.[key]}`}
@@ -785,46 +785,46 @@ const ATSResume = () => {
         {/* Missing / Matched skills */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <motion.div variants={itemVariants} className="glass-card p-6">
-            <h3 className="text-lg font-bold text-navy mb-4 flex items-center gap-2">
-              <AlertCircle className="text-saffron-hover" size={22} /> Missing Skills
+            <h3 className="text-lg font-bold text-[#111827] mb-4 flex items-center gap-2">
+              <AlertCircle className="text-[#e68a2e]" size={22} /> Missing Skills
             </h3>
             <p className="text-sub font-medium text-sm mb-6">Keywords commonly required but not found in your resume.</p>
             {atsScoreData?.missingKeywords?.length > 0 ? (
               <div className="flex flex-wrap gap-2.5">
                 {atsScoreData.missingKeywords.map((skill, i) => (
                   <motion.span key={i} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-                    className="px-3.5 py-1.5 bg-saffron-light/50 text-saffron-hover rounded-lg text-sm font-bold shadow-sm border border-saffron-light flex items-center gap-1.5">
+                    className="px-3.5 py-1.5 bg-[#fff0e0] text-[#e68a2e] rounded-lg text-sm font-bold shadow-sm border border-[rgba(255,153,51,0.25)] flex items-center gap-1.5">
                     <XCircle size={16} /> {skill}
                   </motion.span>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-center bg-gradient-to-br from-green-primary/5 to-transparent rounded-xl border border-green-primary/20 border-dashed">
-                <CheckCircle className="text-green-primary mb-3" size={36} />
-                <p className="text-navy font-bold text-lg">No missing skills detected!</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center bg-linear-to-br from-[#e8f5e6] to-transparent rounded-xl border border-[rgba(19,136,8,0.2)] border-dashed">
+                <CheckCircle className="text-[#138808] mb-3" size={36} />
+                <p className="text-[#111827] font-bold text-lg">No missing skills detected!</p>
                 <p className="text-sub font-medium text-sm mt-1">Your resume covers all the key requirements.</p>
               </div>
             )}
           </motion.div>
 
           <motion.div variants={itemVariants} className="glass-card p-6">
-            <h3 className="text-lg font-bold text-navy mb-4 flex items-center gap-2">
-              <CheckCircle className="text-green-primary" size={22} /> Matched Skills
+            <h3 className="text-lg font-bold text-[#111827] mb-4 flex items-center gap-2">
+              <CheckCircle className="text-[#138808]" size={22} /> Matched Skills
             </h3>
             <p className="text-sub font-medium text-sm mb-6">Required skills successfully detected in your resume.</p>
             {atsScoreData?.matchedKeywords?.length > 0 ? (
               <div className="flex flex-wrap gap-2.5">
                 {atsScoreData.matchedKeywords.map((skill, i) => (
                   <motion.span key={i} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-                    className="px-3.5 py-1.5 bg-green-light/80 text-green-hover rounded-lg text-sm font-bold shadow-sm border border-green-light flex items-center gap-1.5">
+                    className="px-3.5 py-1.5 bg-[#e3f2e1] text-[#0f7006] rounded-lg text-sm font-bold shadow-sm border border-[rgba(19,136,8,0.2)] flex items-center gap-1.5">
                     <CheckCircle size={16} /> {skill}
                   </motion.span>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-center bg-gradient-to-br from-saffron/5 to-transparent rounded-xl border border-saffron/20 border-dashed">
-                <AlertCircle className="text-saffron-hover/60 mb-3" size={36} />
-                <p className="text-navy font-bold text-lg">No matched skills found</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center bg-linear-to-br from-[#fff4e8] to-transparent rounded-xl border border-[rgba(255,153,51,0.2)] border-dashed">
+                <AlertCircle className="text-[#e68a2e]/60 mb-3" size={36} />
+                <p className="text-[#111827] font-bold text-lg">No matched skills found</p>
                 <p className="text-sub font-medium text-sm mt-1">Add more relevant keywords to your resume.</p>
               </div>
             )}
@@ -833,18 +833,18 @@ const ATSResume = () => {
 
         {/* Suggestions */}
         {atsScoreData?.suggestions?.length > 0 && (
-          <motion.div variants={itemVariants} className="glass-card p-6 border-t-4 border-t-saffron">
-            <h3 className="text-xl font-bold text-navy mb-5 flex items-center gap-2">
-              <Zap className="text-saffron" size={24} /> Improvement Suggestions
+          <motion.div variants={itemVariants} className="glass-card p-6 border-t-4 border-t-[#FF9933]">
+            <h3 className="text-xl font-bold text-[#111827] mb-5 flex items-center gap-2">
+              <Zap className="text-[#FF9933]" size={24} /> Improvement Suggestions
             </h3>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
               {atsScoreData.suggestions.map((suggestion, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-                  className="flex items-start p-5 bg-gradient-to-br from-saffron/5 to-white/40 rounded-xl shadow-sm border border-saffron/10 hover:shadow-md transition-all hover:-translate-y-0.5">
-                  <div className="bg-gradient-to-br from-saffron/20 to-saffron/5 p-2.5 rounded-xl mr-4 flex-shrink-0 shadow-sm border border-saffron/10">
-                    <AlertCircle size={20} className="text-saffron-hover" />
+                  className="flex items-start p-5 bg-linear-to-br from-[#fff4e8] to-white/40 rounded-xl shadow-sm border border-[rgba(255,153,51,0.18)] hover:shadow-md transition-all hover:-translate-y-0.5">
+                  <div className="bg-linear-to-br from-[#fff0e0] to-[#fffaf5] p-2.5 rounded-xl mr-4 shrink-0 shadow-sm border border-[rgba(255,153,51,0.2)]">
+                    <AlertCircle size={20} className="text-[#e68a2e]" />
                   </div>
-                  <p className="text-sm font-medium text-navy/80 leading-relaxed pt-1">{suggestion}</p>
+                  <p className="text-sm font-medium text-[#111827]/80 leading-relaxed pt-1">{suggestion}</p>
                 </motion.div>
               ))}
             </div>

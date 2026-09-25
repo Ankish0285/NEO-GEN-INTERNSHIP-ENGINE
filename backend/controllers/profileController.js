@@ -38,6 +38,9 @@ const getProfile = asyncHandler(async (req, res) => {
       profilePicture: user.profilePicture,
       university: user.university,
       course: user.course,
+      currentYear: user.currentYear,
+      semester: user.semester,
+      graduationYear: user.graduationYear,
       skills: user.skills,
       experience: user.experience,
       projects: user.projects,
@@ -74,6 +77,9 @@ const updateProfile = asyncHandler(async (req, res) => {
     }
     if (req.body.university) user.university = sanitizeInput(req.body.university);
     if (req.body.course) user.course = sanitizeInput(req.body.course);
+    if (req.body.currentYear !== undefined) user.currentYear = sanitizeInput(req.body.currentYear);
+    if (req.body.semester !== undefined) user.semester = sanitizeInput(req.body.semester);
+    if (req.body.graduationYear !== undefined) user.graduationYear = sanitizeInput(req.body.graduationYear);
     if (req.body.preferredLocation) user.preferredLocation = sanitizeInput(req.body.preferredLocation);
     
     if (req.body.skills) {
@@ -106,6 +112,9 @@ const updateProfile = asyncHandler(async (req, res) => {
       profilePicture: updatedUser.profilePicture,
       university: updatedUser.university,
       course: updatedUser.course,
+      currentYear: updatedUser.currentYear,
+      semester: updatedUser.semester,
+      graduationYear: updatedUser.graduationYear,
       preferredLocation: updatedUser.preferredLocation,
       skills: updatedUser.skills,
       experience: updatedUser.experience,
