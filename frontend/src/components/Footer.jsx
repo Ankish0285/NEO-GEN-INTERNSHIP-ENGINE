@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Youtube, Linkedin, Mail, MapPin, Phone, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import defaultLogo from '../assets/images/logo.png';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { resolveStoryImageUrl } from '../utils/resolveStoryImageUrl';
@@ -29,7 +30,7 @@ const Footer = () => {
     : defaultLogo;
 
   return (
-    <footer className="footer neo-footer">
+    <motion.footer className="footer neo-footer" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
         <div className="neo-container">
             <div className="footer-content" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '60px' }}>
                 <div className="footer-section">
@@ -107,7 +108,7 @@ const Footer = () => {
                 </div>
             </div>
         </div>
-    </footer>
+    </motion.footer>
   );
 };
 

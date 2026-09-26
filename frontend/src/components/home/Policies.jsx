@@ -1,20 +1,25 @@
 import React from 'react';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
+import MotionReveal from '../ui/MotionReveal';
 
 const PolicyBlock = ({ id, block }) => {
   const paragraphs = (block.body || '').split(/\n\n+/).filter(Boolean);
   return (
-    <section className="policy-section" id={id} style={{ padding: '60px 0', backgroundColor: id === 'terms-of-service' ? '#f9fafb' : '#fff' }}>
-      <div className="container">
+    <section className="policy-section neo-section" id={id} style={{ opacity: 1 }}>
+      <div className="neo-container">
         <div className="section-header" style={{ marginBottom: '20px' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#111827' }}>{block.title}</h2>
-          <p style={{ color: '#6b7280' }}>{block.subtitle}</p>
+          <MotionReveal y={30} delay={0} duration={0.6}>
+            <h2 className="neo-h2" style={{ fontSize: '2rem', fontWeight: 'bold' }}>{block.title}</h2>
+          </MotionReveal>
+          <MotionReveal y={25} delay={0.1} duration={0.55}>
+            <p className="neo-lead">{block.subtitle}</p>
+          </MotionReveal>
         </div>
-        <div style={{ color: '#4b5563', lineHeight: 1.7 }}>
+        <MotionReveal y={20} delay={0.2} duration={0.55} className="neo-policy-body" style={{ lineHeight: 1.7 }}>
           {paragraphs.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
-        </div>
+        </MotionReveal>
       </div>
     </section>
   );

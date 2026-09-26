@@ -1,6 +1,19 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem('neo-gen-theme');
+          if (theme === 'dark' || theme === 'light') {
+            document.documentElement.dataset.colorScheme = theme;
+            document.documentElement.style.colorScheme = theme;
+          }
+        } catch (error) {
+          // Fall back to the default light theme.
+        }
+      }());
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/logo.png" />

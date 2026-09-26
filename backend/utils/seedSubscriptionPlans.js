@@ -7,6 +7,22 @@ const SubscriptionPlan = require('../models/SubscriptionPlan');
 
 const DEFAULT_PLANS = [
   {
+    name:         'Starter',
+    description:  'Affordable premium access for 30 days.',
+    price:        49,
+    currency:     'INR',
+    durationDays: 30,
+    isActive:     true,
+    displayOrder: 0,
+    features: {
+      atsAnalysis: true,
+      aiResumeAnalysis: true,
+      aiReport: true,
+      premiumRecommendations: true,
+      maxAnalysesPerMonth: 0,
+    },
+  },
+  {
     name:         'Monthly Pro',
     description:  'Full access to ATS Score, AI Resume Analysis, AI Report and Premium Recommendations for 30 days.',
     price:        99,

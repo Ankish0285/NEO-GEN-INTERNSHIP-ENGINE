@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { api } from '../../services/api';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
+import MotionReveal from '../ui/MotionReveal';
 
 const Contact = () => {
   const { settings } = useSiteSettings();
@@ -136,19 +138,23 @@ const Contact = () => {
   };
 
   return (
-    <section className="contact-section" id="contact-section" style={{ padding: '80px 0', backgroundColor: '#f9fafb' }}>
-      <div className="container">
+    <section className="contact-section neo-section" id="contact-section" style={{ opacity: 1 }}>
+      <div className="neo-container">
         <div className="section-header" style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 className="section-title" style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>{contact.title}</h2>
-          <p className="section-subtitle" style={{ fontSize: '1.125rem', color: '#6b7280', maxWidth: '700px', margin: '0 auto' }}>
-            {contact.subtitle}
-          </p>
+          <MotionReveal y={30} delay={0} duration={0.6}>
+            <h2 className="neo-h2 section-title">{contact.title}</h2>
+          </MotionReveal>
+          <MotionReveal y={25} delay={0.1} duration={0.55}>
+            <p className="neo-lead section-subtitle" style={{ maxWidth: '700px', margin: '0 auto' }}>
+              {contact.subtitle}
+            </p>
+          </MotionReveal>
         </div>
 
-        <div className="contact-content" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
+        <div className="contact-content neo-contact-layout" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
           <div className="contact-info-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
             {/* Contact Info Cards */}
-            <div className="contact-info-card glass-card" style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
+            <motion.div className="contact-info-card glass-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.45 }} whileHover={{ y: -5 }} style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
               <div className="contact-icon" style={{ width: '50px', height: '50px', backgroundColor: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb', margin: '0 auto 20px' }}>
                 <Mail size={24} />
               </div>
@@ -158,9 +164,9 @@ const Contact = () => {
                   {contact.email}
                 </a>
               </p>
-            </div>
+            </motion.div>
 
-            <div className="contact-info-card glass-card" style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
+            <motion.div className="contact-info-card glass-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ delay: 0.06, duration: 0.45 }} whileHover={{ y: -5 }} style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
               <div className="contact-icon" style={{ width: '50px', height: '50px', backgroundColor: '#f0fdf4', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16a34a', margin: '0 auto 20px' }}>
                 <Phone size={24} />
               </div>
@@ -175,9 +181,9 @@ const Contact = () => {
                 </a>
                 )}
               </p>
-            </div>
+            </motion.div>
 
-            <div className="contact-info-card glass-card" style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
+            <motion.div className="contact-info-card glass-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ delay: 0.12, duration: 0.45 }} whileHover={{ y: -5 }} style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
               <div className="contact-icon" style={{ width: '50px', height: '50px', backgroundColor: '#fff7ed', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f97316', margin: '0 auto 20px' }}>
                 <MapPin size={24} />
               </div>
@@ -187,9 +193,9 @@ const Contact = () => {
                 {contact.addressLine2}<br />
                 {contact.addressLine3}
               </p>
-            </div>
+            </motion.div>
 
-            <div className="contact-info-card glass-card" style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
+            <motion.div className="contact-info-card glass-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ delay: 0.18, duration: 0.45 }} whileHover={{ y: -5 }} style={{ padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
               <div className="contact-icon" style={{ width: '50px', height: '50px', backgroundColor: '#fef2f2', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626', margin: '0 auto 20px' }}>
                 <Clock size={24} />
               </div>
@@ -199,11 +205,11 @@ const Contact = () => {
                   <React.Fragment key={i}>{line}{i < supportLines.length - 1 && <br />}</React.Fragment>
                 ))}
               </p>
-            </div>
+            </motion.div>
           </div>
 
           {/* Contact Form */}
-          <div className="contact-form-container glass-card" style={{ padding: '40px', borderRadius: '24px' }}>
+          <motion.div className="contact-form-container glass-card" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ delay: 0.1, duration: 0.5 }} style={{ padding: '40px', borderRadius: '24px' }}>
             <h3 className="contact-form-title" style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '24px', color: '#111827' }}>Send us a Message</h3>
 
             {error && (
@@ -330,11 +336,13 @@ const Contact = () => {
                 {!loading && <Send size={18} />}
               </button>
             </form>
-          </div>
+          </motion.div>
         </div>
         {/* FAQ Section */}
         <div className="faq-section" style={{ marginTop: '80px' }}>
-          <h3 className="faq-title" style={{ textAlign: 'center', fontSize: '2rem', fontWeight: 'bold', marginBottom: '40px', color: '#111827' }}>Frequently Asked Questions</h3>
+          <MotionReveal y={28} delay={0.15} duration={0.55}>
+            <h3 className="neo-h2 faq-title" style={{ textAlign: 'center', fontSize: '2rem', fontWeight: 'bold', marginBottom: '40px' }}>Frequently Asked Questions</h3>
+          </MotionReveal>
           
           <div className="faq-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
             <div className="faq-card glass-card" style={{ padding: '30px', borderRadius: '16px' }}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
@@ -11,6 +11,7 @@ const Hero = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { settings } = useSiteSettings();
+  const prefersReducedMotion = useReducedMotion();
   const canPostInternship = user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'partner';
   const { branding, hero } = settings;
   const heroImages = Array.isArray(hero.backgroundImages) && hero.backgroundImages.length
@@ -56,14 +57,14 @@ const Hero = () => {
       <div className="neo-container">
         <motion.div
           className="neo-hero__content"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}
+          animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={prefersReducedMotion ? undefined : { duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.span
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.15 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }}
+            animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={prefersReducedMotion ? undefined : { delay: 0.1, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
             style={{
               background: 'rgba(255,255,255,0.12)',
@@ -75,14 +76,31 @@ const Hero = () => {
             India&apos;s internship platform
           </motion.span>
 
-          <h1 className="neo-hero__title">
+          <motion.h1
+            className="neo-hero__title"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+            animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={prefersReducedMotion ? undefined : { delay: 0.22, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
             {hero.titleBefore}{' '}
             <span style={{ color: branding.primaryColor || '#FF9933' }}>{hero.titleHighlight1}</span>{' '}
             <span style={{ color: branding.secondaryColor || '#138808' }}>{hero.titleHighlight2}</span>
-          </h1>
-          <p className="neo-hero__subtitle">{hero.subtitle}</p>
+          </motion.h1>
+          <motion.p
+            className="neo-hero__subtitle"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
+            animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={prefersReducedMotion ? undefined : { delay: 0.34, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {hero.subtitle}
+          </motion.p>
 
-          <div className="neo-hero__actions">
+          <motion.div
+            className="neo-hero__actions"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }}
+            animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={prefersReducedMotion ? undefined : { delay: 0.46, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
             <button
               type="button"
               className="neo-btn neo-btn-primary"
@@ -109,7 +127,7 @@ const Hero = () => {
                 {hero.secondaryButtonText}
               </button>
             )}
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

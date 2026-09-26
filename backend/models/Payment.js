@@ -44,6 +44,7 @@ const paymentSchema = new mongoose.Schema(
       default: 'CREATED',
       index: true,
     },
+    paidAt: { type: Date, default: null, index: true },
 
     // Raw gateway response stored for audit — never expose to frontend
     gatewayResponse: { type: mongoose.Schema.Types.Mixed, default: null },

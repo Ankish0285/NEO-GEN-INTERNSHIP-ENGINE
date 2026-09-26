@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, DollarSign, Clock, ArrowRight, Filter, Briefcase, Building } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { getResumeFromStorage, isResumeUploaded } from '../../utils/storageUtils';
 import ApplicationService from '../../services/applicationService';
+import MotionReveal from '../ui/MotionReveal';
 import AIApplicationModal from './AIApplicationModal';
 
 const InternshipList = () => {
@@ -220,17 +222,21 @@ const InternshipList = () => {
   const filteredData = filteredInternships;
 
   return (
-    <section className="internships-section" id="internships-section">
-      <div className="container">
+    <section className="internships-section neo-section" id="internships-section" style={{ opacity: 1 }}>
+      <div className="neo-container">
         <div className="section-header" style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>Featured Internships</h2>
-            <p style={{ fontSize: '1.125rem', color: '#6b7280' }}>Explore top opportunities handpicked for you</p>
+            <MotionReveal y={30} delay={0} duration={0.6}>
+              <h2 className="neo-h2">Featured Internships</h2>
+            </MotionReveal>
+            <MotionReveal y={25} delay={0.1} duration={0.55}>
+              <p className="neo-lead">Explore top opportunities handpicked for you</p>
+            </MotionReveal>
           </div>
           
           {/* Search Bar with Enhanced Filters */}
-          <div className="search-container" style={{ marginTop: '30px', marginBottom: '40px' }}>
-            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center', backgroundColor: 'white', padding: '10px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: '1px solid #f3f4f6' }}>
-              <div style={{ flex: '1', minWidth: '250px', position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <div className="search-container internship-search-container" style={{ marginTop: '30px', marginBottom: '40px' }}>
+            <div className="internship-search-toolbar" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center', padding: '10px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: '1px solid #f3f4f6' }}>
+              <div className="internship-search-field" style={{ flex: '1', minWidth: '250px', position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <Search className="text-gray-400" size={20} style={{ position: 'absolute', left: '12px' }} />
                 <input 
                   type="text" 
@@ -248,10 +254,10 @@ const InternshipList = () => {
                 />
               </div>
               
-              <div style={{ height: '30px', width: '1px', backgroundColor: '#e5e7eb', display: 'block' }}></div>
+              <div className="internship-search-divider" style={{ height: '30px', width: '1px', backgroundColor: '#e5e7eb', display: 'block' }}></div>
 
               <select 
-                className="form-control" 
+                className="form-control internship-sort-control" 
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 style={{ 
@@ -271,12 +277,11 @@ const InternshipList = () => {
               </select>
               
               <button 
-                className="btn" 
+                className="btn internship-filter-toggle" 
                 onClick={() => setShowFilters(!showFilters)}
                 style={{ 
                   padding: '10px 20px', 
                   whiteSpace: 'nowrap', 
-                  backgroundColor: showFilters ? '#e5e7eb' : '#f3f4f6', 
                   color: '#374151',
                   border: 'none',
                   borderRadius: '8px',
@@ -295,10 +300,9 @@ const InternshipList = () => {
             
             {/* Advanced Filters Panel */}
             {showFilters && (
-              <div className="filters-panel" style={{ 
+              <div className="filters-panel internship-filters-panel" style={{ 
                 marginTop: '15px', 
                 padding: '20px', 
-                backgroundColor: '#f9f9f9', 
                 borderRadius: '8px',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -421,7 +425,7 @@ const InternshipList = () => {
           </div>
           
           {/* Results Count */}
-          <div style={{ marginTop: '15px', fontSize: '14px', color: '#666' }}>
+          <div className="internship-result-count" style={{ marginTop: '15px', fontSize: '14px', color: '#666' }}>
             Showing <strong>{filteredInternships.length}</strong> of <strong>{internships.length}</strong> internships
           </div>
         </div>
@@ -434,9 +438,14 @@ const InternshipList = () => {
             </div>
           ) : (
             filteredInternships.map(internship => (
-              <div 
+              <motion.div
                 key={internship._id || internship.id} 
                 className="internship-card glass-card"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-70px' }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -5, scale: 1.01 }}
                 onClick={() => handleApply(internship._id || internship.id)}
                 style={{
                   display: 'flex',
@@ -553,7 +562,7 @@ const InternshipList = () => {
                      </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))
           )}
         </div>

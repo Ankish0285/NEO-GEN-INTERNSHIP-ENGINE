@@ -286,6 +286,30 @@ const approveInternship = asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Internship approved successfully', internship });
 });
 
+// @desc    Get internships posted by the current user (partner)
+// @route   GET /api/internships/mine
+// @access  Private (Partner / Admin / Super Admin)
+const getMyInternships = asyncHandler(async (req, res) => {
+    const role = req.user.role;
+    const userId = req.user._id;
+
+    let query = {};
+
+    if (role === 'partner') {
+        query.createdBy = userId;
+    } else if (role === 'super_admin' || role === 'admin') {
+        // Admin / Super Admin sees everything via /admin/all — but still allow this endpoint
+        // to return their own posted internships (useful if they post as an org too)
+        query.createdBy = userId;
+    } else {
+        res.status(403);
+        throw new Error('Forbidden - Students cannot post internships');
+    }
+
+    const internships = await Internship.find(query).sort({ createdAt: -1 }).lean();
+    res.status(200).json(internships);
+});
+
 module.exports = {
     getInternships,
     getInternshipById,
@@ -294,5 +318,6 @@ module.exports = {
     deleteInternship,
     getRecommendedInternships,
     getAdminInternships,
-    approveInternship
+    approveInternship,
+    getMyInternships
 };

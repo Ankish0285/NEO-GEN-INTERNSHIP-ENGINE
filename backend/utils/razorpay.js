@@ -44,13 +44,24 @@ async function createOrder({ amountInPaise, currency = 'INR', receipt, notes = {
  */
 function verifySignature({ orderId, paymentId, signature }) {
   const secret = process.env.RAZORPAY_KEY_SECRET;
-  if (!secret) return false;
+  if (!secret || !orderId || !paymentId || !signature) return false;
   const body    = `${orderId}|${paymentId}`;
   const expected = crypto
     .createHmac('sha256', secret)
     .update(body)
     .digest('hex');
-  return expected === signature;
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+  const signatureBuffer = Buffer.from(signature, 'utf8');
+  return expectedBuffer.length === signatureBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+}
+
+async function fetchOrder(orderId) {
+  return getRazorpay().orders.fetch(orderId);
+}
+
+async function fetchPayment(paymentId) {
+  return getRazorpay().payments.fetch(paymentId);
 }
 
 /**
@@ -58,12 +69,21 @@ function verifySignature({ orderId, paymentId, signature }) {
  */
 function verifyWebhookSignature(rawBody, signature) {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-  if (!secret || secret.includes('REPLACE')) return false;
+  if (!secret || !signature || secret.includes('REPLACE')) return false;
   const expected = crypto
     .createHmac('sha256', secret)
     .update(rawBody)
     .digest('hex');
-  return expected === signature;
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+  const signatureBuffer = Buffer.from(signature, 'utf8');
+  return expectedBuffer.length === signatureBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
 }
 
-module.exports = { createOrder, verifySignature, verifyWebhookSignature };
+module.exports = {
+  createOrder,
+  fetchOrder,
+  fetchPayment,
+  verifySignature,
+  verifyWebhookSignature,
+};

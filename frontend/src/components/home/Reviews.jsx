@@ -3,7 +3,7 @@ import { Quote, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { api } from '../../services/api';
 import { resolveStoryImageUrl } from '../../utils/resolveStoryImageUrl';
-import MotionSection from '../ui/MotionSection';
+import MotionReveal from '../ui/MotionReveal';
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -45,13 +45,17 @@ const Reviews = () => {
   }, []);
 
   return (
-    <MotionSection className="neo-section" id="reviews-section">
+    <section className="neo-section" id="reviews-section" style={{ opacity: 1 }}>
       <div className="neo-container">
         <div className="neo-section-header">
-          <h2 className="neo-h2">What People Say</h2>
-          <p className="neo-lead">
-            Hear from interns who found their path and employers who found talent.
-          </p>
+          <MotionReveal y={30} delay={0} duration={0.6}>
+            <h2 className="neo-h2">What People Say</h2>
+          </MotionReveal>
+          <MotionReveal y={25} delay={0.1} duration={0.55}>
+            <p className="neo-lead">
+              Hear from interns who found their path and employers who found talent.
+            </p>
+          </MotionReveal>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reviews.map((review, i) => (
@@ -61,7 +65,7 @@ const Reviews = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
+              transition={{ delay: 0.2 + i * 0.08, duration: 0.5 }}
               whileHover={{ y: -6 }}
             >
               <Quote className="absolute top-6 right-6 w-10 h-10 text-[#138808] opacity-15" />
@@ -75,8 +79,8 @@ const Reviews = () => {
                   }}
                 />
                 <div>
-                  <h4 className="font-bold text-[#111827]">{review.name}</h4>
-                  <p className="text-sm text-[#4B5563]">{review.role}</p>
+                  <h4 className="font-bold text-gray-900">{review.name}</h4>
+                  <p className="text-sm text-gray-600">{review.role}</p>
                   {review.department && (
                     <p className="text-xs font-medium text-[#138808]">{review.department}</p>
                   )}
@@ -98,17 +102,17 @@ const Reviews = () => {
                     />
                   ))}
                 </div>
-                <span className="text-xs font-medium text-[#4B5563]">
+                <span className="text-xs font-medium text-gray-600">
                   {review.rating > 0 ? `${review.rating}` : 'Not rated'}
                 </span>
               </div>
 
-              <p className="text-[#4B5563] leading-relaxed italic">&ldquo;{review.text}&rdquo;</p>
+              <p className="text-gray-600 leading-relaxed italic">&ldquo;{review.text}&rdquo;</p>
             </motion.div>
           ))}
         </div>
       </div>
-    </MotionSection>
+    </section>
   );
 };
 

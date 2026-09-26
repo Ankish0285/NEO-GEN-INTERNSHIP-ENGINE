@@ -30,5 +30,6 @@ const promoRedemptionSchema = new mongoose.Schema(
 );
 
 promoRedemptionSchema.index({ promoCodeId: 1, userId: 1 });
+promoRedemptionSchema.index({ subscriptionId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('PromoRedemption', promoRedemptionSchema);

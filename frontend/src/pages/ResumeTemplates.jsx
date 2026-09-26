@@ -183,7 +183,9 @@ const TemplateCard = ({ template, isSubscribed, onUse, onPreview }) => {
           <button
             onClick={() => onUse(template)}
             style={{
-              flex: 1, padding: '8px', borderRadius: '8px', border: 'none',
+              flex: 1, padding: '8px',
+              border: canUse ? 'none' : '1.5px solid #e5e7eb',
+              borderRadius: '8px',
               background: canUse
                 ? 'linear-gradient(135deg,#FF9933,#e68a2e)'
                 : '#f9fafb',
@@ -192,7 +194,6 @@ const TemplateCard = ({ template, isSubscribed, onUse, onPreview }) => {
               cursor: 'pointer',
               display: 'flex', alignItems: 'center',
               justifyContent: 'center', gap: '5px',
-              border: canUse ? 'none' : '1.5px solid #e5e7eb',
             }}>
             {canUse
               ? <><Pencil size={13} /> Use Template</>

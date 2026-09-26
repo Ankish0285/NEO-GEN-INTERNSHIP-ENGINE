@@ -34,6 +34,7 @@ const ResumeUsage       = require('../models/ResumeUsage');
 const PromoCode         = require('../models/PromoCode');
 const PromoRedemption   = require('../models/PromoRedemption');
 const Payment           = require('../models/Payment');
+const WebhookEvent      = require('../models/WebhookEvent');
 const User              = require('../models/User');
 const subscriptionSettings = require('../utils/subscriptionSettings');
 const { getActiveSubscription, getOrCreateUsage } = require('../middleware/subscriptionMiddleware');
@@ -158,6 +159,8 @@ const createOrder = asyncHandler(async (req, res) => {
 
   const plan = await SubscriptionPlan.findOne({ _id: planId, isActive: true });
   if (!plan) { res.status(404); throw new Error('Plan not found or inactive'); }
+  if (plan.currency !== 'INR') { res.status(400); throw new Error('Only INR plans can be paid through Razorpay'); }
+  if (plan.price <= 0) { res.status(400); throw new Error('This is a free plan and does not require payment'); }
 
   // Validate promo (if provided)
   let finalAmount    = plan.price;
@@ -197,7 +200,7 @@ const createOrder = asyncHandler(async (req, res) => {
   try {
     rzOrder = await razorpayUtil.createOrder({
       amountInPaise: Math.round(finalAmount * 100),  // Razorpay takes paise
-      currency:      plan.currency || 'INR',
+      currency:      'INR',
       receipt:       `sub_${sub._id}`,
       notes: {
         subscriptionId: sub._id.toString(),
@@ -220,7 +223,7 @@ const createOrder = asyncHandler(async (req, res) => {
     amount:          finalAmount,
     originalAmount:  plan.price,
     discountAmount:  promoResult?.discountAmount || 0,
-    currency:        plan.currency || 'INR',
+    currency:        'INR',
     promoCodeStr:    promoCode ? promoCode.toUpperCase().trim() : null,
     promoCodeId:     appliedPromoId,
     status:          'CREATED',
@@ -237,7 +240,7 @@ const createOrder = asyncHandler(async (req, res) => {
     originalAmount:  plan.price,
     discountAmount:  promoResult?.discountAmount || 0,
     discountLabel:   promoResult?.discountLabel  || null,
-    currency:        plan.currency || 'INR',
+    currency:        'INR',
     planName:        plan.name,
     promoApplied:    !!promoResult,
   });
@@ -246,6 +249,58 @@ const createOrder = asyncHandler(async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 // STUDENT — Verify payment & activate subscription
 // ═══════════════════════════════════════════════════════════════════
+
+async function activateSubscriptionForPayment(payment, paymentDetails, signature) {
+  const now = new Date();
+  const sub = await Subscription.findOne({
+    _id: payment.subscriptionId,
+    userId: payment.userId,
+  }).populate('planId', 'durationDays name');
+
+  if (!sub) throw Object.assign(new Error('Subscription record not found'), { statusCode: 404 });
+
+  let resultSub = sub;
+  if (sub.status !== 'ACTIVE') {
+    const durationDays = sub.planId?.durationDays || sub.planSnapshot?.durationDays || 30;
+    const activated = await Subscription.findOneAndUpdate(
+      { _id: sub._id, status: 'PENDING' },
+      {
+        $set: {
+          status: 'ACTIVE', paymentProvider: 'razorpay',
+          transactionId: paymentDetails.id,
+          paymentPayload: { razorpayOrderId: payment.razorpayOrderId, razorpayPaymentId: paymentDetails.id, razorpaySignature: signature },
+          startedAt: now, expiresAt: new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000),
+        },
+      },
+      { new: true }
+    );
+    if (activated) resultSub = activated;
+  }
+
+  await Payment.updateOne(
+    { _id: payment._id },
+    { $set: {
+      status: 'SUCCESS', razorpayPaymentId: paymentDetails.id,
+      razorpaySignature: signature, gatewayResponse: paymentDetails,
+      paidAt: paymentDetails.created_at ? new Date(paymentDetails.created_at * 1000) : new Date(),
+    } }
+  );
+
+  if (resultSub.promoCodeId) {
+    try {
+      await PromoRedemption.create({
+        promoCodeId: resultSub.promoCodeId, userId: resultSub.userId,
+        subscriptionId: resultSub._id, paymentId: payment._id,
+        discountAmount: resultSub.discountAmount || 0,
+      });
+      await PromoCode.findByIdAndUpdate(resultSub.promoCodeId, { $inc: { usedCount: 1 } });
+    } catch (err) {
+      if (err.code !== 11000) throw err;
+    }
+  }
+
+  return resultSub;
+}
 
 // POST /api/subscriptions/verify-payment
 const verifyPayment = asyncHandler(async (req, res) => {
@@ -260,6 +315,12 @@ const verifyPayment = asyncHandler(async (req, res) => {
   if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature || !subscriptionId) {
     res.status(400);
     throw new Error('razorpayOrderId, razorpayPaymentId, razorpaySignature and subscriptionId are required');
+  }
+
+  const payment = await Payment.findOne({ razorpayOrderId, userId });
+  if (!payment) { res.status(404); throw new Error('Payment record not found'); }
+  if (payment.subscriptionId.toString() !== subscriptionId) {
+    res.status(400); throw new Error('Payment and subscription do not match');
   }
 
   // Verify signature FIRST — never trust client-reported success
@@ -279,48 +340,21 @@ const verifyPayment = asyncHandler(async (req, res) => {
     throw new Error('Payment signature verification failed. Payment not activated.');
   }
 
-  // Find payment record — must belong to this user
-  const payment = await Payment.findOne({ razorpayOrderId, userId });
-  if (!payment) { res.status(404); throw new Error('Payment record not found'); }
-
-  // Find subscription — must belong to this user
-  const sub = await Subscription.findOne({ _id: subscriptionId, userId, status: 'PENDING' })
-    .populate('planId', 'durationDays name');
-  if (!sub) {
-    res.status(404);
-    throw new Error('Pending subscription not found. It may have already been activated.');
+  const [orderDetails, paymentDetails] = await Promise.all([
+    razorpayUtil.fetchOrder(razorpayOrderId),
+    razorpayUtil.fetchPayment(razorpayPaymentId),
+  ]);
+  const expectedAmount = Math.round(payment.amount * 100);
+  if (orderDetails.id !== razorpayOrderId || orderDetails.amount !== expectedAmount || orderDetails.currency !== payment.currency) {
+    res.status(400); throw new Error('Razorpay order details do not match this payment');
+  }
+  if (paymentDetails.id !== razorpayPaymentId || paymentDetails.order_id !== razorpayOrderId ||
+      paymentDetails.amount !== expectedAmount || paymentDetails.currency !== payment.currency ||
+      paymentDetails.status !== 'captured') {
+    res.status(400); throw new Error('Razorpay payment is invalid or not captured');
   }
 
-  // Activate subscription
-  const now          = new Date();
-  const durationDays = sub.planId?.durationDays || sub.planSnapshot?.durationDays || 30;
-  const expiresAt    = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
-
-  sub.status          = 'ACTIVE';
-  sub.paymentProvider = 'razorpay';
-  sub.transactionId   = razorpayPaymentId;
-  sub.paymentPayload  = { razorpayOrderId, razorpayPaymentId, razorpaySignature };
-  sub.startedAt       = now;
-  sub.expiresAt       = expiresAt;
-  await sub.save();
-
-  // Mark payment as successful
-  payment.status            = 'SUCCESS';
-  payment.razorpayPaymentId = razorpayPaymentId;
-  payment.razorpaySignature = razorpaySignature;
-  await payment.save();
-
-  // Record promo redemption if applicable
-  if (sub.promoCodeId) {
-    await PromoCode.findByIdAndUpdate(sub.promoCodeId, { $inc: { usedCount: 1 } });
-    await PromoRedemption.create({
-      promoCodeId:    sub.promoCodeId,
-      userId,
-      subscriptionId: sub._id,
-      paymentId:      payment._id,
-      discountAmount: sub.discountAmount || 0,
-    });
-  }
+  const sub = await activateSubscriptionForPayment(payment, paymentDetails, razorpaySignature);
 
   res.json({
     success:  true,
@@ -341,6 +375,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
 
 // POST /api/subscriptions/webhook
 const handleWebhook = async (req, res) => {
+  let webhookRecord;
   try {
     const sig  = req.headers['x-razorpay-signature'];
     const body = req.rawBody || JSON.stringify(req.body); // need raw body for HMAC
@@ -351,51 +386,24 @@ const handleWebhook = async (req, res) => {
 
     const event = req.body;
     const eventType = event.event;
+    const eventId = req.headers['x-razorpay-event-id'] || require('crypto').createHash('sha256').update(body).digest('hex');
+    webhookRecord = await WebhookEvent.findOneAndUpdate(
+      { eventId },
+      { $setOnInsert: { eventId, eventType, status: 'PROCESSING' } },
+      { upsert: true, new: true }
+    );
+    if (webhookRecord.status === 'PROCESSED') return res.status(200).json({ success: true });
 
     if (eventType === 'payment.captured' || eventType === 'order.paid') {
       const payment = event.payload?.payment?.entity || event.payload?.order?.entity;
       const orderId = payment?.order_id || event.payload?.order?.entity?.id;
 
       if (orderId) {
-        // Idempotent: only process if not already SUCCESS
         const paymentRecord = await Payment.findOne({ razorpayOrderId: orderId });
-        if (paymentRecord && paymentRecord.status !== 'SUCCESS') {
-          paymentRecord.status            = 'SUCCESS';
-          paymentRecord.razorpayPaymentId = payment?.id;
-          paymentRecord.gatewayResponse   = event.payload;
-          await paymentRecord.save();
-
-          const sub = await Subscription.findOne({
-            _id: paymentRecord.subscriptionId,
-            status: 'PENDING',
-          }).populate('planId', 'durationDays');
-
-          if (sub) {
-            const now          = new Date();
-            const durationDays = sub.planId?.durationDays || sub.planSnapshot?.durationDays || 30;
-            sub.status          = 'ACTIVE';
-            sub.paymentProvider = 'razorpay';
-            sub.transactionId   = payment?.id;
-            sub.startedAt       = now;
-            sub.expiresAt       = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
-            await sub.save();
-
-            if (sub.promoCodeId) {
-              await PromoCode.findByIdAndUpdate(sub.promoCodeId, { $inc: { usedCount: 1 } });
-              const alreadyRedeemed = await PromoRedemption.findOne({
-                promoCodeId: sub.promoCodeId, subscriptionId: sub._id,
-              });
-              if (!alreadyRedeemed) {
-                await PromoRedemption.create({
-                  promoCodeId: sub.promoCodeId,
-                  userId:      sub.userId,
-                  subscriptionId: sub._id,
-                  paymentId:   paymentRecord._id,
-                  discountAmount: sub.discountAmount || 0,
-                });
-              }
-            }
-          }
+        if (paymentRecord && payment?.id &&
+            payment.amount === Math.round(paymentRecord.amount * 100) &&
+            payment.currency === paymentRecord.currency && payment.status === 'captured') {
+          await activateSubscriptionForPayment(paymentRecord, payment, null);
         }
       }
     }
@@ -410,9 +418,11 @@ const handleWebhook = async (req, res) => {
       }
     }
 
+    await WebhookEvent.updateOne({ _id: webhookRecord._id }, { $set: { status: 'PROCESSED', processedAt: new Date(), error: null } });
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error('[Webhook] Error:', err.message);
+    if (webhookRecord) await WebhookEvent.updateOne({ _id: webhookRecord._id }, { $set: { status: 'FAILED', error: err.message } }).catch(() => {});
     return res.status(500).json({ success: false });
   }
 };

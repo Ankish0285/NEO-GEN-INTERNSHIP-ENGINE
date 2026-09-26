@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import MotionSection from '../ui/MotionSection';
+import MotionReveal from '../ui/MotionReveal';
 
 const LandingCTA = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const LandingCTA = () => {
   return (
     <MotionSection className="neo-section">
       <div className="neo-container">
-        <div className="neo-cta neo-glass">
+        <MotionReveal className="neo-cta neo-glass" y={28} scale={0.98}>
           <h2 className="neo-h2 mb-3">Ready to start your journey?</h2>
           <p className="neo-lead max-w-xl mx-auto mb-8">
             Explore internships across India or partner with NeoGen to reach talented students nationwide.
@@ -30,7 +31,7 @@ const LandingCTA = () => {
               Become a Partner
             </button>
           </div>
-        </div>
+        </MotionReveal>
       </div>
     </MotionSection>
   );

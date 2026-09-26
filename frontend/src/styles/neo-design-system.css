@@ -305,6 +305,13 @@ body {
   inset: 0;
   background-size: cover;
   background-position: center;
+  animation: neo-hero-drift 22s ease-in-out infinite alternate;
+  transform: scale(1.03);
+}
+
+@keyframes neo-hero-drift {
+  from { transform: scale(1.03) translate3d(0, 0, 0); }
+  to { transform: scale(1.08) translate3d(-0.8%, -0.5%, 0); }
 }
 
 .neo-hero__overlay {
@@ -480,6 +487,314 @@ body {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--neo-gray-900);
+}
+
+/* Landing page layout polish. Keep these rules scoped so dashboard surfaces stay unchanged. */
+.neo-page {
+  --neo-content-width: 1200px;
+  --neo-section-gap: clamp(3.75rem, 7vw, 6rem);
+}
+
+.neo-page .neo-section,
+.neo-page .resources-section,
+.neo-page .contact-section,
+.neo-page .policy-section,
+.neo-page .internships-section {
+  padding: var(--neo-section-gap) 0;
+}
+
+.neo-page .neo-container {
+  max-width: var(--neo-content-width);
+}
+
+.neo-page .neo-section-header,
+.neo-page .section-header {
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.neo-page .neo-section-header .neo-lead,
+.neo-page .section-header p {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.neo-page .neo-about-copy {
+  max-width: 920px;
+  margin: 0 auto 2.75rem;
+  text-align: center;
+}
+
+.neo-page .neo-about-copy .neo-lead {
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.neo-page .neo-about-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  text-align: left;
+}
+
+.neo-page .neo-about-features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.neo-page .neo-about-features .neo-feature-card {
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+.neo-page .neo-glass,
+.neo-page .glass-card,
+.neo-page .faq-card,
+.neo-page .contact-info-card,
+.neo-page .resource-card,
+.neo-page .internship-card {
+  min-width: 0;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.neo-page .neo-feature-card,
+.neo-page .neo-stat-card,
+.neo-page .internship-card,
+.neo-page .resource-card,
+.neo-page .contact-info-card,
+.neo-page .faq-card,
+.neo-page .neo-cta {
+  will-change: transform;
+}
+
+.neo-page .neo-feature-card:hover,
+.neo-page .neo-stat-card:hover,
+.neo-page .internship-card:hover,
+.neo-page .resource-card:hover,
+.neo-page .contact-info-card:hover,
+.neo-page .faq-card:hover {
+  box-shadow: var(--theme-shadow-lg, var(--neo-shadow-lg)) !important;
+}
+
+.neo-page .resource-card > div:first-child,
+.neo-page .internship-card img,
+.neo-page .resource-card img {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.neo-page .resource-card:hover > div:first-child,
+.neo-page .internship-card:hover img,
+.neo-page .resource-card:hover img {
+  transform: scale(1.03);
+}
+
+.neo-page .neo-btn,
+.neo-page button,
+.neo-page a {
+  transition-duration: 0.25s;
+}
+
+.neo-page .neo-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.015);
+}
+
+.neo-page .neo-feature-card,
+.neo-page .neo-stat-card,
+.neo-page #reviews-section .neo-glass,
+.neo-page .resource-card,
+.neo-page .contact-info-card,
+.neo-page .faq-card,
+.neo-page .internship-card {
+  height: 100%;
+}
+
+.neo-page .neo-feature-card:hover,
+.neo-page .neo-stat-card:hover,
+.neo-page .resource-card:hover,
+.neo-page .contact-info-card:hover,
+.neo-page .faq-card:hover,
+.neo-page .internship-card:hover {
+  transform: translateY(-5px);
+}
+
+.neo-page .neo-feature-card__icon,
+.neo-page .contact-icon {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.neo-page .neo-feature-card:hover .neo-feature-card__icon,
+.neo-page .contact-info-card:hover .contact-icon {
+  transform: translateY(-2px) scale(1.05);
+}
+
+.neo-page .neo-contact-layout {
+  align-items: start;
+  gap: clamp(2rem, 4vw, 3rem) !important;
+}
+
+.neo-page .contact-info-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+  margin-bottom: 0 !important;
+}
+
+.neo-page .contact-info-card {
+  padding: 1.5rem !important;
+  border-radius: var(--neo-radius-md) !important;
+}
+
+.neo-page .contact-form-container {
+  width: 100%;
+  max-width: none;
+  padding: clamp(1.5rem, 4vw, 2.5rem) !important;
+  margin: 0 !important;
+}
+
+.neo-page .contact-form-container input,
+.neo-page .contact-form-container select,
+.neo-page .contact-form-container textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.neo-page .contact-form-container input:focus,
+.neo-page .contact-form-container select:focus,
+.neo-page .contact-form-container textarea:focus {
+  border-color: var(--neo-saffron) !important;
+  box-shadow: 0 0 0 4px rgba(255, 153, 51, 0.12);
+}
+
+.neo-page .faq-section {
+  margin-top: clamp(3rem, 6vw, 5rem) !important;
+}
+
+.neo-page .faq-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+.neo-page .faq-card {
+  padding: 1.5rem !important;
+}
+
+.neo-page .resource-guides-grid {
+  max-width: 900px !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1.25rem !important;
+}
+
+.neo-page .resource-card {
+  padding: 1.5rem !important;
+  border-radius: var(--neo-radius-md) !important;
+}
+
+.neo-page .resource-card > div:first-child {
+  height: 180px !important;
+}
+
+.neo-page .internships-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 1.25rem !important;
+}
+
+.neo-page .internship-card > div {
+  min-width: 0;
+}
+
+.neo-page .internship-card button,
+.neo-page .contact-form-container button,
+.neo-page .resource-card button {
+  transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+}
+
+.neo-page .internship-card button:hover,
+.neo-page .contact-form-container button:hover:not(:disabled),
+.neo-page .resource-card button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}
+
+.neo-page .neo-footer {
+  padding-top: clamp(3rem, 6vw, 4rem);
+}
+
+@media (max-width: 1100px) {
+  .neo-page .neo-about-features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+
+  .neo-page .internships-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .neo-page .neo-contact-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .neo-page .neo-about-details,
+  .neo-page .neo-about-features {
+    grid-template-columns: 1fr;
+  }
+
+  .neo-page .neo-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .neo-page .neo-section,
+  .neo-page .resources-section,
+  .neo-page .contact-section,
+  .neo-page .policy-section,
+  .neo-page .internships-section {
+    padding: 3.5rem 0;
+  }
+
+  .neo-page .neo-hero {
+    min-height: 760px;
+    padding-top: 7rem;
+  }
+
+  .neo-page .neo-hero__actions,
+  .neo-page .neo-hero__actions .neo-btn {
+    width: 100%;
+  }
+
+  .neo-page .contact-info-grid,
+  .neo-page .faq-grid,
+  .neo-page .resource-guides-grid,
+  .neo-page .internships-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .neo-page .faq-card,
+  .neo-page .resource-card,
+  .neo-page .contact-info-card {
+    padding: 1.25rem !important;
+  }
+
+  .neo-page .neo-about-features .neo-feature-card {
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neo-page *,
+  .neo-page *::before,
+  .neo-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* —— Dashboard shell (all roles) —— */
@@ -811,4 +1126,1356 @@ body {
 .admin-dashboard .bg-theme-grid {
   background: transparent !important;
   background-image: none !important;
+}
+
+/* —— Theme toggle & dark mode —— */
+html,
+body,
+#root,
+.neo-page,
+.neo-dashboard,
+.admin-dashboard {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: 0;
+  color: var(--neo-gray-600);
+  background: var(--neo-glass-strong);
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.06);
+  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--neo-saffron);
+  transform: translateY(-2px) rotate(8deg);
+  border-color: rgba(255, 153, 51, 0.45);
+  box-shadow: 0 8px 20px rgba(255, 153, 51, 0.18);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid rgba(255, 153, 51, 0.3);
+  outline-offset: 2px;
+}
+
+.theme-toggle__icon {
+  display: inline-flex;
+  animation: neo-theme-icon-in 0.25s ease both;
+}
+
+@keyframes neo-theme-icon-in {
+  from { opacity: 0; transform: scale(0.65) rotate(-20deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+[data-color-scheme='dark'] {
+  --neo-white: #f8fafc;
+  --neo-gray-900: #f3f4f6;
+  --neo-gray-600: #cbd5e1;
+  --neo-gray-400: #94a3b8;
+  --neo-bg: #0f172a;
+  --neo-glass: rgba(30, 41, 59, 0.84);
+  --neo-glass-strong: rgba(15, 23, 42, 0.94);
+  --neo-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+  --neo-shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.38);
+  --neo-gradient-page: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+[data-color-scheme='dark'] body {
+  background: #0f172a;
+  color: #f3f4f6;
+}
+
+[data-color-scheme='dark'] .neo-page,
+[data-color-scheme='dark'] .neo-dashboard,
+[data-color-scheme='dark'] .admin-dashboard {
+  background: var(--neo-gradient-page);
+  color: var(--neo-gray-900);
+}
+
+[data-color-scheme='dark'] .neo-page::before {
+  background: rgba(255, 153, 51, 0.08);
+}
+
+[data-color-scheme='dark'] .neo-page::after {
+  background: rgba(22, 163, 74, 0.07);
+}
+
+[data-color-scheme='dark'] .neo-page .navbar.neo-navbar--scrolled,
+[data-color-scheme='dark'] .neo-page .navbar-menu {
+  background: var(--neo-glass-strong) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .nav-link,
+[data-color-scheme='dark'] .neo-page .navbar-toggle {
+  color: var(--neo-gray-600) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .nav-link:hover,
+[data-color-scheme='dark'] .neo-page .nav-link.active {
+  color: var(--neo-gray-900) !important;
+  background: rgba(22, 163, 74, 0.16);
+}
+
+[data-color-scheme='dark'] .theme-toggle {
+  color: #fbbf24;
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+[data-color-scheme='dark'] .neo-page .neo-glass,
+[data-color-scheme='dark'] .neo-page .glass-card,
+[data-color-scheme='dark'] .neo-page .faq-card,
+[data-color-scheme='dark'] .neo-page .contact-info-card,
+[data-color-scheme='dark'] .neo-page .resource-card,
+[data-color-scheme='dark'] .neo-page .internship-card,
+[data-color-scheme='dark'] .neo-page .contact-form-container {
+  background: var(--neo-glass) !important;
+  background-image: none !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  box-shadow: var(--neo-shadow) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .neo-h2,
+[data-color-scheme='dark'] .neo-page h3,
+[data-color-scheme='dark'] .neo-page h4,
+[data-color-scheme='dark'] .neo-page .section-title,
+[data-color-scheme='dark'] .neo-page .faq-title,
+[data-color-scheme='dark'] .neo-page .contact-form-title {
+  color: #f8fafc !important;
+}
+
+[data-color-scheme='dark'] .neo-page .neo-lead,
+[data-color-scheme='dark'] .neo-page .section-subtitle,
+[data-color-scheme='dark'] .neo-page .contact-info-card p,
+[data-color-scheme='dark'] .neo-page .faq-card p,
+[data-color-scheme='dark'] .neo-page .resource-card p,
+[data-color-scheme='dark'] .neo-page .policy-section p {
+  color: #cbd5e1 !important;
+}
+
+[data-color-scheme='dark'] .neo-page .resources-section,
+[data-color-scheme='dark'] .neo-page .contact-section,
+[data-color-scheme='dark'] .neo-page .policy-section,
+[data-color-scheme='dark'] .neo-page .internships-section {
+  background: transparent !important;
+  border-color: rgba(148, 163, 184, 0.12) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .contact-form-container input,
+[data-color-scheme='dark'] .neo-page .contact-form-container select,
+[data-color-scheme='dark'] .neo-page .contact-form-container textarea,
+[data-color-scheme='dark'] .neo-page .internships-section input,
+[data-color-scheme='dark'] .neo-page .internships-section select {
+  color: #f8fafc !important;
+  background: #1e293b !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .contact-form-container input::placeholder,
+[data-color-scheme='dark'] .neo-page .contact-form-container textarea::placeholder,
+[data-color-scheme='dark'] .neo-page .internships-section input::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-card h3,
+[data-color-scheme='dark'] .neo-page .internship-card [style*='color: #6b7280'],
+[data-color-scheme='dark'] .neo-page .internship-card [style*='color: #9ca3af'],
+[data-color-scheme='dark'] .neo-page .internship-card [style*='color: #4b5563'] {
+  color: #cbd5e1 !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-card [style*='border-top'],
+[data-color-scheme='dark'] .neo-page .internship-card [style*='border: 1px solid #e5e7eb'] {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+[data-color-scheme='dark'] .neo-page [role='dialog'],
+[data-color-scheme='dark'] .neo-page .modal,
+[data-color-scheme='dark'] .neo-page .dropdown-menu {
+  color: #f8fafc;
+  background: #1e293b !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .neo-footer {
+  background: #020617;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+[data-color-scheme='dark'] .neo-dashboard,
+[data-color-scheme='dark'] .admin-dashboard {
+  --neo-glass: rgba(30, 41, 59, 0.88);
+  --neo-glass-strong: rgba(15, 23, 42, 0.96);
+}
+
+[data-color-scheme='dark'] .neo-dashboard .neo-sidebar,
+[data-color-scheme='dark'] .neo-dashboard .neo-topbar {
+  background: #111827 !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+[data-color-scheme='dark'] .neo-dashboard .neo-glass,
+[data-color-scheme='dark'] .admin-dashboard .neo-glass,
+[data-color-scheme='dark'] .neo-dashboard .neo-form-section {
+  background: #1e293b !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+[data-color-scheme='dark'] .neo-dashboard input,
+[data-color-scheme='dark'] .neo-dashboard textarea,
+[data-color-scheme='dark'] .neo-dashboard select,
+[data-color-scheme='dark'] .admin-dashboard input,
+[data-color-scheme='dark'] .admin-dashboard textarea,
+[data-color-scheme='dark'] .admin-dashboard select {
+  color: #f8fafc !important;
+  background-color: #1e293b !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+}
+
+@media (max-width: 640px) {
+  .theme-toggle {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle__icon {
+    animation: none;
+  }
+}
+
+/* Internship search toolbar: one balanced, theme-aware control surface. */
+.neo-page .internship-search-container {
+  margin-top: 2rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.neo-page .internship-search-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.75rem !important;
+  padding: 0.75rem !important;
+  background: var(--neo-glass-strong) !important;
+  border: 1px solid rgba(17, 24, 39, 0.08) !important;
+  border-radius: var(--neo-radius-md) !important;
+  box-shadow: var(--neo-shadow) !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.neo-page .internship-search-field {
+  min-width: 0 !important;
+}
+
+.neo-page .internship-search-field .form-control {
+  min-height: 44px;
+  border: 1px solid transparent !important;
+  border-radius: var(--neo-radius-sm) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.neo-page .internship-search-field .form-control:focus {
+  border-color: rgba(255, 153, 51, 0.4) !important;
+  box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.1) !important;
+}
+
+.neo-page .internship-sort-control {
+  width: 190px;
+  min-width: 0 !important;
+  min-height: 44px;
+  border: 1px solid rgba(17, 24, 39, 0.08) !important;
+  border-radius: var(--neo-radius-sm) !important;
+  background: var(--neo-bg) !important;
+  color: var(--neo-gray-600) !important;
+}
+
+.neo-page .internship-filter-toggle {
+  min-height: 44px;
+  padding: 0.65rem 1rem !important;
+  border: 1px solid rgba(17, 24, 39, 0.08) !important;
+  border-radius: var(--neo-radius-sm) !important;
+  background: var(--neo-bg) !important;
+  color: var(--neo-gray-600) !important;
+}
+
+.neo-page .internship-filter-toggle:hover {
+  border-color: rgba(255, 153, 51, 0.35) !important;
+  color: var(--neo-gray-900) !important;
+  background: var(--neo-saffron-soft) !important;
+}
+
+.neo-page .internship-search-divider {
+  display: none !important;
+}
+
+.neo-page .internship-filters-panel {
+  margin-top: 0.75rem !important;
+  padding: 1rem !important;
+  background: var(--neo-glass) !important;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: var(--neo-radius-md) !important;
+  color: var(--neo-gray-900);
+}
+
+.neo-page .internship-filters-panel .form-control {
+  min-height: 42px;
+  border-radius: var(--neo-radius-sm);
+}
+
+.neo-page .internship-result-count {
+  margin-top: 0 !important;
+  margin-bottom: 1.25rem;
+  color: var(--neo-gray-600) !important;
+}
+
+.neo-page .internships-grid {
+  margin-top: 0 !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-search-toolbar,
+[data-color-scheme='dark'] .neo-page .internship-filters-panel {
+  background: #172033 !important;
+  background-color: #172033 !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-search-toolbar {
+  color: #e5e7eb !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-card {
+  color: #e5e7eb !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-search-field .form-control,
+[data-color-scheme='dark'] .neo-page .internship-sort-control,
+[data-color-scheme='dark'] .neo-page .internship-filter-toggle {
+  color: #e5e7eb !important;
+  background: #1e293b !important;
+  border-color: rgba(148, 163, 184, 0.24) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-search-field .form-control {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-filter-toggle:hover {
+  color: #f8fafc !important;
+  background: rgba(255, 153, 51, 0.12) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-filters-panel label,
+[data-color-scheme='dark'] .neo-page .internship-result-count {
+  color: #cbd5e1 !important;
+}
+
+@media (max-width: 640px) {
+  .neo-page .internship-search-toolbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .neo-page .internship-search-field {
+    grid-column: 1 / -1;
+  }
+
+  .neo-page .internship-sort-control {
+    width: 100%;
+  }
+
+  .neo-page .internship-filter-toggle {
+    justify-self: end;
+  }
+}
+
+/* —— Unified application theme contract —— */
+:root,
+[data-color-scheme='light'] {
+  --theme-bg-primary: #f9fafb;
+  --theme-bg-secondary: #f3f4f6;
+  --theme-card: #ffffff;
+  --theme-card-muted: #f8fafc;
+  --theme-input: #ffffff;
+  --theme-text-primary: #111827;
+  --theme-text-secondary: #4b5563;
+  --theme-text-muted: #6b7280;
+  --theme-border: rgba(17, 24, 39, 0.1);
+  --theme-border-subtle: rgba(17, 24, 39, 0.06);
+  --theme-shadow: 0 8px 28px rgba(17, 24, 39, 0.08);
+  --theme-shadow-lg: 0 20px 45px rgba(17, 24, 39, 0.12);
+  --neo-bg: var(--theme-bg-primary);
+  --neo-glass: rgba(255, 255, 255, 0.86);
+  --neo-glass-strong: rgba(255, 255, 255, 0.96);
+  --neo-gray-900: var(--theme-text-primary);
+  --neo-gray-600: var(--theme-text-secondary);
+  --neo-gray-400: #9ca3af;
+  --neo-gradient-page: linear-gradient(180deg, var(--theme-bg-primary) 0%, var(--theme-bg-secondary) 100%);
+  --color-background: var(--theme-bg-primary);
+  --color-surface: var(--theme-card);
+  --color-text: var(--theme-text-primary);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-border: var(--theme-border);
+}
+
+[data-color-scheme='dark'] {
+  --theme-bg-primary: #0b1220;
+  --theme-bg-secondary: #111827;
+  --theme-card: #172033;
+  --theme-card-muted: #1a2538;
+  --theme-input: #1e293b;
+  --theme-text-primary: #f8fafc;
+  --theme-text-secondary: #cbd5e1;
+  --theme-text-muted: #94a3b8;
+  --theme-border: rgba(255, 255, 255, 0.1);
+  --theme-border-subtle: rgba(255, 255, 255, 0.06);
+  --theme-shadow: 0 8px 28px rgba(0, 0, 0, 0.24);
+  --theme-shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.38);
+  --neo-bg: var(--theme-bg-primary);
+  --neo-glass: var(--theme-card);
+  --neo-glass-strong: var(--theme-bg-secondary);
+  --neo-gray-900: var(--theme-text-primary);
+  --neo-gray-600: var(--theme-text-secondary);
+  --neo-gray-400: var(--theme-text-muted);
+  --neo-gradient-page: linear-gradient(180deg, var(--theme-bg-primary) 0%, var(--theme-bg-secondary) 100%);
+  --color-background: var(--theme-bg-primary);
+  --color-surface: var(--theme-card);
+  --color-text: var(--theme-text-primary);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-border: var(--theme-border);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--theme-bg-primary);
+  background-color: var(--theme-bg-primary) !important;
+  color: var(--theme-text-primary);
+  color-scheme: light;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.neo-page,
+.neo-dashboard,
+.admin-dashboard,
+.page {
+  background: var(--theme-bg-primary);
+  background-color: var(--theme-bg-primary) !important;
+  color: var(--theme-text-primary);
+}
+
+[data-color-scheme='dark'] html,
+[data-color-scheme='dark'] body,
+[data-color-scheme='dark'] #root,
+[data-color-scheme='dark'] .neo-page,
+[data-color-scheme='dark'] .neo-dashboard,
+[data-color-scheme='dark'] .admin-dashboard,
+[data-color-scheme='dark'] .page {
+  background-color: var(--theme-bg-primary) !important;
+  color: var(--theme-text-primary) !important;
+  color-scheme: dark;
+}
+
+/* Shared surfaces use the same contract on public pages and dashboards. */
+.card,
+.neo-glass,
+.glass-card,
+.neo-form-section,
+.notifications-container,
+.notification-card,
+.review-card,
+.resource-guide-card,
+.enhanced-form,
+.progress-container,
+.upload-box,
+.login-box {
+  background-color: var(--theme-card) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+input,
+textarea,
+select,
+option {
+  color: var(--theme-text-primary);
+  background-color: var(--theme-input);
+  border-color: var(--theme-border);
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--theme-text-muted);
+  opacity: 1;
+}
+
+select option {
+  color: var(--theme-text-primary);
+  background: var(--theme-input);
+}
+
+[data-color-scheme='dark'] .bg-white,
+[data-color-scheme='dark'] [style*='background: white'],
+[data-color-scheme='dark'] [style*='background: #fff'],
+[data-color-scheme='dark'] [style*='backgroundColor: white'],
+[data-color-scheme='dark'] [style*='backgroundColor: #fff'] {
+  background: var(--theme-card) !important;
+  background-color: var(--theme-card) !important;
+}
+
+[data-color-scheme='dark'] .bg-gray-50,
+[data-color-scheme='dark'] .bg-gray-100,
+[data-color-scheme='dark'] .bg-slate-50,
+[data-color-scheme='dark'] [style*='backgroundColor: #f9fafb'],
+[data-color-scheme='dark'] [style*='backgroundColor: #f3f4f6'] {
+  background-color: var(--theme-card-muted) !important;
+}
+
+[data-color-scheme='dark'] .text-black,
+[data-color-scheme='dark'] .text-gray-900,
+[data-color-scheme='dark'] .text-gray-800,
+[data-color-scheme='dark'] .text-gray-700,
+[data-color-scheme='dark'] .text-gray-600,
+[data-color-scheme='dark'] .text-gray-500,
+[data-color-scheme='dark'] [style*='color: #111827'],
+[data-color-scheme='dark'] [style*='color: #374151'],
+[data-color-scheme='dark'] [style*='color: #4b5563'],
+[data-color-scheme='dark'] [style*='color: #6b7280'] {
+  color: var(--theme-text-secondary) !important;
+}
+
+[data-color-scheme='dark'] h1,
+[data-color-scheme='dark'] h2,
+[data-color-scheme='dark'] h3,
+[data-color-scheme='dark'] h4,
+[data-color-scheme='dark'] h5,
+[data-color-scheme='dark'] h6,
+[data-color-scheme='dark'] .text-gray-900,
+[data-color-scheme='dark'] [style*='color: #111827'] {
+  color: var(--theme-text-primary) !important;
+}
+
+[data-color-scheme='dark'] [style*='border: 1px solid #e5e7eb'],
+[data-color-scheme='dark'] [style*='border: 1px solid #f3f4f6'],
+[data-color-scheme='dark'] .border-gray-100,
+[data-color-scheme='dark'] .border-gray-200,
+[data-color-scheme='dark'] .border-black\/5 {
+  border-color: var(--theme-border) !important;
+}
+
+/* Public navbar and profile menu contain legacy inline light styles. */
+[data-color-scheme='dark'] .neo-page .user-profile-btn,
+[data-color-scheme='dark'] .neo-page #profileMenu,
+[data-color-scheme='dark'] .neo-page .dropdown-item {
+  color: var(--theme-text-primary) !important;
+  background-color: var(--theme-card) !important;
+  border-color: var(--theme-border) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .dropdown-item:hover {
+  background-color: var(--theme-card-muted) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .navbar.neo-navbar--scrolled,
+[data-color-scheme='dark'] .neo-dashboard .neo-topbar,
+[data-color-scheme='dark'] .admin-topbar {
+  background: var(--theme-bg-secondary) !important;
+  background-color: var(--theme-bg-secondary) !important;
+  border-color: var(--theme-border) !important;
+}
+
+[data-color-scheme='dark'] .neo-dashboard .neo-sidebar,
+[data-color-scheme='dark'] .admin-sidebar,
+[data-color-scheme='dark'] .sidebar {
+  background: var(--theme-bg-secondary) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* Modal surfaces are portalled outside .neo-page, so they need root-scoped rules. */
+[data-color-scheme='dark'] .modal,
+[data-color-scheme='dark'] [role='dialog'],
+[data-color-scheme='dark'] .neo-glass.fixed,
+[data-color-scheme='dark'] .fixed .glass-card {
+  background-color: var(--theme-card) !important;
+  color: var(--theme-text-primary) !important;
+  border-color: var(--theme-border) !important;
+}
+
+[data-color-scheme='dark'] .fixed .glass-card input,
+[data-color-scheme='dark'] .fixed .glass-card textarea,
+[data-color-scheme='dark'] .fixed .glass-card select {
+  background-color: var(--theme-input) !important;
+  color: var(--theme-text-primary) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* Legitimate modal backdrops stay overlays; no permanent page overlay is added. */
+[data-color-scheme='dark'] .fixed.inset-0.bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.58) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  #root,
+  input,
+  textarea,
+  select,
+  .card,
+  .neo-glass,
+  .glass-card {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+[data-color-scheme='light'] .neo-page .internship-search-toolbar,
+[data-color-scheme='light'] .neo-page .internship-filters-panel {
+  background-color: var(--theme-card) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+[data-color-scheme='dark'] .neo-page .internship-search-toolbar,
+[data-color-scheme='dark'] .neo-page .internship-filters-panel {
+  background-color: var(--theme-card) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+html[data-color-scheme='light'],
+html[data-color-scheme='light'] body,
+html[data-color-scheme='light'] #root,
+html[data-color-scheme='light'] .neo-page,
+html[data-color-scheme='light'] .neo-dashboard,
+html[data-color-scheme='light'] .admin-dashboard,
+html[data-color-scheme='light'] .page {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+html[data-color-scheme='dark'],
+html[data-color-scheme='dark'] body,
+html[data-color-scheme='dark'] #root,
+html[data-color-scheme='dark'] .neo-page,
+html[data-color-scheme='dark'] .neo-dashboard,
+html[data-color-scheme='dark'] .admin-dashboard,
+html[data-color-scheme='dark'] .page {
+  background-color: #0b1220 !important;
+  color: #f8fafc !important;
+}
+
+body.theme-light,
+body.theme-light #root,
+body.theme-light .neo-page,
+body.theme-light .neo-dashboard,
+body.theme-light .admin-dashboard,
+body.theme-light .page {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+body.theme-dark,
+body.theme-dark #root,
+body.theme-dark .neo-page,
+body.theme-dark .neo-dashboard,
+body.theme-dark .admin-dashboard,
+body.theme-dark .page {
+  background-color: #0b1220 !important;
+  color: #f8fafc !important;
+}
+
+/* ================================================================
+   ABOUT NEO GEN — THEME-AWARE SECTION + TRANSITIONS
+   ================================================================ */
+
+/* --- Light + Dark shared semantic tokens for the About section --- */
+.neo-page {
+  --about-section-bg: var(--theme-bg-secondary, #f3f4f6);
+  --about-text-primary: var(--neo-gray-900, #111827);
+  --about-text-secondary: var(--neo-gray-600, #4b5563);
+  --about-glass-bg: var(--neo-glass, rgba(255, 255, 255, 0.78));
+  --about-glass-border: rgba(255, 255, 255, 0.85);
+  --about-card-shadow: var(--neo-shadow, 0 8px 32px rgba(17, 24, 39, 0.06));
+  --about-card-shadow-lg: var(--neo-shadow-lg, 0 24px 48px rgba(17, 24, 39, 0.1));
+}
+
+body.theme-dark .neo-page {
+  --about-section-bg: #111827;
+  --about-text-primary: #f8fafc;
+  --about-text-secondary: #cbd5e1;
+  --about-glass-bg: rgba(23, 32, 51, 0.88);
+  --about-glass-border: rgba(148, 163, 184, 0.18);
+  --about-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --about-card-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* --- Section itself --- */
+.neo-about-section {
+  opacity: 1;
+  background: var(--about-section-bg);
+  color: var(--about-text-primary);
+  transition:
+    background-color 250ms ease,
+    color 250ms ease,
+    border-color 250ms ease;
+}
+
+/* Ensure no accidental light overlay sits on top in dark mode */
+.neo-about-section::before,
+.neo-about-section::after {
+  content: none !important;
+}
+
+/* --- Typography inside About section --- */
+.neo-about-section .neo-h2,
+.neo-about-section .neo-about-subtitle,
+.neo-about-section .neo-about-card-title {
+  color: var(--about-text-primary);
+  transition: color 250ms ease;
+}
+
+.neo-about-section .neo-lead {
+  color: var(--about-text-secondary);
+  transition: color 250ms ease;
+}
+
+/* --- Glass surface + cards --- */
+.neo-about-section .neo-glass,
+.neo-about-section .neo-about-card {
+  background: var(--about-glass-bg) !important;
+  border: 1px solid var(--about-glass-border) !important;
+  box-shadow: var(--about-card-shadow) !important;
+  color: var(--about-text-primary);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    background-color 250ms ease,
+    border-color 250ms ease,
+    color 250ms ease;
+}
+
+.neo-about-section .neo-about-card:hover {
+  box-shadow: var(--about-card-shadow-lg) !important;
+}
+
+/* --- Inline / utility color overrides for dark mode safety --- */
+body.theme-dark .neo-about-section .text-\[\#111827\],
+body.theme-dark .neo-about-section .text-gray-900 {
+  color: #f8fafc !important;
+}
+
+body.theme-dark .neo-about-section .neo-lead.text-sm,
+body.theme-dark .neo-about-section .neo-lead {
+  color: #cbd5e1 !important;
+}
+
+/* --- Dark-mode polish: subtle lift between section bg and card bg --- */
+body.theme-dark .neo-about-section .neo-about-card {
+  background: rgba(23, 32, 51, 0.92) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Shared dashboard motion language for student, partner and super-admin surfaces. */
+.neo-dashboard .neo-glass,
+.neo-dashboard .glass-card,
+.admin-dashboard .neo-glass,
+.admin-dashboard .glass-card {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.neo-dashboard .neo-glass:hover,
+.neo-dashboard .glass-card:hover,
+.admin-dashboard .neo-glass:hover,
+.admin-dashboard .glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--theme-shadow-lg, var(--neo-shadow-lg)) !important;
+}
+
+.neo-dashboard .neo-dash-nav-link,
+.admin-dashboard .admin-nav-link,
+.admin-dashboard .neo-dash-nav-link {
+  transition: transform 0.22s ease, background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.neo-dashboard .neo-dash-nav-link:hover,
+.admin-dashboard .admin-nav-link:hover,
+.admin-dashboard .neo-dash-nav-link:hover {
+  transform: translateX(3px);
+}
+
+.neo-dashboard button,
+.admin-dashboard button,
+.neo-dashboard a,
+.admin-dashboard a {
+  transition-duration: 0.25s;
+}
+
+.neo-dashboard button:hover:not(:disabled),
+.admin-dashboard button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.neo-dashboard .neo-topbar,
+.admin-dashboard .admin-topbar {
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neo-dashboard .neo-glass,
+  .neo-dashboard .glass-card,
+  .admin-dashboard .neo-glass,
+  .admin-dashboard .glass-card,
+  .neo-dashboard .neo-dash-nav-link,
+  .admin-dashboard .admin-nav-link,
+  .admin-dashboard .neo-dash-nav-link {
+    transition-duration: 0.01ms !important;
+  }
+
+  .neo-dashboard .neo-glass:hover,
+  .neo-dashboard .glass-card:hover,
+  .admin-dashboard .neo-glass:hover,
+  .admin-dashboard .glass-card:hover,
+  .neo-dashboard .neo-dash-nav-link:hover,
+  .admin-dashboard .admin-nav-link:hover,
+  .admin-dashboard .neo-dash-nav-link:hover,
+  .neo-dashboard button:hover:not(:disabled),
+  .admin-dashboard button:hover:not(:disabled) {
+    transform: none !important;
+  }
+}
+
+/* ================================================================
+   GLOBAL DARK MODE UTILITY OVERRIDES (WHOLE APP)
+   Fixes bg-white / light surfaces + text colors on Landing + Dashboards
+   ================================================================ */
+
+/* Shared semantic tokens */
+body.theme-dark .neo-page,
+body.theme-dark .neo-dashboard,
+body.theme-dark .admin-dashboard,
+body.theme-dark #root > .neo-page,
+body.theme-dark #root > .neo-dashboard,
+body.theme-dark #root > .admin-dashboard {
+  --g-dark-page: #0b1220;
+  --g-dark-surface: #111827;
+  --g-dark-surface-2: #151e33;
+  --g-dark-card: rgba(23, 32, 51, 0.88);
+  --g-dark-card-hover: rgba(27, 40, 66, 0.94);
+  --g-dark-border: rgba(148, 163, 184, 0.16);
+  --g-dark-border-strong: rgba(148, 163, 184, 0.28);
+  --g-dark-text: #f8fafc;
+  --g-dark-text-mute: #cbd5e1;
+  --g-dark-text-dim: #94a3b8;
+  --g-dark-input: rgba(15, 23, 42, 0.9);
+  --g-dark-overlay-success: rgba(22, 163, 74, 0.12);
+  --g-dark-overlay-saffron: rgba(249, 115, 22, 0.12);
+  --g-dark-overlay-danger: rgba(239, 68, 68, 0.12);
+  --g-dark-overlay-info: rgba(59, 130, 246, 0.12);
+  --g-dark-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --g-dark-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* Only explicit .neo-section sections get the surface background
+   Hero / LandingCTA / Stats / floating banners keep their own gradients/tints */
+body.theme-dark .neo-page .neo-section {
+  background-color: var(--g-dark-surface) !important;
+  color: var(--g-dark-text) !important;
+  transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+  opacity: 1;
+}
+
+/* Landing hero & CTA sections: keep gradients, ensure text contrast */
+body.theme-dark .hero-section,
+body.theme-dark .stats-section,
+body.theme-dark .landing-cta-section,
+body.theme-dark .landing-cta {
+  color: #ffffff !important;
+}
+
+/* Ensure dark mode does not flatten hero/cta gradient backgrounds */
+body.theme-dark .hero-section .hero-background,
+body.theme-dark .hero-section [class*="bg-gradient"] {
+  background-blend-mode: multiply;
+  filter: saturate(1.1);
+}
+
+body.theme-dark .neo-dashboard,
+body.theme-dark .admin-dashboard,
+body.theme-dark .dashboard-container {
+  background-color: var(--g-dark-page) !important;
+  color: var(--g-dark-text) !important;
+  transition: background-color 250ms ease, color 250ms ease;
+}
+
+/* ---- Hardcoded light backgrounds -> dark surface equivalents ---- */
+body.theme-dark .neo-page .bg-white,
+body.theme-dark .neo-dashboard .bg-white,
+body.theme-dark .admin-dashboard .bg-white,
+body.theme-dark .neo-page .glass-card,
+body.theme-dark .neo-page .neo-glass,
+body.theme-dark .neo-dashboard .glass-card,
+body.theme-dark .neo-dashboard .neo-glass,
+body.theme-dark .admin-dashboard .glass-card,
+body.theme-dark .admin-dashboard .neo-glass,
+body.theme-dark .neo-page [class*="bg-\[\#fff\]"],
+body.theme-dark .neo-page [class*="bg-white/"],
+body.theme-dark .neo-page [class*="bg-\[white\]"] {
+  background-color: var(--g-dark-card) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-color: var(--g-dark-border) !important;
+  color: var(--g-dark-text) !important;
+  transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+
+/* Light gray surfaces (F9FAFB, F8FAFC, F3F4F6, gray-50/100 etc.) */
+body.theme-dark .neo-page [class*="bg-gray-50"],
+body.theme-dark .neo-page [class*="bg-gray-100"],
+body.theme-dark .neo-page [class*="bg-gray-200"],
+body.theme-dark .neo-page [class*="bg-\[\#f9fafb\]"],
+body.theme-dark .neo-page [class*="bg-\[\#F9FAFB\]"],
+body.theme-dark .neo-page [class*="bg-\[\#f8fafc\]"],
+body.theme-dark .neo-page [class*="bg-\[\#F8FAFC\]"],
+body.theme-dark .neo-page [class*="bg-\[\#f3f4f6\]"],
+body.theme-dark .neo-page [class*="bg-\[\#e5e7eb\]"],
+body.theme-dark .neo-dashboard [class*="bg-gray-50"],
+body.theme-dark .neo-dashboard [class*="bg-gray-100"],
+body.theme-dark .admin-dashboard [class*="bg-gray-50"],
+body.theme-dark .admin-dashboard [class*="bg-gray-100"] {
+  background-color: var(--g-dark-surface-2) !important;
+  color: var(--g-dark-text) !important;
+  border-color: var(--g-dark-border) !important;
+}
+
+/* Light success/saffron/info tinted backgrounds (used on badges, icon containers, tags, contact cards, resource previews) */
+body.theme-dark .neo-page [class*="bg-\[\#f0fdf4\]"],
+body.theme-dark .neo-page [class*="bg-\[\#fff7ed\]"],
+body.theme-dark .neo-page [class*="bg-\[\#eff6ff\]"],
+body.theme-dark .neo-page [class*="bg-\[\#fef2f2\]"],
+body.theme-dark .neo-page [class*="bg-\[\#fff0e0\]"],
+body.theme-dark .neo-page [class*="bg-\[\#fff8f0\]"],
+body.theme-dark .neo-page [class*="bg-\[\#e0f2fe\]"],
+body.theme-dark .neo-page [class*="bg-\[\#f0fdf4\]/10"],
+body.theme-dark .neo-page [style*="#f0fdf4"],
+body.theme-dark .neo-page [style*="#fff7ed"],
+body.theme-dark .neo-page [style*="#eff6ff"],
+body.theme-dark .neo-page [style*="#fef2f2"],
+body.theme-dark .neo-page [style*="#fff0e0"],
+body.theme-dark .neo-page [style*="#fff8f0"],
+body.theme-dark .neo-page [style*="#e0f2fe"],
+body.theme-dark .neo-page [style*="backgroundColor: 'white'"],
+body.theme-dark .neo-page [style*='backgroundColor: "white"'] {
+  background-color: var(--g-dark-overlay-saffron) !important;
+  color: var(--g-dark-text) !important;
+  border-color: var(--g-dark-border) !important;
+}
+
+body.theme-dark .neo-page [style*="#f0fdf4"] {
+  background-color: var(--g-dark-overlay-success) !important;
+}
+body.theme-dark .neo-page [style*="#eff6ff"] {
+  background-color: var(--g-dark-overlay-info) !important;
+}
+body.theme-dark .neo-page [style*="#fef2f2"] {
+  background-color: var(--g-dark-overlay-danger) !important;
+}
+
+/* ---- Hardcoded text colors -> dark text variants ---- */
+body.theme-dark .neo-page [class*="text-gray-50"],
+body.theme-dark .neo-page [class*="text-gray-100"],
+body.theme-dark .neo-page [class*="text-gray-200"] {
+  color: var(--g-dark-text) !important;
+}
+
+body.theme-dark .neo-page [class*="text-gray-900"],
+body.theme-dark .neo-page [class*="text-gray-800"],
+body.theme-dark .neo-page [class*="text-gray-700"],
+body.theme-dark .neo-page [class*="text-gray-600"],
+body.theme-dark .neo-page [class*="text-gray-500"],
+body.theme-dark .neo-page [class*="text-\[\#111827\]"],
+body.theme-dark .neo-page [class*="text-\[\#1f2937\]"],
+body.theme-dark .neo-page [class*="text-\[\#374151\]"],
+body.theme-dark .neo-page [class*="text-\[\#4b5563\]"],
+body.theme-dark .neo-page [class*="text-\[\#4B5563\]"],
+body.theme-dark .neo-page [class*="text-\[\#6b7280\]"],
+body.theme-dark .neo-page [class*="text-\[\#6B7280\]"],
+body.theme-dark .neo-page [class*="text-\[\#9ca3af\]"],
+body.theme-dark .neo-page [class*="text-\[\#9CA3AF\]"],
+body.theme-dark .neo-page [class*="text-\[\#666\]"],
+body.theme-dark .neo-dashboard [class*="text-gray-900"],
+body.theme-dark .neo-dashboard [class*="text-gray-800"],
+body.theme-dark .neo-dashboard [class*="text-gray-700"],
+body.theme-dark .neo-dashboard [class*="text-gray-600"],
+body.theme-dark .neo-dashboard [class*="text-gray-500"],
+body.theme-dark .neo-dashboard [class*="text-\[\#111827\]"],
+body.theme-dark .neo-dashboard [class*="text-\[\#374151\]"],
+body.theme-dark .neo-dashboard [class*="text-\[\#4b5563\]"],
+body.theme-dark .neo-dashboard [class*="text-\[\#6b7280\]"],
+body.theme-dark .admin-dashboard [class*="text-gray-900"],
+body.theme-dark .admin-dashboard [class*="text-gray-800"],
+body.theme-dark .admin-dashboard [class*="text-gray-700"],
+body.theme-dark .admin-dashboard [class*="text-gray-600"],
+body.theme-dark .admin-dashboard [class*="text-gray-500"],
+body.theme-dark .admin-dashboard [class*="text-\[\#111827\]"],
+body.theme-dark .admin-dashboard [class*="text-\[\#374151\]"],
+body.theme-dark .admin-dashboard [class*="text-\[\#4b5563\]"],
+body.theme-dark .admin-dashboard [class*="text-\[\#6b7280\]"] {
+  color: var(--g-dark-text-mute) !important;
+}
+
+/* Specifically PRIMARY strong text (titles / headings -> #111827 / gray-900) -> lightest text */
+body.theme-dark .neo-page h1[class*="text-\[\#111827\]"],
+body.theme-dark .neo-page h2[class*="text-\[\#111827\]"],
+body.theme-dark .neo-page h3[class*="text-\[\#111827\]"],
+body.theme-dark .neo-page h4[class*="text-\[\#111827\]"],
+body.theme-dark .neo-page h5[class*="text-\[\#111827\]"],
+body.theme-dark .neo-page h1.text-gray-900,
+body.theme-dark .neo-page h2.text-gray-900,
+body.theme-dark .neo-page h3.text-gray-900,
+body.theme-dark .neo-page h4.text-gray-900,
+body.theme-dark .neo-dashboard h1.text-gray-900,
+body.theme-dark .neo-dashboard h2.text-gray-900,
+body.theme-dark .neo-dashboard h3.text-gray-900,
+body.theme-dark .admin-dashboard h1.text-gray-900,
+body.theme-dark .admin-dashboard h2.text-gray-900,
+body.theme-dark .admin-dashboard h3.text-gray-900 {
+  color: var(--g-dark-text) !important;
+}
+
+/* ---- INLINE style text color overrides (beats inline only via !important, scoped to body.theme-dark) ---- */
+body.theme-dark .neo-page [style*="color: '#111827'"],
+body.theme-dark .neo-page [style*='color: "#111827"'],
+body.theme-dark .neo-page [style*="color:'#111827'"],
+body.theme-dark .neo-page [style*='color:"#111827"'],
+body.theme-dark .neo-page [style*="color: '#1f2937'"],
+body.theme-dark .neo-page [style*='color: "#1f2937"'] {
+  color: var(--g-dark-text) !important;
+}
+
+body.theme-dark .neo-page [style*="color: '#374151'"],
+body.theme-dark .neo-page [style*='color: "#374151"'],
+body.theme-dark .neo-page [style*="color: '#4b5563'"],
+body.theme-dark .neo-page [style*='color: "#4b5563"'],
+body.theme-dark .neo-page [style*="color: '#4B5563'"],
+body.theme-dark .neo-page [style*='color: "#4B5563"'],
+body.theme-dark .neo-page [style*="color: '#6b7280'"],
+body.theme-dark .neo-page [style*='color: "#6b7280"'],
+body.theme-dark .neo-page [style*="color: '#6B7280'"],
+body.theme-dark .neo-page [style*='color: "#6B7280"'],
+body.theme-dark .neo-page [style*="color: '#9ca3af'"],
+body.theme-dark .neo-page [style*='color: "#9ca3af"'],
+body.theme-dark .neo-page [style*="color: '#9CA3AF'"],
+body.theme-dark .neo-page [style*='color: "#9CA3AF"'],
+body.theme-dark .neo-page [style*="color: '#666'"],
+body.theme-dark .neo-page [style*='color: "#666"'],
+body.theme-dark .neo-dashboard [style*="color: '#111827'"],
+body.theme-dark .neo-dashboard [style*='color: "#111827"'],
+body.theme-dark .neo-dashboard [style*="color: '#374151'"],
+body.theme-dark .neo-dashboard [style*='color: "#374151"'],
+body.theme-dark .neo-dashboard [style*="color: '#4b5563'"],
+body.theme-dark .neo-dashboard [style*='color: "#4b5563"'],
+body.theme-dark .neo-dashboard [style*="color: '#6b7280'"],
+body.theme-dark .neo-dashboard [style*='color: "#6b7280"'],
+body.theme-dark .admin-dashboard [style*="color: '#111827'"],
+body.theme-dark .admin-dashboard [style*='color: "#111827"'],
+body.theme-dark .admin-dashboard [style*="color: '#374151'"],
+body.theme-dark .admin-dashboard [style*='color: "#374151"'],
+body.theme-dark .admin-dashboard [style*="color: '#4b5563'"],
+body.theme-dark .admin-dashboard [style*='color: "#4b5563"'],
+body.theme-dark .admin-dashboard [style*="color: '#6b7280'"],
+body.theme-dark .admin-dashboard [style*='color: "#6b7280"'] {
+  color: var(--g-dark-text-mute) !important;
+}
+
+/* ---- Buttons / surfaces with inline white bg ---- */
+body.theme-dark .neo-page button[style*="backgroundColor: 'white'"],
+body.theme-dark .neo-page button[style*='backgroundColor: "white"'],
+body.theme-dark .neo-page [style*="backgroundColor: '#fff'"],
+body.theme-dark .neo-page [style*='backgroundColor: "#fff"'],
+body.theme-dark .neo-page [style*="background-color: '#ffffff'"],
+body.theme-dark .neo-dashboard button[style*="backgroundColor: 'white'"],
+body.theme-dark .admin-dashboard button[style*="backgroundColor: 'white'"] {
+  background-color: var(--g-dark-card) !important;
+  border-color: var(--g-dark-border-strong) !important;
+  color: var(--g-dark-text) !important;
+}
+
+/* Navbar profile button & dropdown inline styles */
+body.theme-dark .navbar .user-profile-btn,
+body.theme-dark .navbar .dropdown-menu,
+body.theme-dark .navbar .dropdown-item,
+body.theme-dark .navbar .navbar-toggle {
+  background-color: var(--g-dark-card) !important;
+  border-color: var(--g-dark-border-strong) !important;
+  color: var(--g-dark-text) !important;
+  box-shadow: var(--g-dark-shadow) !important;
+}
+
+body.theme-dark .navbar .dropdown-item:hover {
+  background-color: var(--g-dark-surface-2) !important;
+}
+
+/* Navbar base */
+body.theme-dark .navbar {
+  background-color: rgba(11, 18, 32, 0.85) !important;
+  backdrop-filter: blur(18px) !important;
+  border-bottom: 1px solid var(--g-dark-border) !important;
+}
+
+body.theme-dark .navbar.neo-navbar--scrolled {
+  background-color: rgba(11, 18, 32, 0.92) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.theme-dark .navbar .nav-link,
+body.theme-dark .navbar .nav-link:visited {
+  color: var(--g-dark-text-mute) !important;
+}
+
+body.theme-dark .navbar .nav-link.active,
+body.theme-dark .navbar .nav-link:hover {
+  color: var(--g-dark-text) !important;
+}
+
+body.theme-dark .navbar .navbar-toggle {
+  color: var(--g-dark-text) !important;
+}
+
+body.theme-dark .navbar .brand-subtitle {
+  color: var(--g-dark-text-dim) !important;
+}
+
+/* Forms & inputs (default light outline white bg) */
+body.theme-dark .neo-page input,
+body.theme-dark .neo-page textarea,
+body.theme-dark .neo-page select,
+body.theme-dark .neo-dashboard input,
+body.theme-dark .neo-dashboard textarea,
+body.theme-dark .neo-dashboard select,
+body.theme-dark .admin-dashboard input,
+body.theme-dark .admin-dashboard textarea,
+body.theme-dark .admin-dashboard select,
+body.theme-dark .neo-page .form-control,
+body.theme-dark .neo-dashboard .form-control,
+body.theme-dark .admin-dashboard .form-control {
+  background-color: var(--g-dark-input) !important;
+  color: var(--g-dark-text) !important;
+  border-color: var(--g-dark-border-strong) !important;
+  transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
+}
+
+body.theme-dark .neo-page input::placeholder,
+body.theme-dark .neo-page textarea::placeholder,
+body.theme-dark .neo-dashboard input::placeholder,
+body.theme-dark .neo-dashboard textarea::placeholder,
+body.theme-dark .admin-dashboard input::placeholder,
+body.theme-dark .admin-dashboard textarea::placeholder {
+  color: var(--g-dark-text-dim) !important;
+  opacity: 0.8;
+}
+
+/* Labels */
+body.theme-dark .neo-page .form-label,
+body.theme-dark .neo-page label[style*="color: '#374151'"],
+body.theme-dark .neo-page label[style*='color: "#374151"'] {
+  color: var(--g-dark-text-mute) !important;
+}
+
+/* Borders (common light utility classes) */
+body.theme-dark .neo-page [class*="border-gray-100"],
+body.theme-dark .neo-page [class*="border-gray-200"],
+body.theme-dark .neo-page [class*="border-gray-300"],
+body.theme-dark .neo-page [class*="border-black/5"],
+body.theme-dark .neo-page [class*="border-black/10"],
+body.theme-dark .neo-page [class*="border-\[\#d1d5db\]"],
+body.theme-dark .neo-page [class*="border-\[\#e5e7eb\]"],
+body.theme-dark .neo-page [class*="border-\[\#f3f4f6\]"],
+body.theme-dark .neo-page [class*="border-\[\#138808\]/10"],
+body.theme-dark .neo-page [class*="border-\[\#FF9933\]/20"],
+body.theme-dark .neo-dashboard [class*="border-gray-100"],
+body.theme-dark .neo-dashboard [class*="border-gray-200"],
+body.theme-dark .neo-dashboard [class*="border-gray-300"],
+body.theme-dark .admin-dashboard [class*="border-gray-100"],
+body.theme-dark .admin-dashboard [class*="border-gray-200"] {
+  border-color: var(--g-dark-border) !important;
+}
+
+/* Horizontal dividers (style.height:'1px', bg-color e5e7eb, f3f4f6) */
+body.theme-dark .neo-page div[style*="backgroundColor: '#e5e7eb'"],
+body.theme-dark .neo-page div[style*="backgroundColor: '#f3f4f6'"],
+body.theme-dark .neo-page hr {
+  background-color: var(--g-dark-border) !important;
+  border-color: var(--g-dark-border) !important;
+}
+
+/* Card chip/tag (F9FAFB) + dark border */
+body.theme-dark .neo-page span[style*="backgroundColor: '#f9fafb'"],
+body.theme-dark .neo-page span[style*='backgroundColor: "#f9fafb"'],
+body.theme-dark .neo-page span[style*="backgroundColor: '#F9FAFB'"] {
+  background-color: var(--g-dark-surface-2) !important;
+  color: var(--g-dark-text-mute) !important;
+  border-color: var(--g-dark-border-strong) !important;
+}
+
+body.theme-dark .neo-page span[style*="backgroundColor: '#f0fdf4'"],
+body.theme-dark .neo-page span[style*='backgroundColor: "#f0fdf4"'],
+body.theme-dark .neo-page span[style*="backgroundColor: '#fee2e2'"] {
+  background-color: var(--g-dark-overlay-success) !important;
+}
+
+body.theme-dark .neo-page span[style*="backgroundColor: '#fee2e2'"] {
+  background-color: var(--g-dark-overlay-danger) !important;
+}
+
+/* Soft shadows (not dark enough for dark mode) */
+body.theme-dark .neo-page [class*="shadow-sm"],
+body.theme-dark .neo-page [class*="shadow-md"],
+body.theme-dark .neo-page [class*="shadow-lg"],
+body.theme-dark .neo-dashboard [class*="shadow-sm"],
+body.theme-dark .neo-dashboard [class*="shadow-md"],
+body.theme-dark .admin-dashboard [class*="shadow-sm"],
+body.theme-dark .admin-dashboard [class*="shadow-md"] {
+  box-shadow: var(--g-dark-shadow) !important;
+}
+
+body.theme-dark .neo-page [class*="shadow-xl"],
+body.theme-dark .neo-page [class*="shadow-2xl"],
+body.theme-dark .neo-dashboard [class*="shadow-2xl"],
+body.theme-dark .admin-dashboard [class*="shadow-2xl"] {
+  box-shadow: var(--g-dark-shadow-lg) !important;
+}
+
+/* UpgradeModal (top-level overlay card) */
+body.theme-dark .UpgradeModal__panel,
+body.theme-dark .UpgradeModal__planCard,
+body.theme-dark .UpgradeModal__summary,
+body.theme-dark .UpgradeModal__success,
+body.theme-dark .UpgradeModal__failure {
+  background-color: var(--g-dark-card) !important;
+  border-color: var(--g-dark-border) !important;
+  color: var(--g-dark-text) !important;
+}
+
+body.theme-dark .UpgradeModal__promoResult,
+body.theme-dark .UpgradeModal__price {
+  color: var(--g-dark-text-mute) !important;
+}
+
+/* Inline style resource preview bar (rgba white 0.9 etc.) */
+body.theme-dark .neo-page [style*="background: 'rgba(255,255,255,"],
+body.theme-dark .neo-page [style*="background: rgba(255,255,255,"],
+body.theme-dark .neo-page [style*="backgroundColor: 'rgba(255,255,255,"],
+body.theme-dark .neo-page [style*='backgroundColor: "rgba(255,255,255,'] {
+  background-color: var(--g-dark-card) !important;
+  color: var(--g-dark-text-mute) !important;
+}
+
+/* Dashboard sidebar + topbar + stats cards + tables */
+body.theme-dark .neo-dashboard .neo-sidebar,
+body.theme-dark .neo-dashboard .neo-topbar,
+body.theme-dark .neo-dashboard .dashboard-content,
+body.theme-dark .admin-dashboard .admin-sidebar,
+body.theme-dark .admin-dashboard .admin-topbar,
+body.theme-dark .admin-dashboard .admin-content {
+  background-color: var(--g-dark-page) !important;
+  color: var(--g-dark-text) !important;
+  border-color: var(--g-dark-border) !important;
+}
+
+body.theme-dark .neo-dashboard .neo-sidebar .neo-dash-nav-link,
+body.theme-dark .admin-dashboard .admin-sidebar .admin-nav-link {
+  color: var(--g-dark-text-mute) !important;
+}
+
+body.theme-dark .neo-dashboard .neo-sidebar .neo-dash-nav-link.active,
+body.theme-dark .neo-dashboard .neo-sidebar .neo-dash-nav-link:hover,
+body.theme-dark .admin-dashboard .admin-sidebar .admin-nav-link.active,
+body.theme-dark .admin-dashboard .admin-sidebar .admin-nav-link:hover {
+  color: var(--g-dark-text) !important;
+  background-color: var(--g-dark-surface-2) !important;
+}
+
+body.theme-dark .neo-dashboard table,
+body.theme-dark .admin-dashboard table {
+  color: var(--g-dark-text-mute) !important;
+}
+
+body.theme-dark .neo-dashboard table th,
+body.theme-dark .admin-dashboard table th {
+  background-color: var(--g-dark-surface-2) !important;
+  color: var(--g-dark-text) !important;
+  border-bottom-color: var(--g-dark-border) !important;
+}
+
+body.theme-dark .neo-dashboard table td,
+body.theme-dark .admin-dashboard table td {
+  border-color: var(--g-dark-border) !important;
+}
+
+/* Support Inbox (both panels) — explicit overrides for hardcoded classes/styles */
+body.theme-dark .SupportInbox__ticketActive {
+  background-color: var(--g-dark-overlay-saffron) !important;
+  border-left-color: #f97316 !important;
+}
+
+body.theme-dark .SupportInbox__ticketItem:hover {
+  background-color: var(--g-dark-overlay-saffron) !important;
+}
+
+body.theme-dark .SupportInbox__detailsHeader,
+body.theme-dark .SupportInbox__message,
+body.theme-dark .SupportInbox__composer {
+  background-color: var(--g-dark-card) !important;
+  border-color: var(--g-dark-border) !important;
+}
+
+/* Footer */
+body.theme-dark footer,
+body.theme-dark .footer {
+  background-color: #080e19 !important;
+  color: var(--g-dark-text-mute) !important;
+  border-top: 1px solid var(--g-dark-border) !important;
+}
+
+body.theme-dark footer a,
+body.theme-dark .footer a {
+  color: var(--g-dark-text-mute) !important;
+}
+
+body.theme-dark footer h1,
+body.theme-dark footer h2,
+body.theme-dark footer h3,
+body.theme-dark footer h4,
+body.theme-dark .footer h1,
+body.theme-dark .footer h2,
+body.theme-dark .footer h3,
+body.theme-dark .footer h4 {
+  color: var(--g-dark-text) !important;
+}
+
+/* Modal overlays (bg-white rounded-2xl like UpgradeModal, AIApplicationModal) — cover whole-app dialogs */
+body.theme-dark [data-modal-root="true"] > div > div[class*="bg-white"],
+body.theme-dark [aria-modal="true"] > div[class*="bg-white"] {
+  background-color: var(--g-dark-card) !important;
+  color: var(--g-dark-text) !important;
+  border: 1px solid var(--g-dark-border-strong) !important;
 }

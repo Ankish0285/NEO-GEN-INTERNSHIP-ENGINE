@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const Card = ({ 
   children, 
@@ -12,11 +12,15 @@ const Card = ({
   onClick,
   variant = 'default',
 }) => {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }}
+      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      whileHover={onClick && !prefersReducedMotion ? { y: -3 } : undefined}
+      transition={{ duration: prefersReducedMotion ? 0.2 : 0.45, ease: [0.22, 1, 0.36, 1] }}
       onClick={onClick}
       className={clsx(
         'neo-glass overflow-hidden relative',

@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ArrowRight, Download } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
+import MotionReveal from '../ui/MotionReveal';
 
 const Resources = () => {
   const navigate = useNavigate();
@@ -36,23 +38,32 @@ const Resources = () => {
   ];
 
   return (
-    <section className="resources-section" id="resources-section" style={{ padding: '80px 0', backgroundColor: '#fff' }}>
-        <div className="container">
+    <section className="resources-section neo-section" id="resources-section" style={{ opacity: 1 }}>
+        <div className="neo-container">
             <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>{resources.title}</h2>
-                <p style={{ fontSize: '1.125rem', color: '#6b7280' }}>{resources.subtitle}</p>
+                <MotionReveal y={30} delay={0} duration={0.6}>
+                    <h2 className="neo-h2">{resources.title}</h2>
+                </MotionReveal>
+                <MotionReveal y={25} delay={0.1} duration={0.55}>
+                    <p className="neo-lead">{resources.subtitle}</p>
+                </MotionReveal>
             </div>
             
             <div className="resource-guides-container">
-                <div className="resource-guides-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', maxWidth: '900px', margin: '0 auto' }}>
+                <div className="resource-guides-grid neo-resource-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', maxWidth: '900px', margin: '0 auto' }}>
                     {templates.map(template => (
-                        <div 
+                        <motion.div
                             key={template.id} 
                             className="resource-card glass-card" 
+                            initial={{ opacity: 0, y: 24 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '-70px' }}
+                            transition={{ delay: 0.2 + template.id * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                            whileHover={{ y: -5 }}
                             style={{ 
                                 padding: '30px', 
                                 borderRadius: '16px', 
-                                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                transition: 'transform 0.3s ease, box-shadow 0.3s ease, background-color 250ms ease, border-color 250ms ease',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -68,7 +79,7 @@ const Resources = () => {
                                 e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
                             }}
                         >
-                            <div style={{ 
+                            <div className="resource-preview" style={{ 
                                 width: '100%', 
                                 height: '200px', 
                                 backgroundColor: template.color, 
@@ -81,7 +92,7 @@ const Resources = () => {
                                 overflow: 'hidden'
                             }}>
                                 <FileText size={64} color={template.iconColor} opacity={0.8} />
-                                <div style={{
+                                <div className="resource-preview-bar" style={{
                                     position: 'absolute',
                                     bottom: '0',
                                     left: '0',
@@ -96,15 +107,15 @@ const Resources = () => {
                                 </div>
                             </div>
                             
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>{template.title}</h3>
-                            <p style={{ color: '#6b7280', fontSize: '0.95rem', marginBottom: '20px' }}>Best for {template.role} roles</p>
+                            <h3 className="resource-card-title text-lg font-bold text-gray-900 mb-2">{template.title}</h3>
+                            <p className="neo-lead text-sm mb-5">Best for {template.role} roles</p>
                             
                             <button 
                                 onClick={handleAction}
+                                className="neo-btn resource-use-btn w-full"
                                 style={{ 
                                     width: '100%', 
                                     padding: '12px', 
-                                    backgroundColor: 'white', 
                                     border: `1px solid ${template.iconColor}`, 
                                     color: template.iconColor, 
                                     borderRadius: '8px',
@@ -114,24 +125,29 @@ const Resources = () => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     gap: '8px',
-                                    transition: 'all 0.2s'
+                                    transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease',
+                                    backgroundColor: 'transparent'
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = template.color;
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
+                                    e.currentTarget.style.backgroundColor = 'transparent';
                                 }}
                             >
                                 <Download size={18} /> Use Template
                             </button>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
 
                 <div style={{ textAlign: 'center', marginTop: '50px' }}>
-                    <button
+                    <motion.button
                         onClick={handleAction}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-60px' }}
+                        transition={{ delay: 0.4, duration: 0.5 }}
                         style={{
                             padding: '16px 40px',
                             backgroundColor: branding.primaryColor,
@@ -153,13 +169,13 @@ const Resources = () => {
                             e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(249, 115, 22, 0.4)';
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#f97316';
+                            e.currentTarget.style.backgroundColor = branding.primaryColor;
                             e.currentTarget.style.transform = 'translateY(0)';
                             e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(249, 115, 22, 0.3)';
                         }}
                     >
                         {resources.ctaText} <ArrowRight size={20} />
-                    </button>
+                    </motion.button>
                 </div>
             </div>
         </div>

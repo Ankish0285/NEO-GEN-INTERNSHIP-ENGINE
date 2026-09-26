@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import DashboardNavbar from './DashboardNavbar';
 import { useAuth } from '../../../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const DashboardLayout = ({ children, role }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth();
+  const location = useLocation();
   const currentRole = role || user?.role || 'student';
 
   return (
@@ -23,6 +25,7 @@ const DashboardLayout = ({ children, role }) => {
 
           <main className="neo-main flex-1 overflow-y-auto scroll-smooth">
             <motion.div
+              key={location.pathname}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}

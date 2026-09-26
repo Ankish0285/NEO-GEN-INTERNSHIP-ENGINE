@@ -89,8 +89,9 @@ export const roleConfig = {
         menuItems: [
             { path: '/partner/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/partner/dashboard/profile', label: 'Profile', icon: User },
+            { path: '/partner/dashboard/internships', label: 'Internships', icon: Briefcase },
             { path: '/partner/dashboard/post-internship', label: 'Post Internship', icon: PlusCircle },
-            { path: '/partner/dashboard/applications', label: 'Applications', icon: Briefcase },
+            { path: '/partner/dashboard/applications', label: 'Applications', icon: FileText },
             { path: '/partner/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/partner/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/partner/dashboard/settings', label: 'Settings', icon: Settings },

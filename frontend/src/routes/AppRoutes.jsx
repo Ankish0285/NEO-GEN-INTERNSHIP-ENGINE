@@ -42,6 +42,7 @@ import SubscriptionManagement from '../components/dashboard/admin/SubscriptionMa
 // Partner Components
 import PartnerOverview from '../components/dashboard/partner/Overview';
 import PartnerProfile from '../components/dashboard/partner/Profile';
+import PartnerInternships from '../components/dashboard/partner/Internships';
 import PartnerPostInternship from '../components/dashboard/partner/PostInternship';
 import PartnerApplications from '../components/dashboard/partner/Applications';
 import PartnerAnalytics from '../components/dashboard/partner/Analytics';
@@ -97,6 +98,7 @@ const AppRoutes = () => {
       <Route path="/partner/dashboard" element={<PartnerDashboard />}>
         <Route index element={<PartnerOverview />} />
         <Route path="profile" element={<PartnerProfile />} />
+        <Route path="internships" element={<PartnerInternships />} />
         <Route path="post-internship" element={<PartnerPostInternship />} />
         <Route path="applications" element={<PartnerApplications />} />
         <Route path="analytics" element={<PartnerAnalytics />} />

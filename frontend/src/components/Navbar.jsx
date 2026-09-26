@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, User as UserIcon, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, ChevronDown, User as UserIcon, LogOut, LayoutDashboard, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { resolveStoryImageUrl } from '../utils/resolveStoryImageUrl';
 import defaultLogo from '../assets/images/logo.png';
 import { useSiteSettings } from '../context/SiteSettingsContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,6 +13,7 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { settings } = useSiteSettings();
   const { branding } = settings;
+  const { theme, toggleTheme } = useTheme();
   const logoSrc = branding.logoUrl
     ? resolveStoryImageUrl(branding.logoUrl) || branding.logoUrl
     : defaultLogo;
@@ -145,6 +147,17 @@ const Navbar = () => {
           </div>
 
           <div className="navbar-auth">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              <span className="theme-toggle__icon" aria-hidden="true">
+                {theme === 'dark' ? <Sun size={18} strokeWidth={2.2} /> : <Moon size={18} strokeWidth={2.2} />}
+              </span>
+            </button>
             {!isAuthenticated ? (
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <button 

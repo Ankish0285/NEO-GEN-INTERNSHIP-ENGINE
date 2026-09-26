@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 import { resolveStoryImageUrl } from '../../utils/resolveStoryImageUrl';
-import MotionSection from '../ui/MotionSection';
+import MotionReveal from '../ui/MotionReveal';
 
 const hasText = (value) => String(value ?? '').trim().length > 0;
 
@@ -17,11 +17,17 @@ const BuiltBy = () => {
   if (!members.length) return null;
 
   return (
-    <MotionSection className="neo-section" id="built-by-section">
+    <section className="neo-section" id="built-by-section" style={{ opacity: 1 }}>
       <div className="neo-container">
         <div className="neo-section-header">
-          <h2 className="neo-h2">{team.title || 'Built By'}</h2>
-          {team.subtitle && <p className="neo-lead">{team.subtitle}</p>}
+          <MotionReveal y={30} delay={0} duration={0.6}>
+            <h2 className="neo-h2">{team.title || 'Built By'}</h2>
+          </MotionReveal>
+          {team.subtitle && (
+            <MotionReveal y={25} delay={0.1} duration={0.55}>
+              <p className="neo-lead">{team.subtitle}</p>
+            </MotionReveal>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -39,7 +45,7 @@ const BuiltBy = () => {
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.06 }}
+                transition={{ delay: 0.2 + index * 0.06, duration: 0.5 }}
                 whileHover={{ y: -6 }}
               >
                 <img
@@ -52,7 +58,7 @@ const BuiltBy = () => {
                     e.currentTarget.src = fallback;
                   }}
                 />
-                <h3 className="text-lg font-bold text-[#111827] mb-1">{name}</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{name}</h3>
                 {hasText(member.position) && (
                   <p
                     className="text-sm font-semibold mb-2"
@@ -69,7 +75,7 @@ const BuiltBy = () => {
           })}
         </div>
       </div>
-    </MotionSection>
+    </section>
   );
 };
 
