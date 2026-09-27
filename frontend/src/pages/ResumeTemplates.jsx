@@ -11,11 +11,12 @@ import { Crown, Lock, Eye, Pencil, CheckCircle, Sparkles, X, RefreshCw } from 'l
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { getTemplateById } from '../data/resumeTemplates';   // metadata only (name, description, tags, colors)
+import { getTemplateById } from '../data/resumeTemplates';
 import { THUMBNAIL_MAP, TEMPLATE_MAP } from '../components/resumeTemplates/index';
 import { SubscriptionProvider, useSubscription } from '../context/SubscriptionContext';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import { api } from '../services/api';
+import { useSEO } from '../seo/useSEO';
 
 // ─── Inline preview overlay ────────────────────────────────────────────────
 const DEMO_DATA = {
@@ -209,6 +210,14 @@ const TemplateCard = ({ template, isSubscribed, onUse, onPreview }) => {
 const GalleryInner = () => {
   const navigate = useNavigate();
   const { isSubscribed, openUpgrade, closeUpgrade, showUpgrade, refresh } = useSubscription();
+
+  useSEO({
+    title: 'Free & Premium Resume Templates for Students',
+    description:
+      'Download ATS-friendly resume templates designed for students and freshers — Modern ATS, Professional, ' +
+      'Software Engineer, Student/Fresher, Executive and more. Build your resume on NEOGEN INTERNSHIP ENGINE.',
+    canonical: 'https://neogeninternshipengine.me/resources/resume-templates',
+  });
 
   const [liveTemplates, setLiveTemplates] = useState([]);  // from backend (has live access config)
   const [fetchLoading,  setFetchLoading]  = useState(true);

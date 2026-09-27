@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { motion } from 'framer-motion';
 import { Star, UploadCloud, Building2, User, Briefcase } from 'lucide-react';
@@ -6,8 +6,16 @@ import toast, { Toaster } from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { resolveStoryImageUrl } from '../utils/resolveStoryImageUrl';
+import { useSEO } from '../seo/useSEO';
 
 const SuccessStoriesPublic = () => {
+  useSEO({
+    title: 'Student Success Stories',
+    description:
+      'Read real success stories from students who found internships through NEOGEN INTERNSHIP ENGINE. ' +
+      'Discover how students across Engineering, Commerce, Management, Design and other fields landed great internships.',
+    canonical: 'https://neogeninternshipengine.me/success-stories',
+  });
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('latest');
@@ -257,3 +265,5 @@ const SuccessStoriesPublic = () => {
 };
 
 export default SuccessStoriesPublic;
+
+

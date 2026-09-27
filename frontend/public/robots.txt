@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Public pages — fully crawlable
+Allow: /find-internship
+Allow: /internships/
+Allow: /resources/resume-templates
+Allow: /success-stories
+Allow: /login
+
+# Private / authenticated areas — do not index
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /partner/dashboard
+Disallow: /partner/dashboard/
+Disallow: /resume-builder/
+Disallow: /forgot-password
+Disallow: /reset-password/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://neogeninternshipengine.me/sitemap.xml
+Sitemap: https://api.neogeninternshipengine.me/api/sitemap/internships.xml

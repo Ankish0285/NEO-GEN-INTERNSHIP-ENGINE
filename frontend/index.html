@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- ── Theme flash prevention ───────────────────────────────────── -->
     <script>
       (function () {
         try {
@@ -9,21 +10,83 @@
             document.documentElement.dataset.colorScheme = theme;
             document.documentElement.style.colorScheme = theme;
           }
-        } catch (error) {
-          // Fall back to the default light theme.
-        }
+        } catch (e) {}
       }());
     </script>
+
+    <!-- ── Character set & viewport ────────────────────────────────── -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ── Primary SEO meta ─────────────────────────────────────────── -->
+    <title>NEOGEN INTERNSHIP ENGINE — Find Internships Across Every Field</title>
+    <meta name="description" content="NEOGEN INTERNSHIP ENGINE is India's AI-powered internship discovery platform for students across every branch — Engineering, Commerce, Management, Law, Medical, Design, Agriculture and more. Find remote, work-from-home, and on-site internships now." />
+    <meta name="keywords" content="internships in India, internship for students, engineering internship, commerce internship, management internship, AI internship, remote internship, work from home internship, internship 2025, college internship" />
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+    <meta name="author" content="Ankish Kumar" />
+    <meta name="application-name" content="NEOGEN INTERNSHIP ENGINE" />
+    <meta name="theme-color" content="#FF9933" />
+
+    <!-- ── Canonical (homepage default — overridden per-page by useSEO) ── -->
+    <link rel="canonical" href="https://neogeninternshipengine.me/" />
+
+    <!-- ── Favicon ──────────────────────────────────────────────────── -->
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
-    <meta name="application-name" content="NEOGEN INTERNSHIP ENGINE" />
-    <meta name="description" content="NEOGEN INTERNSHIP ENGINE – AI-powered internship discovery and recruitment platform." />
+    <link rel="shortcut icon" href="/logo.png" />
+
+    <!-- ── Open Graph ───────────────────────────────────────────────── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="NEOGEN INTERNSHIP ENGINE" />
+    <meta property="og:title"       content="NEOGEN INTERNSHIP ENGINE — Find Internships Across Every Field" />
+    <meta property="og:description" content="AI-powered internship discovery for students across every branch. Engineering, Commerce, Law, Medical, Design and 20+ other fields. Apply to internships across India." />
+    <meta property="og:url"         content="https://neogeninternshipengine.me/" />
+    <meta property="og:image"       content="https://neogeninternshipengine.me/og-image.png" />
+    <meta property="og:image:alt"   content="NEOGEN INTERNSHIP ENGINE" />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale"      content="en_IN" />
+
+    <!-- ── Twitter Card ─────────────────────────────────────────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content="NEOGEN INTERNSHIP ENGINE — Find Internships Across Every Field" />
+    <meta name="twitter:description" content="AI-powered internship discovery for students across Engineering, Commerce, Law, Medical, Design and more. Apply to internships across India." />
+    <meta name="twitter:image"       content="https://neogeninternshipengine.me/og-image.png" />
+    <meta name="twitter:image:alt"   content="NEOGEN INTERNSHIP ENGINE" />
+
+    <!-- ── Structured data: Organization + WebSite (always-present) ── -->
+    <script type="application/ld+json" id="ld-organization">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "NEOGEN INTERNSHIP ENGINE",
+      "url": "https://neogeninternshipengine.me",
+      "logo": "https://neogeninternshipengine.me/logo.png",
+      "founder": { "@type": "Person", "name": "Ankish Kumar" },
+      "description": "NEOGEN INTERNSHIP ENGINE is an AI-powered internship discovery and recruitment platform for students across all academic branches and fields in India."
+    }
+    </script>
+    <script type="application/ld+json" id="ld-website">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "NEOGEN INTERNSHIP ENGINE",
+      "url": "https://neogeninternshipengine.me",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://neogeninternshipengine.me/find-internship?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- ── Fonts ─────────────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <title>NEOGEN INTERNSHIP ENGINE</title>
   </head>
   <body class="text-gray-900 font-sans antialiased">
     <div id="root"></div>

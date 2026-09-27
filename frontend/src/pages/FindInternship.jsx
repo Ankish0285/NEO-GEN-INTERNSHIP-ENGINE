@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import InternshipList from '../components/home/InternshipList';
+import { useSEO } from '../seo/useSEO';
 
 class InternshipListErrorBoundary extends React.Component {
   constructor(props) {
@@ -47,6 +48,13 @@ class InternshipListErrorBoundary extends React.Component {
 }
 
 const FindInternship = () => {
+  useSEO({
+    title: 'Browse All Internships in India',
+    description:
+      'Search and filter thousands of internships across Engineering, Commerce, Management, Marketing, Law, ' +
+      'Medical, Design and more. Remote and on-site internships for students across India — apply now on NEOGEN INTERNSHIP ENGINE.',
+    canonical: 'https://neogeninternshipengine.me/find-internship',
+  });
   return (
     <div className="find-internship-page">
       <Navbar />

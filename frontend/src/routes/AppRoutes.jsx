@@ -11,6 +11,9 @@ import ResumeTemplates from '../pages/ResumeTemplates';
 import ResumeBuilder from '../pages/ResumeBuilder';
 import SuccessStoriesPublic from '../pages/SuccessStoriesPublic';
 
+// SEO pages — internship detail + category pages
+import InternshipRouter from '../pages/InternshipRouter';
+
 // Dashboard Wrappers
 import StudentDashboard from '../pages/dashboard/StudentDashboard';
 import AdminDashboard from '../pages/dashboard/AdminDashboard';
@@ -64,6 +67,9 @@ const AppRoutes = () => {
       <Route path="/resources/resume-templates" element={<ResumeTemplates />} />
       <Route path="/resume-builder/:templateId" element={<ResumeBuilder />} />
       <Route path="/success-stories" element={<SuccessStoriesPublic />} />
+
+      {/* SEO: /internships/:slug → category page OR internship detail page */}
+      <Route path="/internships/:slug" element={<InternshipRouter />} />
 
       {/* Student Routes */}
       <Route path="/dashboard" element={<StudentDashboard />}>

@@ -12,8 +12,17 @@ import Policies from '../components/home/Policies';
 import BuiltBy from '../components/home/BuiltBy';
 import LandingCTA from '../components/home/LandingCTA';
 import Footer from '../components/Footer';
+import { useSEO } from '../seo/useSEO';
 
 const Home = () => {
+  useSEO({
+    title: 'Find Internships Across Every Field',
+    description:
+      'NEOGEN INTERNSHIP ENGINE — India\'s AI-powered internship discovery platform for students across ' +
+      'Engineering, Commerce, Management, Law, Medical, Design, Agriculture and 20+ other fields. ' +
+      'Find remote, work-from-home, and on-site internships. Apply today.',
+    canonical: 'https://neogeninternshipengine.me/',
+  });
   return (
     <div id="landingPage" className="page active neo-page">
       <Navbar />
