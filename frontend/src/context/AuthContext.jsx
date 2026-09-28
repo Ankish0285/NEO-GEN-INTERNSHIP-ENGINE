@@ -34,9 +34,9 @@ export const AuthProvider = ({ children }) => {
     return { success: true, role: userData.role };
   };
 
-  const login = async (email, password) => {
+  const login = async (email, password, turnstileToken = '') => {
     try {
-      const data = await AuthService.login(email, password);
+      const data = await AuthService.login(email, password, turnstileToken);
       if (data.success && data.token) {
         return persistSession(data);
       }

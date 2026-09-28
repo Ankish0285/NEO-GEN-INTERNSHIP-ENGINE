@@ -6,6 +6,7 @@ import AuthService from '../services/authService';
 import logo from '../assets/images/logo.png';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { resolveStoryImageUrl } from '../utils/resolveStoryImageUrl';
+import TurnstileWidget from './TurnstileWidget';
 
 const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false }) => {
   const googleClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
@@ -25,6 +26,16 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
   const [success, setSuccess] = useState('');
   const [showOtp, setShowOtp] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
+
+  // ── Turnstile state ──
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+  const turnstileConfigured = Boolean(
+    import.meta.env.VITE_TURNSTILE_SITE_KEY &&
+    import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'your_cloudflare_turnstile_site_key_here'
+  );
+  // Submit button is disabled while: already loading, OR turnstile configured but token not yet received
+  const turnstileBlocking = turnstileConfigured && !turnstileToken;
   const { login, register, verifyOtp, verifyLoginOtp } = useAuth();
   const { settings } = useSiteSettings();
   const { branding } = settings;
@@ -68,8 +79,14 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
           }
           result = await verifyLoginOtp(formData.email, formData.otp);
         } else {
+          // Guard: Turnstile must be completed before login
+          if (turnstileConfigured && !turnstileToken) {
+            setError('Please complete the human verification below.');
+            setLoading(false);
+            return;
+          }
           console.log('[LoginModal] Attempting login...');
-          result = await login(formData.email, formData.password);
+          result = await login(formData.email, formData.password, turnstileToken);
         }
         
         console.log('[LoginModal] Login result:', result);
@@ -95,6 +112,8 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
             otp: ''
           });
           setShowOtp(false);
+          setTurnstileToken('');
+          setTurnstileResetKey(k => k + 1);
           
           setTimeout(() => {
             onClose();
@@ -108,6 +127,9 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
           }, 1000);
         } else {
           setError(result.message || 'Invalid email or password. Please try again.');
+          // Reset Turnstile on failure so user can get a fresh token
+          setTurnstileToken('');
+          setTurnstileResetKey(k => k + 1);
         }
       } else {
         // SIGNUP FLOW
@@ -172,18 +194,27 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
             return;
           }
 
+          // Guard: Turnstile must be completed before registration
+          if (turnstileConfigured && !turnstileToken) {
+            setError('Please complete the human verification below.');
+            setLoading(false);
+            return;
+          }
+
           const result = await register({
             name: formData.name,
             email: formData.email,
             password: formData.password,
             phone: formData.phone || '',
-            role: 'student'
+            role: 'student',
+            turnstileToken,
           });
 
           if (result.success) {
             setSuccess('OTP sent to your email! Please check your inbox (and spam folder).');
             setShowOtp(true);
             setOtpTimer(300); // 5 minutes
+            setTurnstileToken(''); // token consumed — will need fresh one if user retries
             
             // Start countdown
             const interval = setInterval(() => {
@@ -197,6 +228,9 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
             }, 1000);
           } else {
             setError(result.message || 'Registration failed. Please try again.');
+            // Reset Turnstile on failure so user can get a fresh token
+            setTurnstileToken('');
+            setTurnstileResetKey(k => k + 1);
           }
         }
       }
@@ -320,6 +354,8 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
                 setActiveTab('login');
                 setError('');
                 setSuccess('');
+                setTurnstileToken('');
+                setTurnstileResetKey(k => k + 1);
               }}
             >
               Login
@@ -330,6 +366,8 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
                 setActiveTab('signup');
                 setError('');
                 setSuccess('');
+                setTurnstileToken('');
+                setTurnstileResetKey(k => k + 1);
               }}
             >
               Sign Up
@@ -380,7 +418,23 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
                     <label className="checkbox-container"><input type="checkbox" /> Remember me</label>
                     <a href="/forgot-password" onClick={(e) => { e.preventDefault(); onClose?.(); navigate('/forgot-password'); }} className="forgot-password" style={{ fontSize: '14px', color: '#666' }}>Forgot Password?</a>
                   </div>
-                  <button type="submit" className="btn btn--primary btn--full-width" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
+                  {/* ── Turnstile human verification ── */}
+                  {!showOtp && (
+                    <>
+                      <TurnstileWidget
+                        resetKey={turnstileResetKey}
+                        onVerify={(token) => { setTurnstileToken(token); setError(''); }}
+                        onExpire={() => { setTurnstileToken(''); }}
+                        onError={() => { setTurnstileToken(''); setError('Verification widget error. Please refresh the page.'); }}
+                      />
+                      {turnstileBlocking && (
+                        <p style={{ fontSize: '12px', color: '#9ca3af', textAlign: 'center', margin: '-6px 0 10px' }}>
+                          Please complete the human verification above.
+                        </p>
+                      )}
+                    </>
+                  )}
+                  <button type="submit" className="btn btn--primary btn--full-width" disabled={loading || turnstileBlocking}>{loading ? 'Logging in...' : 'Login'}</button>
                 </> : <>
                   <div className="otp-verification-section" style={{ textAlign: 'center' }}>
                     <h3>Verify Login</h3>
@@ -533,10 +587,26 @@ const LoginModal = ({ isOpen, onClose, initialTab = 'login', embedded = false })
                   </div>
                 )}
 
+                {/* ── Turnstile — only on step 1 (before OTP) ── */}
+                {!showOtp && (
+                  <>
+                    <TurnstileWidget
+                      resetKey={turnstileResetKey}
+                      onVerify={(token) => { setTurnstileToken(token); setError(''); }}
+                      onExpire={() => { setTurnstileToken(''); }}
+                      onError={() => { setTurnstileToken(''); setError('Verification widget error. Please refresh the page.'); }}
+                    />
+                    {turnstileBlocking && (
+                      <p style={{ fontSize: '12px', color: '#9ca3af', textAlign: 'center', margin: '-6px 0 10px' }}>
+                        Please complete the human verification above.
+                      </p>
+                    )}
+                  </>
+                )}
                 <button 
                   type="submit" 
                   className="btn btn--primary btn--full-width" 
-                  disabled={loading || (showOtp && otpTimer <= 0)}
+                  disabled={loading || (showOtp && otpTimer <= 0) || (!showOtp && turnstileBlocking)}
                   style={{ marginTop: showOtp ? '15px' : '0' }}
                 >
                   {loading ? 'Processing...' : (showOtp ? 'Verify & Create Account' : 'Send OTP')}

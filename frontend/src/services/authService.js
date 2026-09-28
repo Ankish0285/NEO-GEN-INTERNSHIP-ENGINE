@@ -1,7 +1,7 @@
 import { api } from './api';
 
 const AuthService = {
-  // Register (Step 1)
+  // Register (Step 1) — turnstileToken is verified by backend before proceeding
   register: async (userData) => {
     return await api.post('/auth/register', userData);
   },
@@ -42,8 +42,9 @@ const AuthService = {
   },
 
   // Unified login — student, partner, and admin use the same endpoint
-  login: async (email, password) => {
-    const data = await api.post('/auth/login', { email, password });
+  // turnstileToken is verified by backend middleware before the controller runs
+  login: async (email, password, turnstileToken = '') => {
+    const data = await api.post('/auth/login', { email, password, turnstileToken });
 
     if (data.success && data.token) {
       localStorage.setItem('token', data.token);
