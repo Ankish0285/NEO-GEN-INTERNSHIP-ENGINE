@@ -48,18 +48,18 @@ const sendEmail = async (options) => {
     const htmlBody = options.html || `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
-          <h2 style="color: #333; margin-bottom: 15px;">NEO GEN - Internship Engine</h2>
+          <h2 style="color: #333; margin-bottom: 15px;">NEOGEN INTERNSHIP ENGINE</h2>
           <p style="color: #666; line-height: 1.6;">${options.message.replace(/\n/g, '<br>')}</p>
           <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #999;">
             <p>This is an automated email. Please do not reply.</p>
-            <p>&copy; 2026 NEO GEN Internship Engine. All rights reserved.</p>
+            <p>&copy; 2026 NEOGEN INTERNSHIP ENGINE. All rights reserved.</p>
           </div>
         </div>
       </div>
     `;
 
     const message = {
-      from: `NEO GEN <${emailUser}>`,
+      from: `NEOGEN INTERNSHIP ENGINE <${emailUser}>`,
       to: options.email,
       subject: options.subject,
       text: options.message,

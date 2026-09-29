@@ -74,9 +74,9 @@ const sendLoginOtp = async (user) => {
     try {
         await sendEmail({
             email: user.email,
-            subject: 'NEO GEN - Login Verification OTP',
-            message: `Dear ${user.name || 'User'},\n\nYour OTP for logging in to NEO GEN is: ${otp}\n\nThis code will expire in ${otpExpiryMinutes} minutes.`,
-            html: `<div style="font-family: Arial, sans-serif;"><h2>NEO GEN Login Verification</h2><p>Dear <strong>${user.name || 'User'}</strong>,</p><p>Your login verification OTP is:</p><h1 style="letter-spacing: 5px;">${otp}</h1><p>This code expires in ${otpExpiryMinutes} minutes.</p></div>`
+            subject: 'NEOGEN INTERNSHIP ENGINE - Login Verification OTP',
+            message: `Dear ${user.name || 'User'},\n\nYour OTP for logging in to NEOGEN INTERNSHIP ENGINE is: ${otp}\n\nThis code will expire in ${otpExpiryMinutes} minutes.`,
+            html: `<div style="font-family: Arial, sans-serif;"><h2>NEOGEN INTERNSHIP ENGINE - Login Verification</h2><p>Dear <strong>${user.name || 'User'}</strong>,</p><p>Your login verification OTP is:</p><h1 style="letter-spacing: 5px;">${otp}</h1><p>This code expires in ${otpExpiryMinutes} minutes.</p></div>`
         });
     } catch (error) {
         console.error(`[Auth] Login OTP email failed for ${user.email}: ${error.message}`);
@@ -163,14 +163,14 @@ const registerUser = asyncHandler(async (req, res) => {
         const message = `
 Dear ${name},
 
-Your OTP for NEO GEN registration is: ${otp}
+Your OTP for NEOGEN INTERNSHIP ENGINE registration is: ${otp}
 
 This code will expire in ${otpExpiryMinutes} minutes.
 
 If you didn't request this, please ignore this email.
 
 Best regards,
-NEO GEN Team
+NEOGEN INTERNSHIP ENGINE Team
 `;
 
         // Console fallback for OTP (for development/debugging)
@@ -188,11 +188,11 @@ NEO GEN Team
         try {
             await sendEmail({
                 email: tempUser.email,
-                subject: 'NEO GEN - Registration OTP Verification',
+                subject: 'NEOGEN INTERNSHIP ENGINE - Registration OTP Verification',
                 message,
                 html: `
                     <div style="font-family: Arial, sans-serif;">
-                        <h2>Welcome to NEO GEN!</h2>
+                        <h2>Welcome to NEOGEN INTERNSHIP ENGINE!</h2>
                         <p>Dear <strong>${name}</strong>,</p>
                         <p>Your OTP for registration is:</p>
                         <div style="background-color: #f0f0f0; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
@@ -201,7 +201,7 @@ NEO GEN Team
                         <p><strong>This code expires in ${otpExpiryMinutes} minutes.</strong></p>
                         <p>If you didn't request this code, please ignore this email.</p>
                         <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                        <p style="font-size: 12px; color: #999;">NEO GEN - Internship Engine © 2026</p>
+                        <p style="font-size: 12px; color: #999;">NEOGEN INTERNSHIP ENGINE © 2026</p>
                     </div>
                 `
             });
@@ -381,7 +381,7 @@ const sendOtp = asyncHandler(async (req, res) => {
 
         // Send Email
         const message = `
-Your new OTP for NEO GEN registration is: ${newOtp}
+Your new OTP for NEOGEN INTERNSHIP ENGINE registration is: ${newOtp}
 
 This code will expire in ${otpExpiryMinutes} minutes.
 
@@ -390,11 +390,11 @@ If you didn't request this, please ignore this email.
 
         await sendEmail({
             email: tempUser.email,
-            subject: 'NEO GEN - New Registration OTP',
+            subject: 'NEOGEN INTERNSHIP ENGINE - New Registration OTP',
             message,
             html: `
                 <div style="font-family: Arial, sans-serif;">
-                    <h2>NEO GEN - New OTP</h2>
+                    <h2>NEOGEN INTERNSHIP ENGINE - New OTP</h2>
                     <p>Your new OTP for registration is:</p>
                     <div style="background-color: #f0f0f0; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
                         <h1 style="color: #2c3e50; letter-spacing: 5px; margin: 0;">${newOtp}</h1>
@@ -685,7 +685,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     const message = `
 Dear ${user.name || 'User'},
 
-We received a request to reset your password on NEO GEN Internship Engine.
+We received a request to reset your password on NEOGEN INTERNSHIP ENGINE.
 
 Please click the link below to set a new password:
 
@@ -696,13 +696,13 @@ This link will expire in ${EXPIRE_MINUTES} minutes and can be used only ONCE.
 If you did not request a password reset, please ignore this email — your password will remain unchanged.
 
 Best regards,
-NEO GEN Team
+NEOGEN INTERNSHIP ENGINE Team
 `;
 
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background-color: #f8f9fa; padding: 24px; border-radius: 8px;">
-          <h2 style="color: #1f2937; margin-bottom: 12px;">NEO GEN - Password Reset</h2>
+          <h2 style="color: #1f2937; margin-bottom: 12px;">NEOGEN INTERNSHIP ENGINE - Password Reset</h2>
           <p style="color: #374151; line-height: 1.6;">
             Hi <strong>${user.name || 'there'}</strong>,
           </p>
@@ -744,7 +744,7 @@ NEO GEN Team
     try {
         await sendEmail({
             email: normalizedEmail,
-            subject: 'NEO GEN - Password Reset Request',
+            subject: 'NEOGEN INTERNSHIP ENGINE - Password Reset Request',
             message,
             html: htmlBody,
         });
