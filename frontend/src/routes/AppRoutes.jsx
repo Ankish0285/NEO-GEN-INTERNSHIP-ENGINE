@@ -53,6 +53,28 @@ import PartnerSettings from '../components/dashboard/partner/Settings';
 import StudentSupport from '../components/dashboard/support/StudentSupport';
 import SupportInbox from '../components/dashboard/support/SupportInbox';
 
+// Student Career Intelligence Components
+import SkillEvidenceHub from '../components/dashboard/student/SkillEvidenceHub';
+import SkillGapPriority from '../components/dashboard/student/SkillGapPriority';
+import CareerActionPlan from '../components/dashboard/student/CareerActionPlan';
+import InternshipReadiness from '../components/dashboard/student/InternshipReadiness';
+import DigitalTwin from '../components/dashboard/student/DigitalTwin';
+import CareerPathSimulator from '../components/dashboard/student/CareerPathSimulator';
+import DigitalPassport from '../components/dashboard/student/DigitalPassport';
+import ApplicationOutcomes from '../components/dashboard/student/ApplicationOutcomes';
+import CompanyFeedback from '../components/dashboard/student/CompanyFeedback';
+
+// Partner Career Intelligence Components
+import CompletionWorkflow from '../components/dashboard/partner/CompletionWorkflow';
+import CertificateWorkflow from '../components/dashboard/partner/CertificateWorkflow';
+
+// Admin Career Intelligence Components
+import CertificateManagement from '../components/dashboard/admin/CertificateManagement';
+import CareerIntelligenceInsights from '../components/dashboard/admin/CareerIntelligenceInsights';
+
+// Public Pages
+import CertificateVerification from '../pages/CertificateVerification';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -83,6 +105,15 @@ const AppRoutes = () => {
         <Route path="settings" element={<StudentSettings />} />
         <Route path="success-stories" element={<SuccessStories />} />
         <Route path="support" element={<StudentSupport />} />
+        <Route path="skills/evidence" element={<SkillEvidenceHub />} />
+        <Route path="skills/gaps" element={<SkillGapPriority />} />
+        <Route path="career/action-plan" element={<CareerActionPlan />} />
+        <Route path="career/readiness" element={<InternshipReadiness />} />
+        <Route path="career/digital-twin" element={<DigitalTwin />} />
+        <Route path="career/paths" element={<CareerPathSimulator />} />
+        <Route path="passport" element={<DigitalPassport />} />
+        <Route path="applications/outcomes" element={<ApplicationOutcomes />} />
+        <Route path="feedback" element={<CompanyFeedback />} />
       </Route>
 
       {/* Admin Routes */}
@@ -98,6 +129,8 @@ const AppRoutes = () => {
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="support-inbox" element={<SupportInbox mode="admin" />} />
+        <Route path="certificates" element={<CertificateManagement />} />
+        <Route path="career-insights" element={<CareerIntelligenceInsights />} />
       </Route>
 
       {/* Partner Routes */}
@@ -110,7 +143,12 @@ const AppRoutes = () => {
         <Route path="analytics" element={<PartnerAnalytics />} />
         <Route path="settings" element={<PartnerSettings />} />
         <Route path="support-inbox" element={<SupportInbox mode="partner" />} />
+        <Route path="completion" element={<CompletionWorkflow />} />
+        <Route path="certificates" element={<CertificateWorkflow />} />
       </Route>
+
+      {/* Certificate Verification */}
+      <Route path="/certificate/verify/:certificateId" element={<CertificateVerification />} />
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />

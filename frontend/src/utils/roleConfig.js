@@ -14,6 +14,14 @@ import {
     Headphones,
     LifeBuoy,
     CreditCard,
+    ShieldCheck,
+    Target,
+    ListChecks,
+    Gauge,
+    BookOpen,
+    CheckCircle2,
+    Award,
+    TrendingUp,
 } from 'lucide-react';
 
 export const roleConfig = {
@@ -34,6 +42,11 @@ export const roleConfig = {
             { path: '/dashboard/recommendations', label: 'Recommendations', icon: ThumbsUp },
             { path: '/dashboard/success-stories', label: 'Success Stories', icon: Star },
             { path: '/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+            { path: '/dashboard/skills/evidence', label: 'Skill Evidence', icon: ShieldCheck },
+            { path: '/dashboard/skills/gaps', label: 'Skill Gaps', icon: Target },
+            { path: '/dashboard/career/action-plan', label: 'Action Plan', icon: ListChecks },
+            { path: '/dashboard/career/readiness', label: 'Readiness', icon: Gauge },
+            { path: '/dashboard/passport', label: 'My Passport', icon: BookOpen },
             { path: '/dashboard/settings', label: 'Settings', icon: Settings },
         ]
     },
@@ -54,6 +67,8 @@ export const roleConfig = {
             { path: '/admin/dashboard/subscriptions', label: 'Subscriptions', icon: CreditCard },
             { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
+            { path: '/admin/dashboard/certificates', label: 'Certificates', icon: Award },
+            { path: '/admin/dashboard/career-insights', label: 'Career Insights', icon: TrendingUp },
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
         ]
@@ -75,6 +90,8 @@ export const roleConfig = {
             { path: '/admin/dashboard/subscriptions', label: 'Subscriptions', icon: CreditCard },
             { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
+            { path: '/admin/dashboard/certificates', label: 'Certificates', icon: Award },
+            { path: '/admin/dashboard/career-insights', label: 'Career Insights', icon: TrendingUp },
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
         ]
@@ -93,6 +110,8 @@ export const roleConfig = {
             { path: '/partner/dashboard/post-internship', label: 'Post Internship', icon: PlusCircle },
             { path: '/partner/dashboard/applications', label: 'Applications', icon: FileText },
             { path: '/partner/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
+            { path: '/partner/dashboard/completion', label: 'Completion', icon: CheckCircle2 },
+            { path: '/partner/dashboard/certificates', label: 'Certificates', icon: Award },
             { path: '/partner/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/partner/dashboard/settings', label: 'Settings', icon: Settings },
         ]
