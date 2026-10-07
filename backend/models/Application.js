@@ -44,7 +44,14 @@ const applicationSchema = mongoose.Schema(
     },
     coverLetter: {
       type: String,
-    }
+    },
+
+    // Career Intelligence Loop additions
+    interviewScheduled: { type: Boolean, default: false },
+    interviewDate: { type: Date, default: null },
+    interviewNotes: { type: String, default: '' },
+    feedbackGiven: { type: Boolean, default: false },
+    placementConfirmed: { type: Boolean, default: false },
   },
   {
     timestamps: true,

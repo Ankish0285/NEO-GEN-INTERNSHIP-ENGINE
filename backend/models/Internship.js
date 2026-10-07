@@ -96,7 +96,12 @@ const internshipSchema = mongoose.Schema(
       views: { type: Number, default: 0 },
       applied: { type: Number, default: 0 },
       hired: { type: Number, default: 0 }
-    }
+    },
+
+    // Career Intelligence Loop additions
+    aiMatchMetadata: { type: mongoose.Schema.Types.Mixed, default: null },
+    placementCount: { type: Number, default: 0 },
+    tags: { type: [String], default: [] },
   },
   {
     timestamps: true,

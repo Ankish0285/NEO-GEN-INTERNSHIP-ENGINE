@@ -119,6 +119,16 @@ app.use('/api/resume-templates', require('./routes/resumeTemplateRoutes'));
 app.use('/api/sitemap',          require('./routes/sitemapRoutes'));
 console.log('[Routes] Support tickets API → /api/support-tickets'.cyan);
 
+// Career Intelligence Loop routes
+app.use('/api/career-goals',         require('./routes/careerGoalRoutes'));
+app.use('/api/skill-assessments',    require('./routes/skillAssessmentRoutes'));
+app.use('/api/interview-logs',       require('./routes/interviewLogRoutes'));
+app.use('/api/feedback',             require('./routes/feedbackRoutes'));
+app.use('/api/career-events',        require('./routes/careerEventRoutes'));
+app.use('/api/placements',           require('./routes/placementRoutes'));
+app.use('/api/adaptive-learning',    require('./routes/adaptiveLearningRoutes'));
+app.use('/api/career-intelligence',  require('./routes/careerIntelligenceRoutes'));
+
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

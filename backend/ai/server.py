@@ -11,6 +11,11 @@ from engines.profile_engine import build_student_profile
 from engines.recommendation_engine import recommend_internships
 from engines.resume_parser import parse_resume
 from engines.internship_intelligence import full_internship_intelligence
+from engines.career_intelligence_engine import (
+    compute_skill_gap,
+    compute_career_readiness,
+    generate_learning_recommendations,
+)
 
 app = FastAPI(title='NeoGen AI', version='2.0.0')
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
@@ -150,5 +155,51 @@ def premium_internship_intelligence(body: RecommendRequest):
         '',
         body.user_data,
         body.internships
+    )
+    return {'success': True, 'data': result}
+
+
+# ---------------------------------------------------------------------------
+# Career Intelligence Loop endpoints
+# ---------------------------------------------------------------------------
+
+
+class SkillGapRequest(BaseModel):
+    skill_profile: list = Field(default_factory=list)
+    learning_roadmap: list = Field(default_factory=list)
+    career_domain: dict = Field(default_factory=dict)
+
+
+class CareerReadinessRequest(BaseModel):
+    profile: dict = Field(default_factory=dict)
+    placements: list = Field(default_factory=list)
+    assessments: list = Field(default_factory=list)
+
+
+class LearningRecommendRequest(BaseModel):
+    skill_gaps: list = Field(default_factory=list)
+    completed_guide_ids: list = Field(default_factory=list)
+    guides: list = Field(default_factory=list)
+
+
+@app.post('/api/v1/career-intelligence/skill-gap')
+def career_skill_gap(body: SkillGapRequest):
+    """Compute skill gap coverage between a student profile and their roadmap."""
+    result = compute_skill_gap(body.skill_profile, body.learning_roadmap, body.career_domain)
+    return {'success': True, 'data': result}
+
+
+@app.post('/api/v1/career-intelligence/readiness')
+def career_readiness(body: CareerReadinessRequest):
+    """Compute a 0-100 career readiness score from profile, placements, and assessments."""
+    result = compute_career_readiness(body.profile, body.placements, body.assessments)
+    return {'success': True, 'data': result}
+
+
+@app.post('/api/v1/career-intelligence/learning-recommendations')
+def learning_recommendations(body: LearningRecommendRequest):
+    """Return up to 5 guide recommendations matching the given skill gaps."""
+    result = generate_learning_recommendations(
+        body.skill_gaps, body.completed_guide_ids, body.guides
     )
     return {'success': True, 'data': result}

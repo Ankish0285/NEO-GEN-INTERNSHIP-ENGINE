@@ -150,6 +150,13 @@ const matchInternship = (resumeText, internship) =>
 const chat = (message, context = {}) =>
   callAI('/api/v1/chat', 'chat', { message, context });
 
+const careerIntelligenceSkillGap = (payload) =>
+  callAI('/api/v1/career-intelligence/skill-gap', 'career_skill_gap', {
+    skill_profile: payload.skill_profile || [],
+    learning_roadmap: payload.learning_roadmap || [],
+    career_domain: payload.career_domain || {},
+  });
+
 /** Start embedded AI server (optional, faster than CLI per request). */
 const startAIServer = () => {
   if (process.env.AI_AUTO_START === '0') return null;
@@ -179,4 +186,5 @@ module.exports = {
   chatWithIntelligence,
   startAIServer,
   runCli,
+  careerIntelligenceSkillGap,
 };
