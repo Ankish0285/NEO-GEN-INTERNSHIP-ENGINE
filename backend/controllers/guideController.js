@@ -294,6 +294,32 @@ const deleteResource = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
+// ---------------------------------------------------------------------------
+// @desc    Publish a learning resource
+// @route   PUT /api/guides/:id/publish
+// @access  Private/Admin
+// ---------------------------------------------------------------------------
+const publishResource = asyncHandler(async (req, res) => {
+  const resource = await Guide.findById(req.params.id);
+  if (!resource) { res.status(404); throw new Error('Resource not found'); }
+  resource.status = 'published';
+  await resource.save();
+  res.status(200).json(resource);
+});
+
+// ---------------------------------------------------------------------------
+// @desc    Unpublish a learning resource (revert to draft)
+// @route   PUT /api/guides/:id/unpublish
+// @access  Private/Admin
+// ---------------------------------------------------------------------------
+const unpublishResource = asyncHandler(async (req, res) => {
+  const resource = await Guide.findById(req.params.id);
+  if (!resource) { res.status(404); throw new Error('Resource not found'); }
+  resource.status = 'draft';
+  await resource.save();
+  res.status(200).json(resource);
+});
+
 // Backward-compat aliases so existing code that imported createGuide etc. still works
 const createGuide = createResource;
 const updateGuide = updateResource;
@@ -310,6 +336,8 @@ module.exports = {
   createResource,
   updateResource,
   deleteResource,
+  publishResource,
+  unpublishResource,
   // backward-compat aliases
   createGuide,
   updateGuide,
