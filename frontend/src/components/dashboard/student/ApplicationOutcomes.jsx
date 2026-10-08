@@ -224,7 +224,7 @@ const ApplicationOutcomes = () => {
                       {interviewLearning.weakTopics.map((topic, i) => (
                         <span
                           key={i}
-                          className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200"
+                          className="px-3 py-1 bg-[#fff4e8] text-[#e68a2e] text-xs font-semibold rounded-full border border-[#FF9933]/20"
                         >
                           {topic}
                         </span>

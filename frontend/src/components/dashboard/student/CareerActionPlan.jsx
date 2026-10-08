@@ -16,7 +16,7 @@ const iconMap = {
 };
 
 const priorityStyles = {
-  high: { bg: 'bg-red-100', text: 'text-red-700' },
+  high: { bg: 'bg-[#fff4e8]', text: 'text-[#e68a2e]' },
   medium: { bg: 'bg-amber-100', text: 'text-amber-700' },
   low: { bg: 'bg-green-100', text: 'text-green-700' },
 };

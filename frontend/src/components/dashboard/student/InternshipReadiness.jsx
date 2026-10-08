@@ -5,8 +5,8 @@ import ConfidenceBar from '../../career/ConfidenceBar';
 import { Skeleton } from '../../ui/Skeleton';
 
 const scoreColor = (score) => {
-  if (score >= 70) return 'text-emerald-600';
-  if (score >= 40) return 'text-amber-500';
+  if (score >= 70) return 'text-[#138808]';
+  if (score >= 40) return 'text-[#e68a2e]';
   return 'text-red-500';
 };
 

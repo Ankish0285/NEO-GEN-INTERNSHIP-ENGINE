@@ -89,7 +89,7 @@ const SkillGapPriority = () => {
               <p className="text-xs font-medium text-gray-600">{rec.skillName}</p>
               {rec.guides.slice(0, 2).map((guide, j) => (
                 <a key={j} href={guide.link || '#'} target="_blank" rel="noopener noreferrer"
-                   className="text-xs text-blue-600 hover:underline block ml-2">📖 {guide.title}</a>
+                   className="text-xs text-[#FF9933] hover:underline block ml-2">📖 {guide.title}</a>
               ))}
             </div>
           ))}

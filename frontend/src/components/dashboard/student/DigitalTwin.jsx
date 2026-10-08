@@ -165,7 +165,7 @@ const DigitalTwin = () => {
               <ul className="space-y-1">
                 {strengths.map((s, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 size={15} className="text-[#138808] flex-shrink-0 mt-0.5" />
                     {s}
                   </li>
                 ))}
@@ -186,7 +186,7 @@ const DigitalTwin = () => {
               <ul className="space-y-1">
                 {weaknesses.map((w, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                    <AlertCircle size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                    <AlertCircle size={15} className="text-[#e68a2e] flex-shrink-0 mt-0.5" />
                     {w}
                   </li>
                 ))}

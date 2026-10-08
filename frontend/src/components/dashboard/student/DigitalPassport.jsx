@@ -219,7 +219,7 @@ const DigitalPassport = () => {
                       <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
                         p.status === 'completed' || p.verified
                           ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-amber-100 text-amber-700'
+                          : 'bg-[#fff4e8] text-[#e68a2e]'
                       }`}>
                         {p.verified ? 'Verified' : p.status || 'Ongoing'}
                       </span>
@@ -297,7 +297,7 @@ const DigitalPassport = () => {
                       <div className="flex items-center gap-3">
                         <div className="flex-1 bg-gray-200 rounded-full h-2">
                           <div
-                            className={`h-2 rounded-full ${passed ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                            className={`h-2 rounded-full ${passed ? 'bg-emerald-500' : 'bg-[#FF9933]'}`}
                             style={{ width: `${Math.min(100, score)}%` }}
                           />
                         </div>
