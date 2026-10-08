@@ -38,6 +38,9 @@ export const getAllCertificates = (params) => api.get('/certificates', { params 
 export const getAdminCertificates = (params) => api.get('/certificates/admin/all', { params });
 export const getPartnerCertificates = () => api.get('/certificates/partner');
 export const getPublicCertificate = (certificateId) => api.get(`/certificates/verify/${certificateId}`);
+export const adminIssueCertificate = (data) => api.post('/certificates/admin/issue', data);
+export const searchStudentsForCert = (q) => api.get(`/certificates/admin/students/search?q=${encodeURIComponent(q)}`);
+
 
 // --- Admin ---
 export const getCareerInsights = () => api.get('/admin/career-insights');

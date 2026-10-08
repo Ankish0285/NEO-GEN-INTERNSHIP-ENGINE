@@ -122,4 +122,68 @@ const getAdminCertificates = asyncHandler(async (req, res) => {
   res.json({ success: true, data: certs, total, page, pages: Math.ceil(total/limit) });
 });
 
-module.exports = { issueCertificate, verifyCertificate, revokeCertificate, getMyCertificates, getPublicCertificate, getPartnerCertificates, getAdminCertificates };
+// Admin issues certificate directly for any student (no internship workflow required)
+const adminIssueCertificate = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+    res.status(403); throw new Error('Admin only');
+  }
+  const { studentId, role, organization, duration, skills, notes } = req.body;
+  if (!studentId || !role || !organization) {
+    res.status(400); throw new Error('studentId, role, and organization are required');
+  }
+  // Verify student exists
+  const User = require('../models/User');
+  const student = await User.findById(studentId).select('name email role');
+  if (!student) { res.status(404); throw new Error('Student not found'); }
+  if (student.role !== 'student') { res.status(400); throw new Error('User is not a student'); }
+
+  const certificateId = generateCertificateId();
+  const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/certificate/verify/${certificateId}`;
+  let qrCodeData = '';
+  try { qrCodeData = await QRCode.toDataURL(verifyUrl); } catch(e) { console.error('QR generation failed:', e); }
+
+  const cert = await PlacementRecord.create({
+    studentId, partnerId: req.user._id,
+    certificateId, role, organization,
+    duration: duration || '', skills: skills || [],
+    status: 'active', // Admin-issued certs are immediately active
+    verifiedAt: new Date(), verifiedBy: req.user._id,
+    qrCodeData, publicVerifyUrl: verifyUrl, issuedAt: new Date(),
+    completionNotes: notes || '',
+  });
+
+  await createAndNotify(req.app, {
+    recipient: studentId,
+    title: '🎓 Certificate Issued by Admin',
+    message: `A certificate for "${role}" at ${organization} has been issued. ID: ${certificateId}`,
+    type: 'success', priority: 'high', link: '/dashboard/passport',
+  });
+  await ActivityLog.create({
+    user: req.user.id, action: 'certificate_issued',
+    details: { certificateId, studentId, issuedByAdmin: true },
+    ip: req.ip, userAgent: req.headers['user-agent'],
+  });
+  res.status(201).json({ success: true, data: cert });
+});
+
+// Search students by name or email (for admin certificate issuance)
+const searchStudents = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+    res.status(403); throw new Error('Admin only');
+  }
+  const { q } = req.query;
+  if (!q || q.trim().length < 2) {
+    return res.json({ success: true, data: [] });
+  }
+  const User = require('../models/User');
+  const students = await User.find({
+    role: 'student',
+    $or: [
+      { name: { $regex: q.trim(), $options: 'i' } },
+      { email: { $regex: q.trim(), $options: 'i' } },
+    ]
+  }).select('_id name email university course').limit(10);
+  res.json({ success: true, data: students });
+});
+
+module.exports = { issueCertificate, verifyCertificate, revokeCertificate, getMyCertificates, getPublicCertificate, getPartnerCertificates, getAdminCertificates, adminIssueCertificate, searchStudents };
