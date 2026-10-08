@@ -115,9 +115,52 @@ const adminGetAllAdaptivePlans = asyncHandler(async (req, res) => {
   res.json(plans);
 });
 
+// @desc    Get adaptive learning recommendations based on AI profile skill gaps
+// @route   GET /api/adaptive-learning/recommendations
+// @access  Private
+const getAdaptiveLearningRecommendations = asyncHandler(async (req, res) => {
+  // Try to load AIStudentProfile
+  let AIStudentProfileModel;
+  try { AIStudentProfileModel = require('../models/AIStudentProfile'); } catch(e) {
+    return res.json({ success: true, data: { recommendations: [], message: 'Profile model not available' } });
+  }
+  let GuideModel;
+  try { GuideModel = require('../models/Guide'); } catch(e) { GuideModel = null; }
+
+  const profile = await AIStudentProfileModel.findOne({ userId: req.user._id });
+  if (!profile) {
+    return res.json({ success: true, data: { recommendations: [], message: 'No AI profile found yet. Complete your profile to get personalized recommendations.' } });
+  }
+
+  const roadmap = profile.learningRoadmap || profile.skillGaps || [];
+  const topGaps = roadmap.slice(0, 5);
+  const recommendations = [];
+
+  for (const gap of topGaps) {
+    const skillName = typeof gap === 'string' ? gap : (gap.skill || gap.name || gap.skillName || '');
+    if (!skillName) continue;
+    let guides = [];
+    if (GuideModel) {
+      try {
+        guides = await GuideModel.find({
+          $or: [
+            { title: { $regex: skillName, $options: 'i' } },
+            { tags: { $regex: skillName, $options: 'i' } },
+            { category: { $regex: skillName, $options: 'i' } },
+          ]
+        }).limit(3).select('_id title category link description');
+      } catch(e) { guides = []; }
+    }
+    recommendations.push({ skillName, gap: typeof gap === 'object' ? gap : { skill: skillName }, guides });
+  }
+
+  res.json({ success: true, data: { recommendations } });
+});
+
 module.exports = {
   getMyAdaptivePlan,
   refreshAdaptivePlan,
   markGuideCompleted,
   adminGetAllAdaptivePlans,
+  getAdaptiveLearningRecommendations,
 };

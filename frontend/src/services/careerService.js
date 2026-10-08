@@ -40,6 +40,9 @@ export const getInternshipQuality = (internshipId) => api.get(`/internship-quali
 export const getRejectionPatterns = () => api.get('/interview-logs/rejection-patterns');
 export const getInterviewLogLearning = () => api.get('/interview-logs/interview-learning');
 
+// --- Adaptive Learning ---
+export const getAdaptiveLearningRecommendations = () => api.get('/adaptive-learning/recommendations');
+
 export default {
   // Skill Evidence
   getSkillEvidence,
@@ -73,4 +76,6 @@ export default {
   // Interview Log Analysis
   getRejectionPatterns,
   getInterviewLogLearning,
+  // Adaptive Learning
+  getAdaptiveLearningRecommendations,
 };
