@@ -2,8 +2,8 @@ import React from 'react';
 import ConfidenceBar from './ConfidenceBar';
 
 const strengthColor = (score) => {
-  if (score >= 70) return 'text-emerald-600';
-  if (score >= 40) return 'text-amber-500';
+  if (score >= 70) return 'text-[#138808]';
+  if (score >= 40) return 'text-[#FF9933]';
   return 'text-red-500';
 };
 

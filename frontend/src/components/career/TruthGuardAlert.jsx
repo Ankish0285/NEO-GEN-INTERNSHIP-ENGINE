@@ -9,14 +9,14 @@ const severityStyles = {
     icon: 'text-red-500',
   },
   medium: {
-    wrapper: 'bg-amber-50 border-amber-400',
-    badge: 'bg-amber-100 text-amber-700',
-    icon: 'text-amber-500',
+    wrapper: 'bg-[#fff4e8] border-[#FF9933]',
+    badge: 'bg-[#fff4e8] text-[#e68a2e]',
+    icon: 'text-[#FF9933]',
   },
   low: {
-    wrapper: 'bg-amber-50 border-amber-300',
-    badge: 'bg-amber-50 text-amber-600',
-    icon: 'text-amber-400',
+    wrapper: 'bg-[#fff4e8] border-[#FFD9A0]',
+    badge: 'bg-[#fff4e8] text-[#e68a2e]',
+    icon: 'text-[#FF9933]',
   },
 };
 

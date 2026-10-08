@@ -2,9 +2,9 @@ import React from 'react';
 import ConfidenceBar from './ConfidenceBar';
 
 const priorityColors = {
-  high: 'bg-red-100 text-red-700',
-  medium: 'bg-amber-100 text-amber-700',
-  low: 'bg-green-100 text-green-700',
+  high: 'bg-[#fff4e8] text-[#e68a2e] border border-[#FFD9A0]',
+  medium: 'bg-[#e8f5e6] text-[#138808]',
+  low: 'bg-gray-100 text-gray-600',
 };
 
 const SkillGapItem = ({
@@ -22,7 +22,7 @@ const SkillGapItem = ({
       <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {rank !== undefined && (
-            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-amber-400 text-white text-xs font-bold shrink-0">
+            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#FF9933] text-white text-xs font-bold shrink-0">
               {rank}
             </span>
           )}
@@ -39,7 +39,7 @@ const SkillGapItem = ({
             </span>
           )}
           {learningEffort && (
-            <span className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">
+            <span className={`bg-[#fff4e8] text-[#e68a2e] text-xs px-2 py-0.5 rounded-full`}>
               {learningEffort} effort
             </span>
           )}

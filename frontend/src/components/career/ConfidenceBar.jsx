@@ -15,8 +15,8 @@ const ConfidenceBar = ({
     : clampedScore < 30
     ? 'bg-red-500'
     : clampedScore < 60
-    ? 'bg-amber-500'
-    : 'bg-emerald-500';
+    ? 'bg-[#FF9933]'
+    : 'bg-[#138808]';
 
   const heightClass =
     size === 'sm' ? 'h-1.5' : size === 'lg' ? 'h-4' : 'h-2.5';

@@ -19,12 +19,12 @@ const SkillEvidenceCard = ({
       <div className="flex items-center gap-2 flex-wrap mb-3">
         <span className="font-semibold text-gray-800">{skillName}</span>
         {proficiency && (
-          <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">
+          <span className="bg-[#fff4e8] text-[#e68a2e] text-xs px-2 py-0.5 rounded-full">
             {proficiency}
           </span>
         )}
         {isVerified && (
-          <ShieldCheck size={16} className="text-emerald-500" />
+          <ShieldCheck size={16} className="text-[#138808]" />
         )}
       </div>
 

@@ -36,7 +36,7 @@ const WhatIfSimulator = ({
           <div className="flex-1">
             <label className="text-xs text-gray-500 mb-1 block">Select a skill to add</label>
             <select
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#FF9933]"
               value={selectedSkill}
               onChange={(e) => setSelectedSkill(e.target.value)}
               disabled={!onSimulate}
@@ -54,7 +54,7 @@ const WhatIfSimulator = ({
             <label className="text-xs text-gray-500 mb-1 block">Enter a skill to add</label>
             <input
               type="text"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#FF9933]"
               placeholder="e.g. React, Python…"
               value={selectedSkill}
               onChange={(e) => setSelectedSkill(e.target.value)}
@@ -91,7 +91,7 @@ const WhatIfSimulator = ({
             <span className="font-medium">After:</span> {result.after} opportunities
           </p>
           {diff !== null && (
-            <p className={`text-sm font-semibold ${diff >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+            <p className={`text-sm font-semibold ${diff >= 0 ? 'text-[#138808]' : 'text-red-500'}`}>
               {diff >= 0 ? `+${diff}` : diff} more
             </p>
           )}

@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Shield } from 'lucide-react';
 
 const qualityColor = (score) => {
-  if (score >= 70) return 'bg-green-100 text-green-700';
-  if (score >= 40) return 'bg-amber-100 text-amber-700';
+  if (score >= 70) return 'bg-[#e8f5e6] text-[#138808]';
+  if (score >= 40) return 'bg-[#fff4e8] text-[#e68a2e]';
   return 'bg-red-100 text-red-700';
 };
 
 const riskColor = (level) => {
-  if (level === 'low') return 'bg-green-100 text-green-700';
-  if (level === 'medium') return 'bg-amber-100 text-amber-700';
+  if (level === 'low') return 'bg-[#e8f5e6] text-[#138808]';
+  if (level === 'medium') return 'bg-[#fff4e8] text-[#e68a2e]';
   return 'bg-red-100 text-red-700';
 };
 
@@ -42,7 +42,7 @@ const InternshipQualityBadge = ({
         {roiEstimate && (
           <span
             title={`ROI estimate: ${roiEstimate}`}
-            className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-semibold"
+            className="bg-[#fff4e8] text-[#e68a2e] text-xs px-2 py-0.5 rounded-full font-semibold"
           >
             {roiEstimate}
           </span>
@@ -53,16 +53,16 @@ const InternshipQualityBadge = ({
         <div className="text-xs mt-0.5">
           <button
             onClick={() => setRoiExpanded(!roiExpanded)}
-            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold focus:outline-none"
+            className="inline-flex items-center gap-1 text-[#FF9933] hover:text-[#e68a2e] font-semibold focus:outline-none"
           >
             ROI Details {roiExpanded ? '▲' : '▼'}
           </button>
           {roiExpanded && (
-            <div className="mt-1 px-2 py-1.5 bg-blue-50 rounded text-xs text-blue-900 space-y-0.5">
+            <div className="mt-1 px-2 py-1.5 bg-[#fff4e8] rounded text-xs text-gray-800 space-y-0.5">
               <p><span className="font-semibold">Career Value:</span> {qualityData.roiDetails.careerValue}</p>
               <p><span className="font-semibold">Skill Growth:</span> {qualityData.roiDetails.skillGrowth}</p>
               <p><span className="font-semibold">Portfolio Value:</span> {qualityData.roiDetails.portfolioValue}</p>
-              <p className="text-blue-500 italic mt-1">{qualityData.roiDetails.disclaimer}</p>
+              <p className="text-[#e68a2e] italic mt-1">{qualityData.roiDetails.disclaimer}</p>
             </div>
           )}
         </div>

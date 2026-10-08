@@ -3,8 +3,8 @@ import { Award, Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const statusStyles = {
-  active: 'bg-emerald-100 text-emerald-700',
-  pending: 'bg-amber-100 text-amber-700',
+  active: 'bg-[#e8f5e6] text-[#138808]',
+  pending: 'bg-[#fff4e8] text-[#e68a2e]',
   revoked: 'bg-red-100 text-red-700',
 };
 
@@ -36,10 +36,10 @@ const CertificateCard = ({ certificate = {} }) => {
     : null;
 
   return (
-    <div className="neo-glass p-6 rounded-xl border border-amber-200 space-y-3">
+    <div className="neo-glass p-6 rounded-xl border border-[#FFD9A0] space-y-3">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Award size={28} className="text-amber-500 shrink-0" />
+        <Award size={28} className="text-[#FF9933] shrink-0" />
         <div>
           <p className="font-semibold text-gray-800">{organization || 'Organization'}</p>
           {role && <p className="text-sm text-gray-500">{role}</p>}
