@@ -11,6 +11,7 @@ import Contact from '../components/home/Contact';
 import Policies from '../components/home/Policies';
 import BuiltBy from '../components/home/BuiltBy';
 import LandingCTA from '../components/home/LandingCTA';
+import LearningSection from '../components/home/LearningSection';
 import Footer from '../components/Footer';
 import { useSEO } from '../seo/useSEO';
 
@@ -31,9 +32,10 @@ const Home = () => {
       <HowItWorks />
       <About />
       <InternshipList />
-      <Reviews />
       <Resources />
       <LandingCTA />
+      <LearningSection />
+      <Reviews />
       <Contact />
       <Policies />
       <BuiltBy />
