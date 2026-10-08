@@ -22,6 +22,9 @@ import {
     CheckCircle2,
     Award,
     TrendingUp,
+    GitBranch,
+    Map,
+    MessageSquare,
 } from 'lucide-react';
 
 export const roleConfig = {
@@ -46,6 +49,9 @@ export const roleConfig = {
             { path: '/dashboard/skills/gaps', label: 'Skill Gaps', icon: Target },
             { path: '/dashboard/career/action-plan', label: 'Action Plan', icon: ListChecks },
             { path: '/dashboard/career/readiness', label: 'Readiness', icon: Gauge },
+            { path: '/dashboard/career/digital-twin', label: 'Digital Twin', icon: GitBranch },
+            { path: '/dashboard/career/paths', label: 'Career Paths', icon: Map },
+            { path: '/dashboard/feedback', label: 'Company Feedback', icon: MessageSquare },
             { path: '/dashboard/passport', label: 'My Passport', icon: BookOpen },
             { path: '/dashboard/settings', label: 'Settings', icon: Settings },
         ]
