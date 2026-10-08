@@ -29,8 +29,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AIApplicationModal from '../components/home/AIApplicationModal';
 import InternshipQualityBadge from '../components/career/InternshipQualityBadge';
+import WhyNotApplyModal from '../components/career/WhyNotApplyModal';
 import { api } from '../services/api';
-import { getInternshipQuality } from '../services/careerService';
+import { getInternshipQuality, getWhyNotApply } from '../services/careerService';
 import { useAuth } from '../context/AuthContext';
 import { useSEO, SITE_URL } from '../seo/useSEO';
 import { internshipSlug } from '../seo/slugify';
@@ -80,6 +81,9 @@ const InternshipDetailPage = () => {
   const [applied,        setApplied]        = useState(false);
   const [copied,         setCopied]         = useState(false);
   const [qualityData,    setQualityData]    = useState(null);
+  const [showWhyNot,     setShowWhyNot]     = useState(false);
+  const [whyNotData,     setWhyNotData]     = useState(null);
+  const [whyNotLoading,  setWhyNotLoading]  = useState(false);
 
   /* Derived SEO values */
   const canonical  = internship ? `${SITE_URL}/internships/${internshipSlug(internship)}` : `${SITE_URL}/find-internship`;
@@ -167,6 +171,20 @@ const InternshipDetailPage = () => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       });
+    }
+  };
+
+  const handleWhyNotApply = async () => {
+    if (!isAuthenticated) return;
+    setWhyNotLoading(true);
+    try {
+      const res = await getWhyNotApply(internship._id);
+      setWhyNotData(res?.data || res);
+      setShowWhyNot(true);
+    } catch (e) {
+      console.warn('[InternshipDetailPage] whyNotApply error:', e);
+    } finally {
+      setWhyNotLoading(false);
     }
   };
 
@@ -294,20 +312,38 @@ const InternshipDetailPage = () => {
 
                 {/* CTA */}
                 {!applied ? (
-                  <button
-                    onClick={() => {
-                      if (!isAuthenticated) { navigate('/login'); return; }
-                      setShowApplyModal(true);
-                    }}
-                    style={{
-                      background: 'linear-gradient(135deg,#FF9933,#e68a2e)',
-                      color: '#fff', border: 'none', borderRadius: 10,
-                      padding: '13px 32px', fontSize: 15, fontWeight: 700,
-                      cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8,
-                    }}
-                  >
-                    Apply Now <ArrowRight size={16} />
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => {
+                        if (!isAuthenticated) { navigate('/login'); return; }
+                        setShowApplyModal(true);
+                      }}
+                      style={{
+                        background: 'linear-gradient(135deg,#FF9933,#e68a2e)',
+                        color: '#fff', border: 'none', borderRadius: 10,
+                        padding: '13px 32px', fontSize: 15, fontWeight: 700,
+                        cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8,
+                      }}
+                    >
+                      Apply Now <ArrowRight size={16} />
+                    </button>
+                    {isAuthenticated && (
+                      <button
+                        type="button"
+                        onClick={handleWhyNotApply}
+                        disabled={whyNotLoading}
+                        style={{
+                          background: '#fff', color: '#6b7280', border: '1.5px solid #e5e7eb',
+                          borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600,
+                          cursor: whyNotLoading ? 'not-allowed' : 'pointer',
+                          display: 'inline-flex', alignItems: 'center', gap: 6,
+                          opacity: whyNotLoading ? 0.7 : 1,
+                        }}
+                      >
+                        {whyNotLoading ? 'Analyzing...' : 'Why Not Apply?'}
+                      </button>
+                    )}
+                  </div>
                 ) : (
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#16a34a', fontWeight: 700, fontSize: 15 }}>
                     <CheckCircle size={18} /> Application Submitted
@@ -478,6 +514,16 @@ const InternshipDetailPage = () => {
           }}
         />
       )}
+
+      {/* ── Why Not Apply Modal ── */}
+      <WhyNotApplyModal
+        isOpen={showWhyNot}
+        onClose={() => setShowWhyNot(false)}
+        internshipTitle={internship?.title}
+        concerns={whyNotData?.concerns || []}
+        overallRisk={whyNotData?.overallRisk || 'medium'}
+        recommendation={whyNotData?.recommendation}
+      />
 
       {/* Responsive sidebar collapse */}
       <style>{`

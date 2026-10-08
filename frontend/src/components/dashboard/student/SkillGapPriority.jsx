@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Target } from 'lucide-react';
-import { getSkillGaps, getAdaptiveLearningRecommendations } from '../../../services/careerService';
-import { api } from '../../../services/api';
+import { getSkillGapPriority, simulateWhatIf, getAdaptiveLearningRecommendations } from '../../../services/careerService';
 import SkillGapItem from '../../career/SkillGapItem';
 import WhatIfSimulator from '../../career/WhatIfSimulator';
 import { Skeleton } from '../../ui/Skeleton';
@@ -15,8 +14,9 @@ const SkillGapPriority = () => {
   useEffect(() => {
     const fetchGaps = async () => {
       try {
-        const data = await getSkillGaps();
-        setGaps(Array.isArray(data) ? data : []);
+        const res = await getSkillGapPriority();
+        const raw = res?.data?.gaps || res?.gaps || res?.data || res;
+        setGaps(Array.isArray(raw) ? raw : []);
       } catch (err) {
         console.warn('[SkillGapPriority] fetch error:', err?.message);
       } finally {
@@ -39,7 +39,7 @@ const SkillGapPriority = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const simulateHandler = async (skill) => {
-    const response = await api.post('/career/what-if', { skill });
+    const response = await simulateWhatIf({ skill, improvementPoints: 20 });
     return response;
   };
 
@@ -66,7 +66,17 @@ const SkillGapPriority = () => {
       ) : (
         <div className="space-y-3">
           {gaps.map((gap, idx) => (
-            <SkillGapItem key={gap._id || idx} gap={gap} rank={idx + 1} />
+            <SkillGapItem
+              key={gap._id || idx}
+              rank={idx + 1}
+              skillName={gap.skillName || gap.skill}
+              currentConfidence={gap.currentConfidence ?? gap.confidence ?? 0}
+              gapScore={gap.gapScore}
+              priority={gap.priority}
+              estimatedImpact={gap.estimatedImpact}
+              learningEffort={gap.learningEffort}
+              reason={gap.reason}
+            />
           ))}
         </div>
       )}

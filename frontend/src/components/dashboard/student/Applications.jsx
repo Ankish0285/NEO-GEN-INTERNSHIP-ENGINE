@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, MoreHorizontal, Calendar, Building, Briefcase, ArrowRight, FileText } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Skeleton } from '../../ui/Skeleton';
@@ -10,6 +10,7 @@ import ApplicationService from '../../../services/applicationService';
 import { resolveResumeUrl } from '../../../utils/resolveResumeUrl';
 import { canWithdrawApplicationStatus } from '../../../utils/applicationStatus';
 import ApplicationStrengthBar from '../../career/ApplicationStrengthBar';
+import { getOpportunityCost } from '../../../services/careerService';
 
 const StatusBadge = ({ status }) => {
   const s = (status || 'Applied').toLowerCase().replace(/\s+/g, ' ');
@@ -40,6 +41,23 @@ const Applications = () => {
   const { applications, loading, refreshDashboard } = useStudentDashboard();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedId, setExpandedId] = useState(null);
+  const [opportunityRanks, setOpportunityRanks] = useState({});
+
+  useEffect(() => {
+    getOpportunityCost()
+      .then((res) => {
+        const list = res?.data?.applications || res?.applications || res?.data || [];
+        const map = {};
+        if (Array.isArray(list)) {
+          list.forEach((item) => {
+            const key = item.applicationId || item._id || item.id;
+            if (key) map[key] = { rank: item.opportunityCostRank || item.rank };
+          });
+        }
+        setOpportunityRanks(map);
+      })
+      .catch(() => {}); // non-critical
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const STAGES = ['Applied', 'Shortlisted', 'Interview', 'Selected'];
 
@@ -179,7 +197,14 @@ const Applications = () => {
                               {app.companyLogo || <Building size={20} className="text-orange-600" />}
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-bold text-slate-900">{app.role || app.internship?.title || 'Internship Role'}</div>
+                            <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                              {app.role || app.internship?.title || 'Internship Role'}
+                              {opportunityRanks[appKey]?.rank && (
+                                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700">
+                                  Priority {opportunityRanks[appKey].rank}
+                                </span>
+                              )}
+                            </div>
                             <div className="text-sm text-slate-600">{app.company || app.internship?.company || 'Company Name'}</div>
                           </div>
                         </div>

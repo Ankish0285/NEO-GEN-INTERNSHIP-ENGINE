@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock, DollarSign, Briefcase, Star, ArrowRight, Sparkles, Brain, Lock, Crown } from 'lucide-react';
 import { Skeleton } from '../../ui/Skeleton';
 import { motion } from 'framer-motion';
+import Modal from '../../ui/Modal';
+import ExplainableRecommendationCard from '../../career/ExplainableRecommendationCard';
 import { getAIRecommendations } from '../../../services/aiService';
+import { getExplainableRec } from '../../../services/careerService';
 import { useStudentDashboard } from '../../../context/StudentDashboardContext';
 import { useSubscription } from '../../../context/SubscriptionContext';
 import UpgradeModal from '../../ui/UpgradeModal';
 
-const InternshipCard = ({ job, loading, index }) => {
+const InternshipCard = ({ job, loading, index, onExplain }) => {
   const navigate = useNavigate();
   if (loading) {
     return (
@@ -110,9 +113,20 @@ const InternshipCard = ({ job, loading, index }) => {
 
       <div className="flex justify-between items-center pt-4 border-t border-black/5">
         <span className="text-xs text-[#9CA3AF]">{safeJob.postedAt || 'AI matched'}</span>
-        <button type="button" className="neo-btn neo-btn-primary min-h-10! text-sm" onClick={() => navigate('/find-internship')}>
-          View <ArrowRight size={16} className="inline ml-1" />
-        </button>
+        <div className="flex items-center gap-2">
+          {onExplain && (
+            <button
+              type="button"
+              className="text-xs px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 font-semibold transition-colors"
+              onClick={() => onExplain(safeJob.id || safeJob._id)}
+            >
+              Explain
+            </button>
+          )}
+          <button type="button" className="neo-btn neo-btn-primary min-h-10! text-sm" onClick={() => navigate('/find-internship')}>
+            View <ArrowRight size={16} className="inline ml-1" />
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -131,6 +145,9 @@ const Recommendations = () => {
   const [error,    setError]    = useState(null);
   // true when the backend explicitly returned 403 SUBSCRIPTION_REQUIRED
   const [subBlocked, setSubBlocked] = useState(false);
+  const [explainData,    setExplainData]    = useState(null);
+  const [explainLoading, setExplainLoading] = useState(false);
+  const [showExplain,    setShowExplain]    = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -160,6 +177,20 @@ const Recommendations = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExplain = async (internshipId) => {
+    if (!internshipId) return;
+    setExplainLoading(true);
+    try {
+      const res = await getExplainableRec(internshipId);
+      setExplainData(res?.data || res);
+      setShowExplain(true);
+    } catch (e) {
+      console.warn('[Recommendations] explain error:', e);
+    } finally {
+      setExplainLoading(false);
     }
   };
 
@@ -273,7 +304,7 @@ const Recommendations = () => {
       ) : recommendations.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recommendations.map((job, idx) => (
-            <InternshipCard key={job.id || idx} job={job} index={idx} />
+            <InternshipCard key={job.id || idx} job={job} index={idx} onExplain={handleExplain} />
           ))}
         </div>
       ) : (
@@ -287,6 +318,27 @@ const Recommendations = () => {
       )}
         </>
       )}
+
+      {/* ── Explainable Recommendation Modal ── */}
+      <Modal
+        isOpen={showExplain}
+        onClose={() => setShowExplain(false)}
+        title="Why Recommended?"
+      >
+        {explainData && (
+          <ExplainableRecommendationCard
+            internship={explainData.internship || {}}
+            matchedSkills={explainData.matchedSkills || []}
+            missingSkills={explainData.missingSkills || []}
+            fitScore={explainData.fitScore ?? explainData.matchScore ?? 0}
+            reasons={explainData.reasons || []}
+            warnings={explainData.warnings || []}
+          />
+        )}
+        {explainLoading && (
+          <p className="text-sm text-gray-500 text-center py-4">Loading explanation...</p>
+        )}
+      </Modal>
     </div>
   );
 };

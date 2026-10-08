@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { getDigitalTwin } from '../../../services/careerService';
+import { getSkillEvidenceBreakdown, getMyCertificates } from '../../../services/careerService';
+import { getAIIntelligence } from '../../../services/aiService';
 import { Skeleton } from '../../ui/Skeleton';
 import Card from '../../ui/Card';
 
@@ -22,8 +23,35 @@ const DigitalTwin = () => {
   useEffect(() => {
     const fetchTwin = async () => {
       try {
-        const data = await getDigitalTwin();
-        setTwin(data && typeof data === 'object' ? data : {});
+        const [aiRes, breakdownRes, certsRes] = await Promise.allSettled([
+          getAIIntelligence(),
+          getSkillEvidenceBreakdown(),
+          getMyCertificates(),
+        ]);
+
+        const profile = aiRes.status === 'fulfilled'
+          ? (aiRes.value?.data || aiRes.value)
+          : {};
+        const breakdownRaw = breakdownRes.status === 'fulfilled'
+          ? (breakdownRes.value?.data || breakdownRes.value)
+          : {};
+        const certsRaw = certsRes.status === 'fulfilled'
+          ? (certsRes.value?.data || certsRes.value)
+          : [];
+
+        const certs = Array.isArray(certsRaw) ? certsRaw : [];
+
+        setTwin({
+          currentSkills: Array.isArray(profile?.skillProfile) ? profile.skillProfile : [],
+          strengths: Array.isArray(profile?.strengths) ? profile.strengths : [],
+          weaknesses: Array.isArray(profile?.weaknesses) ? profile.weaknesses : [],
+          targetRoles: Array.isArray(profile?.recommendedCareerPath) ? profile.recommendedCareerPath : [],
+          confidenceMap: breakdownRaw && typeof breakdownRaw === 'object' ? breakdownRaw : null,
+          opportunityProfile: {
+            certificates: certs.length,
+            verifiedCerts: certs.filter((c) => c.status === 'active').length,
+          },
+        });
       } catch (err) {
         console.warn('[DigitalTwin] fetch error:', err?.message);
       } finally {

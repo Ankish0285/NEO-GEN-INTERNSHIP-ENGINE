@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp } from 'lucide-react';
-import { getCareerPaths } from '../../../services/careerService';
+import { getSkillEvidence } from '../../../services/careerService';
 import { Skeleton } from '../../ui/Skeleton';
 import Card from '../../ui/Card';
 import Modal from '../../ui/Modal';
 import ConfidenceBar from '../../career/ConfidenceBar';
 import EmptyState from '../../ui/EmptyState';
+
+const CAREER_PATHS = [
+  { name: 'Frontend Developer', key: 'frontend', requiredSkills: ['React', 'JavaScript', 'TypeScript', 'CSS', 'HTML', 'Next.js'] },
+  { name: 'Backend Developer', key: 'backend', requiredSkills: ['Node.js', 'Python', 'MongoDB', 'SQL', 'REST APIs', 'Docker'] },
+  { name: 'Data Science', key: 'data-science', requiredSkills: ['Python', 'Machine Learning', 'Pandas', 'SQL', 'Statistics', 'TensorFlow'] },
+  { name: 'DevOps Engineer', key: 'devops', requiredSkills: ['Docker', 'AWS', 'Linux', 'CI/CD', 'Kubernetes', 'Terraform'] },
+];
 
 const CareerPathSimulator = () => {
   const [paths, setPaths] = useState([]);
@@ -16,10 +23,54 @@ const CareerPathSimulator = () => {
   useEffect(() => {
     const fetchPaths = async () => {
       try {
-        const data = await getCareerPaths();
-        setPaths(Array.isArray(data) ? data : []);
+        const res = await getSkillEvidence();
+        const raw = res?.data || res;
+        const evidenceDocs = Array.isArray(raw) ? raw : [];
+
+        const computed = CAREER_PATHS.map((path) => {
+          const matched = evidenceDocs.filter((ev) =>
+            path.requiredSkills.some(
+              (s) => s.toLowerCase() === (ev.skillName || '').toLowerCase()
+            )
+          );
+          const coveragePercent = Math.round(matched.length / path.requiredSkills.length * 100);
+          const coveredSkills = matched.map((e) => e.skillName);
+          const missingSkills = path.requiredSkills.filter(
+            (s) => !coveredSkills.some((c) => c.toLowerCase() === s.toLowerCase())
+          );
+          const skillCoverage = path.requiredSkills.map((s) => {
+            const ev = evidenceDocs.find(
+              (e) => (e.skillName || '').toLowerCase() === s.toLowerCase()
+            );
+            return ev?.confidenceScore ?? 0;
+          });
+          const nextSteps = missingSkills.slice(0, 3).map(
+            (s) => `Build evidence for ${s} via projects or adaptive learning`
+          );
+          return {
+            ...path,
+            coveragePercent,
+            coveredSkills,
+            missingSkills,
+            skillCoverage,
+            nextSteps,
+          };
+        });
+
+        setPaths(computed);
       } catch (err) {
         console.warn('[CareerPathSimulator] fetch error:', err?.message);
+        // Fallback: show paths with 0 coverage
+        setPaths(CAREER_PATHS.map((path) => ({
+          ...path,
+          coveragePercent: 0,
+          coveredSkills: [],
+          missingSkills: path.requiredSkills,
+          skillCoverage: path.requiredSkills.map(() => 0),
+          nextSteps: path.requiredSkills.slice(0, 3).map(
+            (s) => `Build evidence for ${s} via projects or adaptive learning`
+          ),
+        })));
       } finally {
         setLoading(false);
       }

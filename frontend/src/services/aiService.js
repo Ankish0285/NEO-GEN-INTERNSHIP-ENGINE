@@ -25,6 +25,9 @@ export const checkTruthGuard = (applicationText, profileData) =>
 export const checkConsistency = (resumeData, applicationText) =>
   api.post('/ai/consistency-check', { resumeData, applicationText });
 
+export const generateApplication = (internshipId) =>
+  api.post('/ai/generate-application', { internshipId });
+
 export default {
   getAIStatus,
   getAIProfile,
@@ -36,4 +39,5 @@ export default {
   getAdminAIInsights,
   checkTruthGuard,
   checkConsistency,
+  generateApplication,
 };
