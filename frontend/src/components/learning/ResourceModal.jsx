@@ -3,12 +3,12 @@ import Modal from '../ui/Modal';
 import ResourcePlayer from './ResourcePlayer';
 
 const CATEGORY_COLORS = {
-  'Interview Prep':     'bg-blue-100 text-blue-700',
-  'Resume & CV':        'bg-violet-100 text-violet-700',
-  'Career Development': 'bg-emerald-100 text-emerald-700',
-  'Industry Insights':  'bg-amber-100 text-amber-700',
-  'Soft Skills':        'bg-pink-100 text-pink-700',
-  'Technical Skills':   'bg-cyan-100 text-cyan-700',
+  'Interview Prep':     'bg-[#fff4e8] text-[#e68a2e]',
+  'Resume & CV':        'bg-[#fff4e8] text-[#e68a2e]',
+  'Career Development': 'bg-[#e8f5e6] text-[#138808]',
+  'Industry Insights':  'bg-[#fff4e8] text-[#e68a2e]',
+  'Soft Skills':        'bg-[#e8f5e6] text-[#138808]',
+  'Technical Skills':   'bg-[#fff4e8] text-[#e68a2e]',
   'Other':              'bg-gray-100 text-gray-600',
 };
 
@@ -84,7 +84,7 @@ const ResourceModal = ({ resource, isOpen, onClose }) => {
             {resource.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-xs font-medium"
+                className="px-2 py-0.5 bg-[#fff4e8] text-[#e68a2e] rounded text-xs font-medium"
               >
                 #{tag}
               </span>

@@ -132,7 +132,7 @@ const LearningResourcesPublic = () => {
             <p className="text-red-500 font-medium mb-4">{error}</p>
             <button
               onClick={load}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF9933] text-white rounded-lg text-sm font-semibold hover:bg-[#e68a2e] transition-colors"
             >
               <RefreshCw size={14} /> Retry
             </button>

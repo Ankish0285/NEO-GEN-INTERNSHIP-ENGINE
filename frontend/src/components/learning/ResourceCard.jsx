@@ -3,12 +3,12 @@ import { BookOpen, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const CATEGORY_COLORS = {
-  'Interview Prep':     'bg-blue-100 text-blue-700',
-  'Resume & CV':        'bg-violet-100 text-violet-700',
-  'Career Development': 'bg-emerald-100 text-emerald-700',
-  'Industry Insights':  'bg-amber-100 text-amber-700',
-  'Soft Skills':        'bg-pink-100 text-pink-700',
-  'Technical Skills':   'bg-cyan-100 text-cyan-700',
+  'Interview Prep':     'bg-[#fff4e8] text-[#e68a2e]',
+  'Resume & CV':        'bg-[#fff4e8] text-[#e68a2e]',
+  'Career Development': 'bg-[#e8f5e6] text-[#138808]',
+  'Industry Insights':  'bg-[#fff4e8] text-[#e68a2e]',
+  'Soft Skills':        'bg-[#e8f5e6] text-[#138808]',
+  'Technical Skills':   'bg-[#fff4e8] text-[#e68a2e]',
   'Other':              'bg-gray-100 text-gray-600',
 };
 
@@ -75,7 +75,7 @@ const ResourceCard = ({ resource, onClick, showAudience = false }) => {
         {resource.youtubeVideoId && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity duration-200">
             <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-              <Play className="w-6 h-6 text-indigo-600 ml-1" />
+              <Play className="w-6 h-6 text-[#FF9933] ml-1" />
             </div>
           </div>
         )}
