@@ -28,7 +28,9 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AIApplicationModal from '../components/home/AIApplicationModal';
+import InternshipQualityBadge from '../components/career/InternshipQualityBadge';
 import { api } from '../services/api';
+import { getInternshipQuality } from '../services/careerService';
 import { useAuth } from '../context/AuthContext';
 import { useSEO, SITE_URL } from '../seo/useSEO';
 import { internshipSlug } from '../seo/slugify';
@@ -77,6 +79,7 @@ const InternshipDetailPage = () => {
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [applied,        setApplied]        = useState(false);
   const [copied,         setCopied]         = useState(false);
+  const [qualityData,    setQualityData]    = useState(null);
 
   /* Derived SEO values */
   const canonical  = internship ? `${SITE_URL}/internships/${internshipSlug(internship)}` : `${SITE_URL}/find-internship`;
@@ -144,6 +147,13 @@ const InternshipDetailPage = () => {
   }, [slug]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!internship?._id) return;
+    getInternshipQuality(internship._id)
+      .then(res => setQualityData(res.data))
+      .catch(() => {}); // quality score is non-critical; fail silently
+  }, [internship?._id]);
 
   const handleShare = () => {
     if (navigator.share && internship) {
@@ -247,6 +257,17 @@ const InternshipDetailPage = () => {
                 <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 20 }}>
                   {internship.organization} &nbsp;·&nbsp; {internship.location}
                 </p>
+
+                {/* Quality Badge */}
+                {qualityData && (
+                  <div style={{ marginBottom: 16 }}>
+                    <InternshipQualityBadge
+                      qualityScore={qualityData.qualityScore}
+                      riskLevel={qualityData.riskLevel}
+                      roiEstimate={qualityData.roiEstimate}
+                    />
+                  </div>
+                )}
 
                 {/* Quick stats */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, padding: '16px 0', borderTop: '1px solid #f3f4f6', borderBottom: '1px solid #f3f4f6', marginBottom: 20 }}>

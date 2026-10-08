@@ -33,6 +33,9 @@ export const getCareerInsights = () => api.get('/admin/career-insights');
 export const getPartnerCompletions = (params) => api.get('/completion/partner/all', { params });
 export const updateCompletionStatus = (id, data) => api.put('/completion/' + id, data);
 
+// --- Internship Quality ---
+export const getInternshipQuality = (internshipId) => api.get(`/internship-quality/${internshipId}`);
+
 export default {
   // Skill Evidence
   getSkillEvidence,
@@ -61,4 +64,6 @@ export default {
   // Completion
   getPartnerCompletions,
   updateCompletionStatus,
+  // Internship Quality
+  getInternshipQuality,
 };
