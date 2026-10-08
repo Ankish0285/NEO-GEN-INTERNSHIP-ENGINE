@@ -37,6 +37,33 @@ const guideSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    youtubeUrl: {
+      type: String,
+      default: null,
+    },
+    youtubeVideoId: {
+      type: String,
+      default: null,
+    },
+    thumbnailUrl: {
+      type: String,
+      default: null,
+    },
+    category: {
+      type: String,
+      enum: ['Interview Prep', 'Resume & CV', 'Career Development', 'Industry Insights', 'Soft Skills', 'Technical Skills', 'Other'],
+      default: 'Other',
+    },
+    tags: [{ type: String }],
+    targetAudience: {
+      type: String,
+      enum: ['students', 'partners', 'both', 'public'],
+      default: 'students',
+    },
+    isPublic: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
