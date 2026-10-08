@@ -75,6 +75,12 @@ import CareerIntelligenceInsights from '../components/dashboard/admin/CareerInte
 // Public Pages
 import CertificateVerification from '../pages/CertificateVerification';
 
+// Learning Resources
+import LearningResourcesPublic from '../pages/LearningResourcesPublic';
+import AdminLearningResources from '../components/dashboard/admin/LearningResources';
+import StudentLearningResources from '../components/dashboard/student/LearningResources';
+import PartnerLearningResources from '../components/dashboard/partner/LearningResources';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -89,6 +95,7 @@ const AppRoutes = () => {
       <Route path="/resources/resume-templates" element={<ResumeTemplates />} />
       <Route path="/resume-builder/:templateId" element={<ResumeBuilder />} />
       <Route path="/success-stories" element={<SuccessStoriesPublic />} />
+      <Route path="/learning-resources" element={<LearningResourcesPublic />} />
 
       {/* SEO: /internships/:slug → category page OR internship detail page */}
       <Route path="/internships/:slug" element={<InternshipRouter />} />
@@ -114,6 +121,7 @@ const AppRoutes = () => {
         <Route path="passport" element={<DigitalPassport />} />
         <Route path="applications/outcomes" element={<ApplicationOutcomes />} />
         <Route path="feedback" element={<CompanyFeedback />} />
+        <Route path="learning-resources" element={<StudentLearningResources />} />
       </Route>
 
       {/* Admin Routes */}
@@ -131,6 +139,7 @@ const AppRoutes = () => {
         <Route path="support-inbox" element={<SupportInbox mode="admin" />} />
         <Route path="certificates" element={<CertificateManagement />} />
         <Route path="career-insights" element={<CareerIntelligenceInsights />} />
+        <Route path="learning-resources" element={<AdminLearningResources />} />
       </Route>
 
       {/* Partner Routes */}
@@ -145,6 +154,7 @@ const AppRoutes = () => {
         <Route path="support-inbox" element={<SupportInbox mode="partner" />} />
         <Route path="completion" element={<CompletionWorkflow />} />
         <Route path="certificates" element={<CertificateWorkflow />} />
+        <Route path="learning-resources" element={<PartnerLearningResources />} />
       </Route>
 
       {/* Certificate Verification */}
