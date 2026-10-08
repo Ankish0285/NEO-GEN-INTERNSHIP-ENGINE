@@ -11,10 +11,10 @@ import {
 const fmt = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
 const badge = (status) => {
   const map = {
-    ACTIVE:    'bg-emerald-100 text-emerald-800',
+    ACTIVE:    'bg-[#e8f5e6] text-[#138808]',
     EXPIRED:   'bg-red-100    text-red-800',
     CANCELLED: 'bg-gray-100   text-gray-700',
-    PENDING:   'bg-amber-100  text-amber-800',
+    PENDING:   'bg-[#fff4e8]  text-[#e68a2e]',
     FAILED:    'bg-red-100    text-red-700',
   };
   return <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${map[status] || 'bg-gray-100 text-gray-600'}`}>{status}</span>;
@@ -86,14 +86,14 @@ const PlansTab = () => {
   return (
     <div className="space-y-4">
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type === 'error' ? 'bg-red-600' : 'bg-emerald-600'}`}>
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type === 'error' ? 'bg-red-600' : 'bg-[#138808]'}`}>
           {toast.msg}
         </div>
       )}
 
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-bold text-gray-900">Subscription Plans</h2>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">
+        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-[#FF9933] text-white rounded-lg text-sm font-semibold hover:bg-[#e68a2e]">
           <Plus size={16} /> New Plan
         </button>
       </div>
@@ -139,7 +139,7 @@ const PlansTab = () => {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
                 </div>
                 <div className="flex items-center gap-2 pt-5">
-                  <input type="checkbox" id="isActive" checked={form.isActive} onChange={e => setForm(f => ({...f, isActive: e.target.checked}))} className="w-4 h-4 accent-indigo-600" />
+                  <input type="checkbox" id="isActive" checked={form.isActive} onChange={e => setForm(f => ({...f, isActive: e.target.checked}))} className="w-4 h-4 accent-[#FF9933]" />
                   <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Active (visible to students)</label>
                 </div>
               </div>
@@ -149,7 +149,7 @@ const PlansTab = () => {
                 <div className="grid grid-cols-2 gap-2">
                   {Object.entries(featureLabel).map(([key, label]) => (
                     <label key={key} className="flex items-center gap-2 text-sm text-gray-600">
-                      <input type="checkbox" className="accent-indigo-600"
+                      <input type="checkbox" className="accent-[#FF9933]"
                         checked={!!form.features?.[key]}
                         onChange={e => setForm(f => ({...f, features: {...f.features, [key]: e.target.checked}}))} />
                       {label}
@@ -166,7 +166,7 @@ const PlansTab = () => {
 
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-indigo-600 text-white rounded-lg py-2 text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">
+                  className="flex-1 bg-[#FF9933] text-white rounded-lg py-2 text-sm font-semibold hover:bg-[#e68a2e] disabled:opacity-50">
                   {saving ? 'Saving…' : (editing === 'new' ? 'Create Plan' : 'Update Plan')}
                 </button>
                 <button type="button" onClick={cancel} className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 text-sm font-semibold hover:bg-gray-50">
@@ -188,23 +188,23 @@ const PlansTab = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {plans.map(p => (
-            <div key={p._id} className={`rounded-xl border-2 p-5 ${p.isActive ? 'border-indigo-200 bg-indigo-50/30' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
+            <div key={p._id} className={`rounded-xl border-2 p-5 ${p.isActive ? 'border-[#FFD9A0] bg-[#fff4e8]/30' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <h3 className="font-bold text-gray-900">{p.name}</h3>
                   <p className="text-xs text-gray-500 mt-0.5">{p.description || 'No description'}</p>
                 </div>
                 {p.isActive
-                  ? <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">Active</span>
+                  ? <span className="px-2 py-0.5 rounded-full bg-[#e8f5e6] text-[#138808] text-xs font-semibold">Active</span>
                   : <span className="px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 text-xs font-semibold">Inactive</span>}
               </div>
-              <div className="text-2xl font-black text-indigo-700 mb-1">
+              <div className="text-2xl font-black text-[#e68a2e] mb-1">
                 {p.currency} {p.price}
                 <span className="text-sm font-medium text-gray-500 ml-1">/ {p.durationDays} days</span>
               </div>
               <div className="flex flex-wrap gap-1 mt-3 mb-4">
                 {Object.entries(p.features || {}).filter(([k,v]) => v === true).map(([k]) => (
-                  <span key={k} className="text-xs bg-white border border-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">{featureLabel[k] || k}</span>
+                  <span key={k} className="text-xs bg-white border border-[#FFD9A0] text-[#e68a2e] px-2 py-0.5 rounded-full">{featureLabel[k] || k}</span>
                 ))}
               </div>
               <div className="flex gap-2">
@@ -299,12 +299,12 @@ const PromosTab = () => {
   return (
     <div className="space-y-4">
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-emerald-600'}`}>{toast.msg}</div>
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-[#138808]'}`}>{toast.msg}</div>
       )}
 
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2"><Tag size={18}/> Promo Codes</h2>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">
+        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-[#FF9933] text-white rounded-lg text-sm font-semibold hover:bg-[#e68a2e]">
           <Plus size={16}/> New Promo Code
         </button>
       </div>
@@ -363,7 +363,7 @@ const PromosTab = () => {
                 <div className="flex flex-wrap gap-2">
                   {plans.map(p => (
                     <label key={p._id} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                      <input type="checkbox" className="accent-indigo-600"
+                      <input type="checkbox" className="accent-[#FF9933]"
                         checked={form.applicablePlanIds.includes(p._id)}
                         onChange={e => setForm(f => ({
                           ...f,
@@ -377,12 +377,12 @@ const PromosTab = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="promoActive" checked={form.isActive} onChange={e=>setForm(f=>({...f,isActive:e.target.checked}))} className="accent-indigo-600 w-4 h-4"/>
+                <input type="checkbox" id="promoActive" checked={form.isActive} onChange={e=>setForm(f=>({...f,isActive:e.target.checked}))} className="accent-[#FF9933] w-4 h-4"/>
                 <label htmlFor="promoActive" className="text-sm font-medium text-gray-700">Active (usable by students)</label>
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-indigo-600 text-white rounded-lg py-2 text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">
+                  className="flex-1 bg-[#FF9933] text-white rounded-lg py-2 text-sm font-semibold hover:bg-[#e68a2e] disabled:opacity-50">
                   {saving ? 'Saving…' : editing === 'new' ? 'Create Code' : 'Update Code'}
                 </button>
                 <button type="button" onClick={cancel} className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 text-sm font-semibold hover:bg-gray-50">
@@ -409,9 +409,9 @@ const PromosTab = () => {
                 <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">No promo codes yet. Create one above.</td></tr>
               ) : promos.map(p => (
                 <tr key={p._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 whitespace-nowrap font-mono font-bold text-indigo-700 tracking-wider">{p.code}</td>
+                  <td className="px-4 py-3 whitespace-nowrap font-mono font-bold text-[#e68a2e] tracking-wider">{p.code}</td>
                   <td className="px-4 py-3 whitespace-nowrap capitalize text-gray-600">{p.discountType}</td>
-                  <td className="px-4 py-3 whitespace-nowrap font-semibold text-emerald-700">
+                  <td className="px-4 py-3 whitespace-nowrap font-semibold text-[#138808]">
                     {p.discountType === 'percent' ? `${p.discountValue}%` : `₹${p.discountValue}`} off
                   </td>
                   <td className="px-4 py-3 text-center font-semibold">{p.usedCount}</td>
@@ -419,12 +419,12 @@ const PromosTab = () => {
                   <td className="px-4 py-3 whitespace-nowrap text-gray-500">{p.expiresAt ? fmt(p.expiresAt) : 'No expiry'}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     {p.isActive
-                      ? <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">Active</span>
+                      ? <span className="px-2 py-0.5 rounded-full bg-[#e8f5e6] text-[#138808] text-xs font-semibold">Active</span>
                       : <span className="px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 text-xs font-semibold">Inactive</span>}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex gap-1.5">
-                      <button onClick={() => openEdit(p)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded"><Edit2 size={14}/></button>
+                      <button onClick={() => openEdit(p)} className="p-1.5 text-[#FF9933] hover:bg-[#fff4e8] rounded"><Edit2 size={14}/></button>
                       <button onClick={() => deletePromo(p._id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Trash2 size={14}/></button>
                     </div>
                   </td>
@@ -459,7 +459,7 @@ const PaymentsTab = () => {
   useEffect(() => { load(); }, [load]);
 
   const payBadge = (status) => {
-    const map = { SUCCESS:'bg-emerald-100 text-emerald-800', CREATED:'bg-amber-100 text-amber-800', FAILED:'bg-red-100 text-red-800', CANCELLED:'bg-gray-100 text-gray-700' };
+    const map = { SUCCESS:'bg-[#e8f5e6] text-[#138808]', CREATED:'bg-[#fff4e8] text-[#e68a2e]', FAILED:'bg-red-100 text-red-800', CANCELLED:'bg-gray-100 text-gray-700' };
     return <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${map[status]||'bg-gray-100 text-gray-600'}`}>{status}</span>;
   };
 
@@ -496,10 +496,10 @@ const PaymentsTab = () => {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-700">{p.planId?.name||'—'}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-600">₹{p.originalAmount||p.amount}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-emerald-700 font-semibold">{p.discountAmount>0?`-₹${p.discountAmount}`:'—'}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-[#138808] font-semibold">{p.discountAmount>0?`-₹${p.discountAmount}`:'—'}</td>
                   <td className="px-4 py-3 whitespace-nowrap font-bold text-gray-900">₹{p.amount}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    {p.promoCodeStr ? <span className="font-mono text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded">{p.promoCodeStr}</span> : '—'}
+                    {p.promoCodeStr ? <span className="font-mono text-xs bg-[#fff4e8] text-[#e68a2e] border border-[#FFD9A0] px-2 py-0.5 rounded">{p.promoCodeStr}</span> : '—'}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">{payBadge(p.status)}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500 font-mono max-w-[120px] truncate">{p.razorpayOrderId||'—'}</td>
@@ -550,7 +550,7 @@ const TemplatesTab = () => {
   return (
     <div className="space-y-4">
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-emerald-600'}`}>{toast.msg}</div>
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-[#138808]'}`}>{toast.msg}</div>
       )}
 
       <div className="flex items-center justify-between">
@@ -582,9 +582,9 @@ const TemplatesTab = () => {
                 </td>
                 <td className="px-5 py-3">
                   {t.access === 'FREE' ? (
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">FREE</span>
+                    <span className="px-3 py-1 rounded-full bg-[#e8f5e6] text-[#138808] text-xs font-bold border border-[#b2dfcc]">FREE</span>
                   ) : (
-                    <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 flex items-center gap-1 w-fit">
+                    <span className="px-3 py-1 rounded-full bg-[#fff4e8] text-[#e68a2e] text-xs font-bold border border-[#FFD9A0] flex items-center gap-1 w-fit">
                       <Crown size={10}/> PREMIUM
                     </span>
                   )}
@@ -595,8 +595,8 @@ const TemplatesTab = () => {
                     onClick={() => toggle(t.templateId, t.access)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors disabled:opacity-50 ${
                       t.access === 'FREE'
-                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                        ? 'bg-[#fff4e8] text-[#e68a2e] border-[#FFD9A0] hover:bg-[#fff4e8]'
+                        : 'bg-[#e8f5e6] text-[#138808] border-[#b2dfcc] hover:bg-[#d4edda]'
                     }`}
                   >
                     {saving === t.templateId ? 'Saving…' : t.access === 'FREE' ? 'Make Premium' : 'Make Free'}
@@ -608,7 +608,7 @@ const TemplatesTab = () => {
         </table>
       </Card>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+      <div className="bg-[#fff4e8] border border-[#FFD9A0] rounded-xl px-4 py-3 text-sm text-[#e68a2e]">
         <strong>Note:</strong> Changes take effect immediately for all students. The backend is the source of truth — frontend config in <code>resumeTemplates.js</code> shows default badges but the backend config overrides access control.
       </div>
     </div>
@@ -651,7 +651,7 @@ const SubscriptionsTab = () => {
   return (
     <div className="space-y-4">
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-emerald-600'}`}>{toast.msg}</div>
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-[#138808]'}`}>{toast.msg}</div>
       )}
       <div className="flex flex-wrap gap-3 items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">All Subscriptions</h2>
@@ -692,15 +692,15 @@ const SubscriptionsTab = () => {
                   <td className="px-4 py-3 whitespace-nowrap text-gray-600">{fmt(s.startedAt)}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-600">{fmt(s.expiresAt)}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className="font-semibold text-indigo-700">{s.usage?.freeUsed ?? '—'}</span>
+                    <span className="font-semibold text-[#e68a2e]">{s.usage?.freeUsed ?? '—'}</span>
                     <span className="text-gray-400">/{s.usage?.freeLimit ?? '—'}</span>
                   </td>
-                  <td className="px-4 py-3 text-center font-semibold text-purple-700">{s.usage?.premiumUsed ?? '—'}</td>
+                  <td className="px-4 py-3 text-center font-semibold text-[#e68a2e]">{s.usage?.premiumUsed ?? '—'}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex gap-1.5">
                       {s.status === 'PENDING' && (
                         <button onClick={() => activate(s._id)}
-                          className="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-xs font-semibold hover:bg-emerald-100">
+                          className="px-2 py-1 bg-[#e8f5e6] text-[#138808] border border-[#b2dfcc] rounded text-xs font-semibold hover:bg-[#d4edda]">
                           Activate
                         </button>
                       )}
@@ -741,8 +741,8 @@ const AnalyticsTab = () => {
 
   const stats = [
     { label: 'Total Students',     value: data.totalStudents,                  icon: Users,      color: 'bg-blue-50 text-blue-600' },
-    { label: 'Active Subscribers', value: data.subscriptions.active,            icon: Crown,      color: 'bg-emerald-50 text-emerald-600' },
-    { label: 'Expired',            value: data.subscriptions.expired,           icon: Clock,      color: 'bg-amber-50 text-amber-600' },
+    { label: 'Active Subscribers', value: data.subscriptions.active,            icon: Crown,      color: 'bg-[#e8f5e6] text-emerald-600' },
+    { label: 'Expired',            value: data.subscriptions.expired,           icon: Clock,      color: 'bg-[#fff4e8] text-amber-600' },
     { label: 'Pending Payments',   value: data.subscriptions.pending,           icon: AlertCircle,color: 'bg-orange-50 text-orange-600' },
     { label: 'Free Checks Used',   value: data.usage.totalFreeChecks,           icon: Zap,        color: 'bg-violet-50 text-violet-600' },
     { label: 'Premium Checks',     value: data.usage.totalPremiumChecks,        icon: Star,       color: 'bg-purple-50 text-purple-600' },
@@ -774,8 +774,8 @@ const AnalyticsTab = () => {
               <div key={p._id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                 <span className="font-medium text-gray-800">{p.planName || 'Unknown Plan'}</span>
                 <div className="flex gap-4 text-sm">
-                  <span className="text-indigo-700 font-semibold">{p.count} active</span>
-                  <span className="text-emerald-700 font-semibold">₹{(p.revenue || 0).toLocaleString('en-IN')}</span>
+                  <span className="text-[#e68a2e] font-semibold">{p.count} active</span>
+                  <span className="text-[#138808] font-semibold">₹{(p.revenue || 0).toLocaleString('en-IN')}</span>
                 </div>
               </div>
             ))}
@@ -845,7 +845,7 @@ const SettingsTab = () => {
   return (
     <div className="space-y-6 max-w-2xl">
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-emerald-600'}`}>{toast.msg}</div>
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white ${toast.type==='error'?'bg-red-600':'bg-[#138808]'}`}>{toast.msg}</div>
       )}
 
       {/* ── Free limit ── */}
@@ -865,7 +865,7 @@ const SettingsTab = () => {
             />
           </div>
           <button type="submit" disabled={saving}
-            className="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">
+            className="px-5 py-2 bg-[#FF9933] text-white rounded-lg text-sm font-semibold hover:bg-[#e68a2e] disabled:opacity-50">
             {saving ? 'Saving…' : 'Save Free Limit'}
           </button>
         </form>
@@ -892,7 +892,7 @@ const SettingsTab = () => {
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
-                    isOn ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    isOn ? 'bg-[#fff4e8] text-[#e68a2e] border-[#FFD9A0]' : 'bg-[#e8f5e6] text-[#138808] border-[#b2dfcc]'
                   }`}>
                     {isOn ? '🔒 Sub Required' : '✓ Free Tier'}
                   </span>
@@ -901,7 +901,7 @@ const SettingsTab = () => {
                     type="button"
                     onClick={() => toggleFeature(key)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                      isOn ? 'bg-amber-500' : 'bg-gray-200'
+                      isOn ? 'bg-[#fff4e8]0' : 'bg-gray-200'
                     }`}
                     aria-label={`Toggle ${label}`}
                   >
@@ -916,7 +916,7 @@ const SettingsTab = () => {
         </div>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-700">
+      <div className="bg-[#fff4e8] border border-[#FFD9A0] rounded-xl px-4 py-3 text-xs text-[#e68a2e]">
         <strong>Note:</strong> Changes take effect immediately — no restart required. Backend reads these settings from the database on every request.
       </div>
     </div>
@@ -937,7 +937,7 @@ const SubscriptionManagement = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <CreditCard className="text-indigo-600" size={26} />
+            <CreditCard className="text-[#FF9933]" size={26} />
             Subscription Management
           </h1>
           <p className="text-sm text-gray-500 mt-1">Manage plans, subscriptions, analytics and settings.</p>
@@ -951,7 +951,7 @@ const SubscriptionManagement = () => {
           return (
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all
-                ${activeTab === tab ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}>
+                ${activeTab === tab ? 'bg-white text-[#e68a2e] shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}>
               <TIcon size={15} /> {tab}
             </button>
           );

@@ -179,9 +179,9 @@ const LearningSection = () => {
           // Empty state — no public resources yet
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { icon: '🎯', title: 'Interview Prep', desc: 'Ace your interviews with expert tips and mock questions' },
-              { icon: '📄', title: 'Resume Building', desc: 'Craft a standout resume that gets noticed by top companies' },
-              { icon: '🚀', title: 'Career Growth', desc: 'Learn skills that make you the ideal internship candidate' },
+              { icon: '🎯', title: 'Interview Prep', desc: 'Ace your interviews with expert tips and mock questions', path: '/learning-resources' },
+              { icon: '📄', title: 'Resume Building', desc: 'Craft a standout resume that gets noticed by top companies', path: '/learning-resources' },
+              { icon: '🚀', title: 'Career Growth', desc: 'Learn skills that make you the ideal internship candidate', path: '/learning-resources' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -193,7 +193,12 @@ const LearningSection = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900">{item.title}</h3>
                 <p className="text-sm text-gray-500">{item.desc}</p>
-                <span className="text-xs text-[#e68a2e] font-medium mt-1">Coming Soon</span>
+                <button
+                  onClick={() => navigate(item.path)}
+                  className="mt-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FF9933] hover:bg-[#e68a2e] text-white text-xs font-semibold transition-colors"
+                >
+                  Explore <ArrowRight size={13} />
+                </button>
               </motion.div>
             ))}
           </div>
