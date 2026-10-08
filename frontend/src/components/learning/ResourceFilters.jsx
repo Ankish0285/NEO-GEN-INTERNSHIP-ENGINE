@@ -37,7 +37,7 @@ const ResourceFilters = ({
             placeholder="Search resources…"
             value={searchValue}
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
+            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#FF9933]/30 focus:border-[#FF9933] transition"
           />
         </div>
 
@@ -63,7 +63,7 @@ const ResourceFilters = ({
             onClick={() => onCategoryChange && onCategoryChange('')}
             className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
               selectedCategory === ''
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-[#FF9933] text-white'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -76,7 +76,7 @@ const ResourceFilters = ({
               onClick={() => onCategoryChange && onCategoryChange(cat)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 selectedCategory === cat
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-[#FF9933] text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >

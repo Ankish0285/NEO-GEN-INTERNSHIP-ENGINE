@@ -116,12 +116,12 @@ const CertificateWorkflow = () => {
                       <td className="px-4 py-3 text-gray-500 text-xs">{fmt(item.completedAt ?? item.updatedAt)}</td>
                       <td className="px-4 py-3">
                         {alreadyIssued ? (
-                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#138808] bg-[#e8f5e6] border border-[#138808]/20 px-2.5 py-1 rounded-full">
                             <CheckCircle2 size={12} />
                             Issued — Pending Admin Verification
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#e68a2e] bg-[#fff4e8] border border-[#FFD9A0] px-2.5 py-1 rounded-full">
                             <Clock size={12} />
                             Not Issued
                           </span>
@@ -132,7 +132,7 @@ const CertificateWorkflow = () => {
                           <button
                             onClick={() => handleIssueCertificate(item)}
                             disabled={isLoading}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-xs font-medium rounded-lg transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FF9933] hover:bg-[#e68a2e] disabled:opacity-60 text-white text-xs font-medium rounded-lg transition-colors"
                           >
                             <Plus size={13} />
                             {isLoading ? 'Issuing…' : 'Issue Certificate'}

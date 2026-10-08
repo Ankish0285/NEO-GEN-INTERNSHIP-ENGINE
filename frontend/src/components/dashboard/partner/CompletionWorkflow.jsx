@@ -10,10 +10,10 @@ import { Skeleton } from '../../ui/Skeleton';
 import EmptyState from '../../ui/EmptyState';
 
 const STATUS_BADGE = {
-  Selected: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
-  Started: 'bg-blue-500/20 text-blue-300 border border-blue-500/40',
-  'In Progress': 'bg-purple-500/20 text-purple-300 border border-purple-500/40',
-  Completed: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+  Selected: 'bg-[#fff4e8] text-[#e68a2e] border border-[#FFD9A0]',
+  Started: 'bg-[#e8f5e6] text-[#138808] border border-[#138808]/20',
+  'In Progress': 'bg-[#e8f5e6] text-[#138808] border border-[#138808]/20',
+  Completed: 'bg-[#e8f5e6] text-[#138808] border border-[#138808]/20',
 };
 
 const STATUS_PROGRESSION = ['Selected', 'Started', 'In Progress', 'Completed'];

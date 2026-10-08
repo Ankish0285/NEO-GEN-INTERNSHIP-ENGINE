@@ -29,7 +29,7 @@ function StarRow({ label, value, onChange }) {
               size={22}
               className={
                 star <= value
-                  ? 'text-amber-400 fill-amber-400'
+                  ? 'text-[#FF9933] fill-[#FF9933]'
                   : 'text-gray-300'
               }
             />
@@ -94,7 +94,7 @@ const FeedbackForm = ({ applicationId, studentName, internshipTitle, onSubmit, o
           />
         ))}
         {!allRated && (
-          <p className="text-amber-400 text-xs mt-2">Please rate all 6 categories before submitting.</p>
+          <p className="text-[#e68a2e] text-xs mt-2">Please rate all 6 categories before submitting.</p>
         )}
       </div>
 
@@ -108,7 +108,7 @@ const FeedbackForm = ({ applicationId, studentName, internshipTitle, onSubmit, o
             value={strengths}
             onChange={(e) => setStrengths(e.target.value)}
             rows={3}
-            className="w-full rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 px-3 py-2 text-sm focus:outline-none focus:border-amber-400 resize-none"
+            className="w-full rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 px-3 py-2 text-sm focus:outline-none focus:border-[#FF9933] resize-none"
             placeholder="What did this intern do well?"
           />
         </div>
@@ -122,7 +122,7 @@ const FeedbackForm = ({ applicationId, studentName, internshipTitle, onSubmit, o
             value={areasForImprovement}
             onChange={(e) => setAreasForImprovement(e.target.value)}
             rows={3}
-            className="w-full rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 px-3 py-2 text-sm focus:outline-none focus:border-amber-400 resize-none"
+            className="w-full rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 px-3 py-2 text-sm focus:outline-none focus:border-[#FF9933] resize-none"
             placeholder="What could be improved?"
           />
         </div>
@@ -136,7 +136,7 @@ const FeedbackForm = ({ applicationId, studentName, internshipTitle, onSubmit, o
             value={comments}
             onChange={(e) => setComments(e.target.value)}
             rows={3}
-            className="w-full rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 px-3 py-2 text-sm focus:outline-none focus:border-amber-400 resize-none"
+            className="w-full rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 px-3 py-2 text-sm focus:outline-none focus:border-[#FF9933] resize-none"
             placeholder="Any other feedback..."
           />
         </div>
