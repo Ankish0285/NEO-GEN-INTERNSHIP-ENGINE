@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MoreHorizontal, Calendar, Building, Briefcase, ArrowRight, FileText } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, Calendar, Building, Briefcase, ArrowRight, FileText, Sparkles, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Skeleton } from '../../ui/Skeleton';
 import { Link } from 'react-router-dom';
@@ -10,7 +10,9 @@ import ApplicationService from '../../../services/applicationService';
 import { resolveResumeUrl } from '../../../utils/resolveResumeUrl';
 import { canWithdrawApplicationStatus } from '../../../utils/applicationStatus';
 import ApplicationStrengthBar from '../../career/ApplicationStrengthBar';
+import TruthGuardAlert from '../../career/TruthGuardAlert';
 import { getOpportunityCost } from '../../../services/careerService';
+import { generateApplication } from '../../../services/aiService';
 
 const StatusBadge = ({ status }) => {
   const s = (status || 'Applied').toLowerCase().replace(/\s+/g, ' ');
@@ -42,6 +44,11 @@ const Applications = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedId, setExpandedId] = useState(null);
   const [opportunityRanks, setOpportunityRanks] = useState({});
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiContent, setAiContent] = useState('');
+  const [aiIssues, setAiIssues] = useState([]);
+  const [currentInternshipId, setCurrentInternshipId] = useState(null);
 
   useEffect(() => {
     getOpportunityCost()
@@ -60,6 +67,25 @@ const Applications = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const STAGES = ['Applied', 'Shortlisted', 'Interview', 'Selected'];
+
+  const handleGenerateWithAI = async (internshipId) => {
+    setCurrentInternshipId(internshipId);
+    setAiContent('');
+    setAiIssues([]);
+    setAiModalOpen(true);
+    setAiGenerating(true);
+    try {
+      const res = await generateApplication(internshipId);
+      const data = res?.data || res || {};
+      setAiContent(data.coverLetter || data.content || data.application || '');
+      setAiIssues(data.issues || data.truthGuardIssues || []);
+    } catch (err) {
+      setAiContent('');
+      setAiIssues([]);
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   const getStageIndex = (status) => {
     if(!status) return 0;
@@ -103,6 +129,7 @@ const Applications = () => {
   };
 
   return (
+    <>
     <motion.div 
       className="space-y-6"
       initial="hidden"
@@ -302,6 +329,14 @@ const Applications = () => {
                                          <Building size={16} className="text-slate-600" />
                                          View Internship
                                       </button>
+                                      <button
+                                         type="button"
+                                         className="inline-flex items-center gap-2 rounded-lg border-2 border-orange-300 bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-800 shadow-sm transition-colors hover:bg-orange-100"
+                                         onClick={() => handleGenerateWithAI(app.internship?._id || app.internship)}
+                                      >
+                                         <Sparkles size={16} className="text-orange-500" />
+                                         Generate with AI
+                                      </button>
                                    </div>
                                    
                                    {canWithdrawApplicationStatus(app.status) && (
@@ -364,6 +399,89 @@ const Applications = () => {
         )}
       </div>
     </motion.div>
+
+      {/* AI Generate Cover Letter Modal */}
+      <AnimatePresence>
+        {aiModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+                <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                  <Sparkles size={18} className="text-orange-500" />
+                  AI-Generated Cover Letter
+                </h3>
+                <button
+                  onClick={() => setAiModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-700 transition-colors"
+                  aria-label="Close modal"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                {aiGenerating ? (
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-full rounded" />
+                    <Skeleton className="h-4 w-5/6 rounded" />
+                    <Skeleton className="h-4 w-4/6 rounded" />
+                    <Skeleton className="h-4 w-full rounded" />
+                    <Skeleton className="h-4 w-3/4 rounded" />
+                    <p className="text-sm text-slate-500 text-center pt-2">Generating your cover letter…</p>
+                  </div>
+                ) : (
+                  <>
+                    {aiIssues.length > 0 && (
+                      <TruthGuardAlert issues={aiIssues} onEdit={() => {}} />
+                    )}
+                    <textarea
+                      className="w-full h-72 border border-slate-200 rounded-xl p-4 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-400/40 resize-y"
+                      value={aiContent}
+                      onChange={(e) => setAiContent(e.target.value)}
+                      placeholder="Generated cover letter will appear here. You can edit before using."
+                    />
+                    {!aiContent && (
+                      <p className="text-sm text-slate-400 text-center">
+                        No content was generated. Please try again.
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+              {!aiGenerating && (
+                <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50">
+                  <button
+                    onClick={() => setAiModalOpen(false)}
+                    className="px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    Close
+                  </button>
+                  {aiContent && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(aiContent);
+                      }}
+                      className="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors"
+                    >
+                      Copy to Clipboard
+                    </button>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

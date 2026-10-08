@@ -35,6 +35,9 @@ const interviewLogSchema = mongoose.Schema(
       enum: ['pending', 'passed', 'failed', 'waitlisted'],
       default: 'pending',
     },
+    difficultTopics: { type: [String], default: [] },
+    interviewStage: { type: String, default: '' },
+    selfAssessment: { type: String, default: '' },
   },
   {
     timestamps: true,

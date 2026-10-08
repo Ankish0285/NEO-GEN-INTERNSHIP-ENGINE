@@ -54,6 +54,7 @@ export const getCompletionStatus = (applicationId) => api.get(`/completion/${app
 
 // --- Internship Quality ---
 export const getInternshipQuality = (internshipId) => api.get(`/internship-quality/${internshipId}`);
+export const getApplicationStrength = (applicationId) => api.get(`/internship-quality/application/${applicationId}/strength`);
 
 // --- Interview Log Analysis ---
 export const getRejectionPatterns = () => api.get('/interview-logs/rejection-patterns');
@@ -61,6 +62,12 @@ export const getInterviewLogLearning = () => api.get('/interview-logs/interview-
 
 // --- Adaptive Learning ---
 export const getAdaptiveLearningRecommendations = () => api.get('/adaptive-learning/recommendations');
+
+// --- Placements ---
+export const getMyPlacements = () => api.get('/placements/my');
+
+// --- Skill Assessments ---
+export const getMySkillAssessments = () => api.get('/skill-assessments');
 
 export default {
   // Skill Evidence
@@ -108,9 +115,14 @@ export default {
   getCompletionStatus,
   // Internship Quality
   getInternshipQuality,
+  getApplicationStrength,
   // Interview Log Analysis
   getRejectionPatterns,
   getInterviewLogLearning,
   // Adaptive Learning
   getAdaptiveLearningRecommendations,
+  // Placements
+  getMyPlacements,
+  // Skill Assessments
+  getMySkillAssessments,
 };
