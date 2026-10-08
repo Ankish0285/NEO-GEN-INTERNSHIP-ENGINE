@@ -1,0 +1,42 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Build the complete Learning Resources frontend: shared components (ResourceCard, ResourcePlayer, ResourceModal, ResourceFilters), frontend service (learningService.js), four view pages (Admin management, Student view, Partner view, Public page), update Navbar to add the /learning-resources route. Depends on FEAT-001 (backend endpoints must exist). Independent of FEAT-003 (sidebar restructure).",
+  "status": "pending",
+  "steps": [
+    "1. CREATE frontend/src/services/learningService.js — exports: getPublicResources(params), getStudentResources(params), getPartnerResources(params), getAdminResources(params), createResource(data), updateResource(id, data), deleteResource(id), getResourceById(id). Each calls api.get/post/put/delete on the corresponding /api/guides/* path. params is an object { search, category, page, limit, status } serialised as query string. Use the existing `api` singleton from './api'.",
+
+    "2. CREATE frontend/src/components/learning/ directory with these four shared components:\n   a) ResourceCard.jsx — props: resource (Guide object), onClick, showAudience (bool, default false). Renders: thumbnail (img if thumbnailUrl exists, else a gradient placeholder with BookOpen icon), title, short description (truncated at 120 chars), category badge, difficulty badge, targetAudience badge (only if showAudience), play button overlay on thumbnail. Uses Card component with onClick. Framer-motion entrance animation matching existing cards in Analytics.jsx pattern.\n   b) ResourceFilters.jsx — props: categories (array of strings), selectedCategory, onCategoryChange, searchValue, onSearchChange, showStatusFilter (bool), selectedStatus, onStatusChange. Renders a search input (magnifying glass icon from lucide-react) + category pill buttons + optional status dropdown. Controlled component — no internal state.\n   c) ResourcePlayer.jsx — props: videoId (11-char YouTube video ID), title. Renders an iframe with src=`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1` in a 16:9 aspect-ratio wrapper div (padding-top 56.25%). Sets sandbox='allow-scripts allow-same-origin allow-presentation'. Shows a friendly error card if videoId is falsy. Title rendered below the player.\n   d) ResourceModal.jsx — props: resource (Guide object or null), isOpen, onClose. Uses existing Modal component (max-w-3xl via className prop). When resource has youtubeVideoId renders ResourcePlayer inside Modal. Below player: title (h2), description, category badge, difficulty, estimatedTime. Close button from Modal. Handles null resource gracefully.",
+
+    "3. CREATE frontend/src/components/dashboard/admin/LearningResources.jsx — Admin CRUD management page. Pattern: matches SubscriptionManagement.jsx structure (useState for list, editing, form, loading, saving, toast). Sections: a) Page header with title 'Learning Resources', subtitle, and 'Add Resource' button (Plus icon). b) ResourceFilters with showStatusFilter=true. c) Resource cards grid using ResourceCard with showAudience=true, plus Edit/Delete action buttons on each card. d) Create/Edit form in a Modal (max-w-2xl): fields: title (required), description (required textarea), youtubeUrl, thumbnailUrl, category (select from enum), difficulty (select), estimatedTime, targetAudience (select: students/partners/both/public), status (draft/published), tags (comma-separated input). e) Preview button in modal opens ResourceModal with current form values. f) Delete confirms with a window.confirm before calling deleteResource. g) Uses learningService.getAdminResources, createResource, updateResource, deleteResource. h) Toast notifications on success/error using react-hot-toast. i) Loading skeleton: 6 Card placeholders with animate-pulse.",
+
+    "4. CREATE frontend/src/components/dashboard/student/LearningResources.jsx — Student read-only view. Calls learningService.getStudentResources on mount. ResourceFilters (no status filter). Grid of ResourceCard components. Clicking a card opens ResourceModal. Empty state: BookOpen icon + 'No learning resources available yet' message. Loading: 6 pulse skeletons. Error state with retry button.",
+
+    "5. CREATE frontend/src/components/dashboard/partner/LearningResources.jsx — Partner read-only view. Identical structure to student view but calls learningService.getPartnerResources. Same empty/loading/error states.",
+
+    "6. CREATE frontend/src/pages/LearningResourcesPublic.jsx — Public page with Navbar and Footer (import same components as SuccessStoriesPublic.jsx: Navbar from '../components/Navbar', Footer from '../components/Footer'). Calls learningService.getPublicResources. useSEO hook with title 'Learning Resources | NEO GEN Internship Engine'. Hero section (h1 + subtitle). ResourceFilters. Grid of ResourceCard. ResourceModal for detail view. Responsive 1-2-3 column grid. Matches NEO GEN branding (uses branding.primaryColor from useSiteSettings).",
+
+    "7. EDIT frontend/src/components/Navbar.jsx — change the existing 'Resources' anchor tag that calls handleNavClick('#resources-section') to a React Router Link to='/learning-resources'. Keep the same className='nav-link' and onClick={() => setIsMenuOpen(false)}. Also add a matching Link in the mobile menu section if one exists (same file, the hamburger menu renders the same links inside .navbar-menu).",
+
+    "8. EDIT frontend/src/routes/AppRoutes.jsx — add these imports at the top (after existing imports): `import LearningResourcesPublic from '../pages/LearningResourcesPublic'`, `import AdminLearningResources from '../components/dashboard/admin/LearningResources'`, `import StudentLearningResources from '../components/dashboard/student/LearningResources'`, `import PartnerLearningResources from '../components/dashboard/partner/LearningResources'`. Add routes: public route `<Route path='/learning-resources' element={<LearningResourcesPublic />} />` (inside Public Routes block, after /success-stories), student nested route `<Route path='learning-resources' element={<StudentLearningResources />} />` (inside /dashboard Route), admin nested route `<Route path='learning-resources' element={<AdminLearningResources />} />` (inside /admin/dashboard Route), partner nested route `<Route path='learning-resources' element={<PartnerLearningResources />} />` (inside /partner/dashboard Route)."
+  ],
+  "acceptance_criteria": [
+    "cd frontend && npm run build completes with 0 errors after all files are created",
+    "Navigating to /learning-resources in the browser renders the public page with Navbar and Footer",
+    "Clicking 'Resources' in the top Navbar navigates to /learning-resources (not scrolling to #resources-section)",
+    "Admin dashboard /admin/dashboard/learning-resources shows the CRUD management page with Add Resource button",
+    "Student dashboard /dashboard/learning-resources shows the read-only grid view",
+    "Partner dashboard /partner/dashboard/learning-resources shows the read-only grid view",
+    "ResourcePlayer renders an iframe when videoId is provided",
+    "ResourcePlayer renders an error card when videoId is null/empty",
+    "ResourceModal opens when a ResourceCard is clicked",
+    "learningService.js exports all 8 functions (getPublicResources, getStudentResources, getPartnerResources, getAdminResources, createResource, updateResource, deleteResource, getResourceById)"
+  ],
+  "verification": [
+    "cd frontend && npm run build — must complete with 0 errors and 0 TypeScript/ESLint blocking errors",
+    "cd frontend && npm run test — all existing Vitest tests must still pass",
+    "Manual: start frontend dev server (npm run dev), open http://localhost:5173/learning-resources — page must load without console errors"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

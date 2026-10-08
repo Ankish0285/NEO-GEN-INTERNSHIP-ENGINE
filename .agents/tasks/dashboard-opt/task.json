@@ -1,0 +1,7 @@
+{
+  "task_id": "task-dashboard-opt",
+  "task_description": "Audit and improve Student Dashboard, Super Admin Dashboard, and Partner Portal navigation (grouped sidebar sections). Build a complete Learning Resources system: YouTube video embedding, role-based audience filtering, admin CRUD, shared across all portals and public website. Extend the existing Guide model and guideController rather than creating new collections.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

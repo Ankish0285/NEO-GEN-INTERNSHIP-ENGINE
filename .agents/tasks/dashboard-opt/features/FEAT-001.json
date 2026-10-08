@@ -1,0 +1,32 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Extend the Guide model with Learning Resources fields, replace guideController with full CRUD + audience filtering + YouTube validation + search/pagination, update guideRoutes to expose audience-scoped public/student/partner endpoints. This is the backend foundation that FEATs 002 and 003 depend on.",
+  "status": "completed",
+  "steps": [
+    "1. EDIT backend/models/Guide.js — add these fields to guideSchema BEFORE the timestamps option: `youtubeUrl: { type: String, default: null }`, `youtubeVideoId: { type: String, default: null }`, `thumbnailUrl: { type: String, default: null }`, `category: { type: String, enum: ['Interview Prep', 'Resume & CV', 'Career Development', 'Industry Insights', 'Soft Skills', 'Technical Skills', 'Other'], default: 'Other' }`, `tags: [{ type: String }]`, `targetAudience: { type: String, enum: ['students', 'partners', 'both', 'public'], default: 'students' }`, `isPublic: { type: Boolean, default: false }`. Keep all existing fields (title, description, sections, status, difficulty, estimatedTime, author, timestamps).",
+
+    "2. REPLACE backend/controllers/guideController.js entirely with the implementation below. The new controller must: (a) export a helper `extractYouTubeVideoId(url)` that parses standard watch URLs (youtube.com/watch?v=ID), youtu.be/ID short URLs, and embed URLs (youtube.com/embed/ID) — returns the 11-char video ID or null for invalid input; (b) `getGuides` — used only internally, kept for backward compat; (c) `getPublicResources(req, res)` — no auth required, returns only `{ status: 'published', $or: [{ targetAudience: 'public' }, { isPublic: true }] }` docs, supports ?search, ?category, ?page, ?limit query params (default limit 12, max 50); (d) `getStudentResources(req, res)` — requires authenticated student (checked via req.user.role === 'student' || 'super_admin' || 'admin'), returns published docs where `targetAudience: { $in: ['students','both','public'] }`, same search/category/page/limit params; (e) `getPartnerResources(req, res)` — requires authenticated partner (checked via req.user.role === 'partner' || 'admin' || 'super_admin'), returns published docs where `targetAudience: { $in: ['partners','both','public'] }`, same params; (f) `getAdminResources(req, res)` — admin only, returns ALL docs regardless of status, with search/category/status filter + pagination; (g) `createResource(req, res)` — admin only, sets author = req.user.id, calls extractYouTubeVideoId on youtubeUrl if provided and stores result in youtubeVideoId, if extraction returns null and url is non-empty respond with 400 'Invalid YouTube URL'; (h) `updateResource(req, res)` — admin only, same youtube validation; (i) `deleteResource(req, res)` — admin only; (j) `getResourceById(req, res)` — uses optionalAuth logic: if resource targetAudience is 'public' or isPublic serve to anyone, otherwise check role matches audience; respond 403 if access denied. Use asyncHandler throughout.",
+
+    "3. REPLACE backend/routes/guideRoutes.js with new routes: GET / → getPublicResources (no auth, optionalAuth for future); GET /admin → protect+admin → getAdminResources; GET /student → protect → getStudentResources; GET /partner → protect → getPartnerResources; GET /:id → optionalAuth → getResourceById; POST / → protect+admin → createResource; PUT /:id → protect+admin → updateResource; DELETE /:id → protect+admin → deleteResource. Import all controller functions and middleware. Keep module.exports = router.",
+
+    "4. Verify the model loads cleanly: in backend/ run `node -e \"const G = require('./models/Guide'); console.log(Object.keys(G.schema.paths))\"` — output must include youtubeUrl, youtubeVideoId, thumbnailUrl, category, tags, targetAudience, isPublic."
+  ],
+  "acceptance_criteria": [
+    "GET /api/guides returns only published public resources (no auth token) — existing Guide documents still served",
+    "POST /api/guides with admin token + invalid YouTube URL returns HTTP 400",
+    "POST /api/guides with admin token + valid youtu.be URL stores the 11-char video ID in youtubeVideoId field",
+    "GET /api/guides/student with student token returns only published docs with targetAudience in ['students','both','public']",
+    "GET /api/guides/partner with partner token returns only published docs with targetAudience in ['partners','both','public']",
+    "GET /api/guides/admin without admin token returns HTTP 403",
+    "backend/models/Guide.js has all 7 new fields present in schema",
+    "node -e require('./models/Guide') completes without error"
+  ],
+  "verification": [
+    "cd backend && node -e \"const G = require('./models/Guide'); console.log(Object.keys(G.schema.paths).join(', '))\" — must print youtubeUrl, youtubeVideoId, thumbnailUrl, category, tags, targetAudience, isPublic among the fields",
+    "cd backend && npm test -- --testPathPattern=guide -- existing unit tests pass (if any exist); if none exist the command exits cleanly",
+    "cd frontend && npm run build — must complete with 0 errors (frontend should be unaffected at this stage)"
+  ],
+  "blocked_reason": null,
+  "findings": "Guide model extended with 7 new fields (youtubeUrl, youtubeVideoId, thumbnailUrl, category, tags, targetAudience, isPublic). All existing fields preserved. guideController replaced with full CRUD + audience-scoped read endpoints (getPublicResources, getStudentResources, getPartnerResources, getAdminResources, getResourceById) + extractYouTubeVideoId helper + backward-compat aliases (createGuide, updateGuide, deleteGuide). guideRoutes replaced with audience-scoped routes using optionalAuth for public GET. Backend unit tests: 38 passed, 6 suites. Frontend build: clean (0 errors, 2798 modules). Committed as e319d6e. Shell tool was in broken PTY/readline mode throughout — all commands executed correctly via Start-Process/batch file workaround; output verified by reading files from TEMP. FEAT-002 and FEAT-003 can now import extractYouTubeVideoId from guideController and use the new model fields."
+}

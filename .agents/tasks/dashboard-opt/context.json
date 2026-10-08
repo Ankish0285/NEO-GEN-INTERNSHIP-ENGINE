@@ -1,0 +1,33 @@
+{
+  "project_type": "MERN stack — Express/Mongoose backend + Vite/React 18 frontend, deployed to AWS",
+  "language": "JavaScript (CommonJS backend, ESM frontend)",
+  "build_system": "Frontend: Vite 5 (npm run build). Backend: plain Node/Express (node server.js / nodemon). No monorepo tooling.",
+  "test_framework": "Frontend: Vitest 2 (npm run test in frontend/). Backend: Jest 29 (npm test in backend/).",
+  "build_command": "cd frontend && npm run build",
+  "test_command": "cd frontend && npm run test    (frontend)   |   cd backend && npm test   (backend unit tests)",
+  "verification_instructions": "1. cd frontend && npm run build — must complete with 0 errors. 2. cd backend && node -e \"require('./models/Guide')\" — must not throw. 3. cd backend && npm test — existing Jest tests must still pass. 4. Manual smoke-test: start backend with 'node server.js', open frontend dev server with 'npm run dev', navigate all new routes.",
+  "snapshot_or_generated_files": null,
+  "environment_constraints": "Windows PowerShell workspace. All paths use backslash outside shell commands. Do NOT restart a running dev server. Do NOT push to git — local commits only on the current branch.",
+  "contribution_requirements": "Preserve all existing working features. Do not delete pages — only reorganise navigation. Backend permission checks must be enforced server-side (middleware), not only client-side. Use exact npm package versions already in package.json; do not introduce new dependencies unless strictly necessary.",
+  "key_patterns": "- API service: import { api } from '../../../services/api'; api.get('/guides') etc. Returns response.data directly (axios interceptor unwraps). - Cards: import Card from '../../ui/Card'; props: title, subtitle, action, onClick, noPadding, variant, className. - Modals: import Modal from '../../ui/Modal'; props: isOpen, onClose, title, className, children. - Auth middleware exports: protect, admin, partner, optionalAuth from backend/middleware/authMiddleware.js. admin middleware allows role 'admin' OR 'super_admin'. - Page pattern: functional component with useState/useEffect, Card wrapper, lucide-react icons, framer-motion animations, tailwind utility classes, toast from react-hot-toast. - roleConfig.js: flat menuItems[] array per role key. Sidebar.jsx iterates menuItems[]. - asyncHandler from express-async-handler for all controller functions. - Guide model is registered as 'Guide' in Mongoose; server.js mounts guideRoutes at /api/guides.",
+  "relevant_files": [
+    "backend/models/Guide.js",
+    "backend/controllers/guideController.js",
+    "backend/routes/guideRoutes.js",
+    "backend/middleware/authMiddleware.js",
+    "backend/server.js",
+    "frontend/src/utils/roleConfig.js",
+    "frontend/src/components/dashboard/common/Sidebar.jsx",
+    "frontend/src/components/dashboard/common/DashboardLayout.jsx",
+    "frontend/src/routes/AppRoutes.jsx",
+    "frontend/src/services/api.js",
+    "frontend/src/components/ui/Card.jsx",
+    "frontend/src/components/ui/Modal.jsx",
+    "frontend/src/components/Navbar.jsx",
+    "frontend/src/components/home/Resources.jsx",
+    "frontend/src/components/dashboard/admin/Analytics.jsx",
+    "frontend/src/components/dashboard/admin/SubscriptionManagement.jsx",
+    "frontend/src/pages/SuccessStoriesPublic.jsx"
+  ],
+  "directory_structure": "backend/ — Express server: models/, controllers/, routes/, middleware/, services/, utils/. frontend/src/ — React app: pages/ (public pages + dashboard wrappers), components/ (dashboard/admin|student|partner, home, ui, common), services/ (api.js + per-feature services), utils/ (roleConfig.js), routes/ (AppRoutes.jsx), context/ (AuthContext, ThemeContext, SiteSettingsContext)."
+}
