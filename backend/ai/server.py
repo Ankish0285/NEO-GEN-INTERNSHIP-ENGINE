@@ -203,3 +203,37 @@ def learning_recommendations(body: LearningRecommendRequest):
         body.skill_gaps, body.completed_guide_ids, body.guides
     )
     return {'success': True, 'data': result}
+
+
+# ---------------------------------------------------------------------------
+# Feature #14 — AI Truth Guard
+# ---------------------------------------------------------------------------
+
+
+class TruthGuardRequest(BaseModel):
+    application_text: str
+    profile_data: dict = Field(default_factory=dict)
+
+
+@app.post('/api/v1/career/truth-guard')
+def truth_guard(body: TruthGuardRequest):
+    from engines.career_intelligence_engine import check_truth_guard
+    issues = check_truth_guard(body.application_text, body.profile_data)
+    return {'success': True, 'data': {'issues': issues, 'count': len(issues)}}
+
+
+# ---------------------------------------------------------------------------
+# Feature #15 — Application Consistency Checker
+# ---------------------------------------------------------------------------
+
+
+class ConsistencyRequest(BaseModel):
+    resume_data: dict = Field(default_factory=dict)
+    application_text: str = ''
+
+
+@app.post('/api/v1/career/consistency-check')
+def consistency_check(body: ConsistencyRequest):
+    from engines.career_intelligence_engine import check_application_consistency
+    issues = check_application_consistency(body.resume_data, body.application_text)
+    return {'success': True, 'data': {'issues': issues}}

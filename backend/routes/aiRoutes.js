@@ -19,6 +19,8 @@ const {
   aiChat,
   getAdminAIInsights,
   rankStudentsForInternship,
+  checkTruthGuard,
+  checkConsistency,
 } = require('../controllers/aiController');
 
 // ── Public / read-only ────────────────────────────────────────────────────────
@@ -43,5 +45,11 @@ router.post('/chat', protect, checkResumeAccess(FEATURE_AI_CHAT), aiChat);
 
 // ── Single-internship semantic match — gated (premium feature) ───────────────
 router.post('/match/:internshipId', protect, checkResumeAccess(FEATURE_AI_MATCH), matchSingleInternship);
+
+// ── AI Truth Guard (Feature #14) ──────────────────────────────────────────────
+router.post('/truth-guard', protect, checkTruthGuard);
+
+// ── Application Consistency Checker (Feature #15) ────────────────────────────
+router.post('/consistency-check', protect, checkConsistency);
 
 module.exports = router;

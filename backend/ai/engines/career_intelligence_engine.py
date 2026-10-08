@@ -190,3 +190,320 @@ def generate_learning_recommendations(
 
     recommendations.sort(key=lambda r: r["priority"])
     return recommendations
+
+
+# ---------------------------------------------------------------------------
+# Feature #14 — AI Truth Guard
+# ---------------------------------------------------------------------------
+
+import re as _re
+
+
+def check_truth_guard(application_text: str, profile_data: dict) -> list[dict]:
+    """Scan application text for claims that cannot be supported by the student's profile.
+
+    Checks performed (all deterministic / regex-based, no LLM):
+    1. Year-of-experience claims — flagged when profile has no experience entries.
+    2. Company name mentions — flagged when the company is not listed in the
+       profile's experience entries.
+    3. Certification / certificate claims — flagged when the certificate name is
+       not found in the profile's certificates list.
+    4. Project title mentions — flagged when the project is not found in the
+       profile's projects list.
+
+    Args:
+        application_text: The cover letter / application essay text.
+        profile_data: Dict that may contain any of:
+            - experience: list of dicts with optional 'company' / 'organization' keys
+            - certificates / certifications: list of dicts with optional 'name' / 'title' keys,
+              or list of strings
+            - projects: list of dicts with optional 'title' / 'name' keys, or list of strings
+            - skills: list of strings
+
+    Returns:
+        List of ``{claim, issue, severity}`` dicts for unsupported claims.
+        Returns an empty list when no issues are found.
+    """
+    issues: list[dict] = []
+
+    text = application_text or ""
+
+    # ------------------------------------------------------------------
+    # Helper: extract lowercase string set from a list that may contain
+    # dicts or plain strings.
+    # ------------------------------------------------------------------
+    def _extract_names(items: list, *keys: str) -> set[str]:
+        names: set[str] = set()
+        for item in (items or []):
+            if isinstance(item, str):
+                names.add(item.strip().lower())
+            elif isinstance(item, dict):
+                for k in keys:
+                    val = item.get(k) or ""
+                    if val:
+                        names.add(str(val).strip().lower())
+        return names
+
+    # ------------------------------------------------------------------
+    # 1. Year-of-experience claims
+    # ------------------------------------------------------------------
+    experience_list = profile_data.get("experience") or []
+    year_pattern = _re.compile(
+        r'\b(\d+(?:\.\d+)?)\s*\+?\s*years?\s+(?:of\s+)?(?:experience|work|industry)',
+        _re.IGNORECASE,
+    )
+    for m in year_pattern.finditer(text):
+        claimed_years = float(m.group(1))
+        claim_text = m.group(0)
+        if len(experience_list) == 0:
+            issues.append({
+                "claim": claim_text,
+                "issue": f"Claims {claimed_years} year(s) of experience but no experience entries found in profile.",
+                "severity": "high",
+            })
+        elif claimed_years > len(experience_list) * 1.5:
+            issues.append({
+                "claim": claim_text,
+                "issue": (
+                    f"Claims {claimed_years} year(s) of experience but profile only lists "
+                    f"{len(experience_list)} experience entr{'y' if len(experience_list) == 1 else 'ies'}."
+                ),
+                "severity": "medium",
+            })
+
+    # ------------------------------------------------------------------
+    # 2. Company name mentions not found in profile experience
+    # ------------------------------------------------------------------
+    profile_companies = _extract_names(experience_list, "company", "organization", "employer")
+    # Extract quoted company-like nouns (Title Case sequences of 1-4 words) after
+    # "at", "with", "for", "worked at", "interned at" etc.
+    company_pattern = _re.compile(
+        r'\b(?:at|with|for|worked\s+at|interned\s+at|joined)\s+([A-Z][A-Za-z0-9&.,\s]{1,50}?)(?=[,.\s]|$)',
+    )
+    for m in company_pattern.finditer(text):
+        candidate = m.group(1).strip().rstrip(".,")
+        if len(candidate) < 3:
+            continue
+        candidate_lower = candidate.lower()
+        # Skip generic words
+        generic = {"the", "a", "an", "our", "my", "their", "this", "that", "team", "company", "organization"}
+        if candidate_lower in generic:
+            continue
+        # Check if any profile company name partially matches
+        matched = any(
+            candidate_lower in company or company in candidate_lower
+            for company in profile_companies
+        )
+        if not matched and profile_companies:
+            issues.append({
+                "claim": f"Mentions '{candidate}'",
+                "issue": f"Company '{candidate}' not found in profile experience entries.",
+                "severity": "medium",
+            })
+
+    # ------------------------------------------------------------------
+    # 3. Certification / certificate claims
+    # ------------------------------------------------------------------
+    profile_certs = _extract_names(
+        profile_data.get("certificates") or profile_data.get("certifications") or [],
+        "name", "title", "certification",
+    )
+    cert_pattern = _re.compile(
+        r'\b(?:certified\s+(?:in\s+)?|certification\s+in\s+|certificate\s+in\s+)'
+        r'([A-Za-z0-9\s+#./]{2,60}?)(?=[,.\s]|$)',
+        _re.IGNORECASE,
+    )
+    for m in cert_pattern.finditer(text):
+        cert_claim = m.group(1).strip().rstrip(".,")
+        if len(cert_claim) < 3:
+            continue
+        cert_lower = cert_claim.lower()
+        matched = any(cert_lower in c or c in cert_lower for c in profile_certs)
+        if not matched:
+            severity = "high" if not profile_certs else "medium"
+            issues.append({
+                "claim": f"Certified in '{cert_claim}'",
+                "issue": (
+                    "Certificate claim not found in profile."
+                    if not profile_certs
+                    else f"'{cert_claim}' not found among profile certificates."
+                ),
+                "severity": severity,
+            })
+
+    # ------------------------------------------------------------------
+    # 4. Project title mentions
+    # ------------------------------------------------------------------
+    profile_projects = _extract_names(
+        profile_data.get("projects") or [],
+        "title", "name",
+    )
+    # Look for project mentions: "project called X", "built X", "developed X", "created X"
+    project_pattern = _re.compile(
+        r'\b(?:project(?:\s+(?:called|titled|named|on))?\s+["\']?|'
+        r'built|developed|created|designed)\s+([A-Za-z0-9\-_\s]{3,60}?)(?=[,.()\n]|$)',
+        _re.IGNORECASE,
+    )
+    for m in project_pattern.finditer(text):
+        proj_claim = m.group(1).strip().rstrip(".,")
+        if len(proj_claim) < 4:
+            continue
+        proj_lower = proj_claim.lower()
+        # Skip overly generic phrases
+        generic_proj = {
+            "a web", "an app", "the app", "a mobile", "a system",
+            "a platform", "the platform", "software", "the software",
+        }
+        if any(proj_lower.startswith(g) for g in generic_proj):
+            continue
+        if profile_projects:
+            matched = any(proj_lower in p or p in proj_lower for p in profile_projects)
+            if not matched:
+                issues.append({
+                    "claim": f"Project '{proj_claim}'",
+                    "issue": f"Project '{proj_claim}' not listed in profile projects.",
+                    "severity": "low",
+                })
+
+    return issues
+
+
+# ---------------------------------------------------------------------------
+# Feature #15 — Application Consistency Checker
+# ---------------------------------------------------------------------------
+
+
+def check_application_consistency(resume_data: dict, application_text: str) -> list[dict]:
+    """Compare an application essay against resume data for consistency.
+
+    Checks:
+    1. Years of experience mentioned in application vs number of experience entries.
+    2. Project names mentioned in application vs resume projects list.
+    3. Skill claims in application vs resume skills list.
+
+    Args:
+        resume_data: Dict that may contain:
+            - experience: list of experience dicts
+            - projects: list of project dicts/strings
+            - skills: list of skill strings
+        application_text: The application / cover-letter text.
+
+    Returns:
+        List of ``{field, resumeValue, applicationClaim, warning}`` dicts.
+        Returns an empty list if no inconsistencies are found.
+    """
+    issues: list[dict] = []
+    text = application_text or ""
+
+    # Reuse the helper from check_truth_guard
+    def _extract_names(items: list, *keys: str) -> set[str]:
+        names: set[str] = set()
+        for item in (items or []):
+            if isinstance(item, str):
+                names.add(item.strip().lower())
+            elif isinstance(item, dict):
+                for k in keys:
+                    val = item.get(k) or ""
+                    if val:
+                        names.add(str(val).strip().lower())
+        return names
+
+    # ------------------------------------------------------------------
+    # 1. Years of experience
+    # ------------------------------------------------------------------
+    experience_list = resume_data.get("experience") or []
+    year_pattern = _re.compile(
+        r'\b(\d+(?:\.\d+)?)\s*\+?\s*years?\s+(?:of\s+)?(?:experience|work|industry)',
+        _re.IGNORECASE,
+    )
+    for m in year_pattern.finditer(text):
+        claimed_years = float(m.group(1))
+        resume_entry_count = len(experience_list)
+        if resume_entry_count == 0:
+            issues.append({
+                "field": "experience",
+                "resumeValue": "0 experience entries on resume",
+                "applicationClaim": m.group(0),
+                "warning": (
+                    f"Application claims {claimed_years} year(s) of experience "
+                    "but resume has no experience entries."
+                ),
+            })
+        elif claimed_years > resume_entry_count * 2:
+            issues.append({
+                "field": "experience",
+                "resumeValue": f"{resume_entry_count} experience entr{'y' if resume_entry_count == 1 else 'ies'} on resume",
+                "applicationClaim": m.group(0),
+                "warning": (
+                    f"Application claims {claimed_years} year(s) of experience "
+                    f"but resume lists only {resume_entry_count} position(s)."
+                ),
+            })
+
+    # ------------------------------------------------------------------
+    # 2. Project names
+    # ------------------------------------------------------------------
+    resume_projects = _extract_names(
+        resume_data.get("projects") or [],
+        "title", "name",
+    )
+    project_pattern = _re.compile(
+        r'\b(?:project(?:\s+(?:called|titled|named|on))?\s+["\']?|'
+        r'built|developed|created|designed)\s+([A-Za-z0-9\-_\s]{3,60}?)(?=[,.()\n]|$)',
+        _re.IGNORECASE,
+    )
+    for m in project_pattern.finditer(text):
+        proj_claim = m.group(1).strip().rstrip(".,")
+        if len(proj_claim) < 4:
+            continue
+        proj_lower = proj_claim.lower()
+        generic_proj = {
+            "a web", "an app", "the app", "a mobile", "a system",
+            "a platform", "the platform", "software", "the software",
+        }
+        if any(proj_lower.startswith(g) for g in generic_proj):
+            continue
+        if resume_projects:
+            matched = any(proj_lower in p or p in proj_lower for p in resume_projects)
+            if not matched:
+                issues.append({
+                    "field": "projects",
+                    "resumeValue": ", ".join(sorted(resume_projects)) or "No projects on resume",
+                    "applicationClaim": proj_claim,
+                    "warning": (
+                        f"Application mentions project '{proj_claim}' "
+                        "which is not listed in resume projects."
+                    ),
+                })
+
+    # ------------------------------------------------------------------
+    # 3. Skill claims
+    # ------------------------------------------------------------------
+    resume_skills = _extract_names(resume_data.get("skills") or [], "name")
+    # Match patterns like "proficient in X", "skilled in X", "expertise in X",
+    # "experience with X", "knowledge of X"
+    skill_claim_pattern = _re.compile(
+        r'\b(?:proficient\s+in|skilled\s+in|expertise\s+in|'
+        r'experience\s+with|knowledge\s+of|expert\s+in)\s+'
+        r'([A-Za-z0-9#+.\-/\s]{2,50}?)(?=[,.\s()\n]|$)',
+        _re.IGNORECASE,
+    )
+    for m in skill_claim_pattern.finditer(text):
+        skill_claim = m.group(1).strip().rstrip(".,")
+        if len(skill_claim) < 2:
+            continue
+        skill_lower = skill_claim.lower()
+        if resume_skills:
+            matched = any(skill_lower in s or s in skill_lower for s in resume_skills)
+            if not matched:
+                issues.append({
+                    "field": "skills",
+                    "resumeValue": f"{len(resume_skills)} skill(s) listed on resume",
+                    "applicationClaim": skill_claim,
+                    "warning": (
+                        f"Application claims skill '{skill_claim}' "
+                        "which is not listed in resume skills."
+                    ),
+                })
+
+    return issues

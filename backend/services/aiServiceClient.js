@@ -157,6 +157,18 @@ const careerIntelligenceSkillGap = (payload) =>
     career_domain: payload.career_domain || {},
   });
 
+const truthGuard = (payload) =>
+  callAI('/api/v1/career/truth-guard', 'truth_guard', {
+    application_text: payload.application_text || '',
+    profile_data: payload.profile_data || {},
+  });
+
+const consistencyCheck = (payload) =>
+  callAI('/api/v1/career/consistency-check', 'consistency_check', {
+    resume_data: payload.resume_data || {},
+    application_text: payload.application_text || '',
+  });
+
 /** Start embedded AI server (optional, faster than CLI per request). */
 const startAIServer = () => {
   if (process.env.AI_AUTO_START === '0') return null;
@@ -187,4 +199,6 @@ module.exports = {
   startAIServer,
   runCli,
   careerIntelligenceSkillGap,
+  truthGuard,
+  consistencyCheck,
 };

@@ -19,6 +19,12 @@ export const sendAIChat = (message) => api.post('/ai/chat', { message });
 
 export const getAdminAIInsights = () => api.get('/ai/admin/insights');
 
+export const checkTruthGuard = (applicationText, profileData) =>
+  api.post('/ai/truth-guard', { applicationText, profileData });
+
+export const checkConsistency = (resumeData, applicationText) =>
+  api.post('/ai/consistency-check', { resumeData, applicationText });
+
 export default {
   getAIStatus,
   getAIProfile,
@@ -28,4 +34,6 @@ export default {
   matchInternshipAI,
   sendAIChat,
   getAdminAIInsights,
+  checkTruthGuard,
+  checkConsistency,
 };

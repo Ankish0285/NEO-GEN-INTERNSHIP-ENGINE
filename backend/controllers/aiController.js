@@ -646,6 +646,26 @@ const rankStudentsForInternship = asyncHandler(async (req, res) => {
   });
 });
 
+// @route POST /api/ai/truth-guard
+const checkTruthGuard = asyncHandler(async (req, res) => {
+  const { applicationText, profileData } = req.body;
+  const data = await aiClient.truthGuard({
+    application_text: applicationText || '',
+    profile_data: profileData || {},
+  });
+  res.json({ success: true, data });
+});
+
+// @route POST /api/ai/consistency-check
+const checkConsistency = asyncHandler(async (req, res) => {
+  const { resumeData, applicationText } = req.body;
+  const data = await aiClient.consistencyCheck({
+    resume_data: resumeData || {},
+    application_text: applicationText || '',
+  });
+  res.json({ success: true, data });
+});
+
 module.exports = {
   getAIStatus,
   getAIProfile,
@@ -657,4 +677,6 @@ module.exports = {
   getAdminAIInsights,
   rankStudentsForInternship,
   runAIPipelineForUser,
+  checkTruthGuard,
+  checkConsistency,
 };
