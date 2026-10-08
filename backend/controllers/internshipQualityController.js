@@ -25,7 +25,18 @@ const calculateQualityScore = (internship) => {
   let riskLevel = score < 40 ? 'high' : score < 70 ? 'medium' : 'low';
   let roiEstimate = (score >= 70 && skillCount >= 3) ? 'high' : score >= 40 ? 'medium' : 'low';
 
-  return { qualityScore: score, riskLevel, roiEstimate, breakdown };
+  const durationMonths = internship.duration ? (parseInt(internship.duration) || 2) : 2;
+  const roiDetails = {
+    careerValue: score >= 70 ? 'High' : score >= 40 ? 'Medium' : 'Low',
+    skillGrowth: skillCount >= 4 ? 'High' : skillCount >= 2 ? 'Medium' : 'Low',
+    portfolioValue: (internship.responsibilities || internship.benefits || internship.perks) ? 'Medium' : 'Low',
+    careerAlignment: score,
+    estimatedSkillsGained: skillCount,
+    estimatedDurationWeeks: durationMonths * 4,
+    disclaimer: 'Career value is an estimate based on listing quality. Actual outcomes may vary.'
+  };
+
+  return { qualityScore: score, riskLevel, roiEstimate, roiDetails, breakdown };
 };
 
 const getInternshipQuality = asyncHandler(async (req, res) => {
