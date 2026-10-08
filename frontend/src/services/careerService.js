@@ -36,6 +36,10 @@ export const updateCompletionStatus = (id, data) => api.put('/completion/' + id,
 // --- Internship Quality ---
 export const getInternshipQuality = (internshipId) => api.get(`/internship-quality/${internshipId}`);
 
+// --- Interview Log Analysis ---
+export const getRejectionPatterns = () => api.get('/interview-logs/rejection-patterns');
+export const getInterviewLogLearning = () => api.get('/interview-logs/interview-learning');
+
 export default {
   // Skill Evidence
   getSkillEvidence,
@@ -66,4 +70,7 @@ export default {
   updateCompletionStatus,
   // Internship Quality
   getInternshipQuality,
+  // Interview Log Analysis
+  getRejectionPatterns,
+  getInterviewLogLearning,
 };

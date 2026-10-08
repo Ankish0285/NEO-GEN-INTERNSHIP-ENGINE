@@ -6,6 +6,8 @@ const {
   updateInterviewLog,
   deleteInterviewLog,
   getAdminInterviewLogs,
+  getRejectionPatterns,
+  getInterviewLearning,
 } = require('../controllers/interviewLogController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -14,6 +16,8 @@ router.route('/')
   .post(protect, createInterviewLog);
 
 router.get('/admin/all', protect, admin, getAdminInterviewLogs);
+router.get('/rejection-patterns', protect, getRejectionPatterns);
+router.get('/interview-learning', protect, getInterviewLearning);
 
 router.route('/:id')
   .put(protect, updateInterviewLog)

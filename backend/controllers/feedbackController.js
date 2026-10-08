@@ -2,7 +2,18 @@ const asyncHandler = require('express-async-handler');
 const FeedbackForm = require('../models/FeedbackForm');
 const FeedbackResponse = require('../models/FeedbackResponse');
 const ActivityLog = require('../models/ActivityLog');
+const SkillAssessment = require('../models/SkillAssessment');
 const { createAndNotify } = require('../utils/notificationHelper');
+
+// Dimension → skill name mapping for company feedback
+const DIMENSION_SKILL_MAP = {
+  technicalSkills: 'technical',
+  communication: 'communication',
+  problemSolving: 'problem-solving',
+  teamwork: 'teamwork',
+  professionalism: 'professionalism',
+  learningAbility: 'learning-ability',
+};
 
 // @desc    Get active feedback forms for current user's role
 // @route   GET /api/feedback/forms
@@ -92,10 +103,12 @@ const submitFeedbackResponse = asyncHandler(async (req, res) => {
     throw new Error('Feedback form not found or inactive');
   }
 
+  const answers = req.body.answers || [];
+
   const response = await FeedbackResponse.create({
     form: req.params.formId,
     respondent: req.user.id,
-    answers: req.body.answers || [],
+    answers,
   });
 
   await ActivityLog.create({
@@ -105,6 +118,79 @@ const submitFeedbackResponse = asyncHandler(async (req, res) => {
     ip: req.ip,
     userAgent: req.headers['user-agent'],
   });
+
+  // --- Feature #24-25: Update SkillAssessment for company feedback dimensions ---
+  // Determine the student being assessed: prefer req.body.studentId (company submitting on behalf of student),
+  // otherwise fall back to the submitting user.
+  const studentId = req.body.studentId || req.user.id;
+
+  // Collect dimension ratings from answers (question matches a dimension key or skill name)
+  const dimensionRatings = {};
+
+  // Also support a top-level `ratings` object in the request body for direct company feedback
+  const directRatings = req.body.ratings || {};
+
+  // Merge direct ratings and answer-based ratings
+  Object.keys(DIMENSION_SKILL_MAP).forEach((dim) => {
+    if (directRatings[dim] !== undefined) {
+      dimensionRatings[dim] = Number(directRatings[dim]);
+    }
+  });
+
+  // Parse structured answers: { question: 'technicalSkills', answer: 4 }
+  answers.forEach(({ question, answer }) => {
+    if (question && DIMENSION_SKILL_MAP[question] !== undefined) {
+      dimensionRatings[question] = Number(answer);
+    }
+  });
+
+  const highRatedDimensions = Object.entries(dimensionRatings).filter(
+    ([, rating]) => !isNaN(rating) && rating >= 4
+  );
+
+  if (highRatedDimensions.length > 0) {
+    await Promise.all(
+      highRatedDimensions.map(async ([dim, rating]) => {
+        const skillName = DIMENSION_SKILL_MAP[dim];
+
+        // Find or create a SkillAssessment for this student + skill
+        let skillDoc = await SkillAssessment.findOne({ user: studentId, skill: skillName });
+
+        if (!skillDoc) {
+          skillDoc = await SkillAssessment.create({
+            user: studentId,
+            skill: skillName,
+            level: rating >= 5 ? 'advanced' : 'intermediate',
+            score: rating,
+            source: 'company_feedback',
+          });
+        } else {
+          // Update score toward the new rating (simple average nudge) and bump level if warranted
+          skillDoc.score = Math.min(5, Math.max(skillDoc.score, rating));
+          if (skillDoc.score >= 4 && skillDoc.level === 'beginner') {
+            skillDoc.level = 'intermediate';
+          }
+          if (skillDoc.score >= 5 && skillDoc.level !== 'advanced') {
+            skillDoc.level = 'advanced';
+          }
+          skillDoc.source = 'company_feedback';
+          skillDoc.assessedAt = new Date();
+          await skillDoc.save();
+        }
+      })
+    );
+
+    // Notify the student that their skill profile was updated
+    await createAndNotify(req.app, {
+      recipient: studentId,
+      title: '📊 Company Feedback Received',
+      message: 'Your company feedback is available! Your skill profile has been updated.',
+      type: 'success',
+      priority: 'medium',
+      link: '/dashboard/career',
+    });
+  }
+  // --- End Feature #24-25 ---
 
   res.status(201).json(response);
 });
