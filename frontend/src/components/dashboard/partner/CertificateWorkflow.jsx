@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Award, CheckCircle2 } from 'lucide-react';
+import { Award, CheckCircle2, Clock, AlertCircle, Plus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { getPartnerCompletions, issueCertificate } from '../../../services/careerService';
-import { api } from '../../../services/api';
-import Button from '../../ui/Button';
 import { Skeleton } from '../../ui/Skeleton';
 import EmptyState from '../../ui/EmptyState';
 
@@ -30,105 +28,129 @@ const CertificateWorkflow = () => {
 
   const handleIssueCertificate = async (item) => {
     const id = item._id ?? item.applicationId;
-    setIssuing((prev) => ({ ...prev, [id]: 'loading' }));
+    setIssuing(prev => ({ ...prev, [id]: 'loading' }));
     try {
       await issueCertificate({
         applicationId: item.applicationId ?? item._id,
         studentId: item.studentId,
         internshipId: item.internshipId,
+        role: item.internshipTitle,
+        organization: item.organizationName,
+        duration: item.duration,
       });
-      setIssuing((prev) => ({ ...prev, [id]: 'issued' }));
-      toast.success(`Certificate issued for ${item.studentName}!`);
+      setIssuing(prev => ({ ...prev, [id]: 'issued' }));
+      toast.success(`Certificate issued for ${item.studentName || 'student'}!`);
     } catch (err) {
       console.error('Certificate issuance failed:', err);
-      setIssuing((prev) => ({ ...prev, [id]: null }));
-      toast.error('Failed to issue certificate.');
+      setIssuing(prev => ({ ...prev, [id]: null }));
+      toast.error(err?.message || 'Failed to issue certificate.');
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="space-y-3">
-        <Skeleton className="h-16 rounded-xl" />
-        <Skeleton className="h-16 rounded-xl" />
-        <Skeleton className="h-16 rounded-xl" />
-      </div>
-    );
-  }
+  const fmt = (d) => d
+    ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '—';
 
   return (
-    <div className="space-y-4">
-      <div className="neo-glass p-4 rounded-xl flex items-start gap-3">
-        <Award size={18} className="text-amber-400 mt-0.5 shrink-0" />
-        <p className="text-white/70 text-sm">
-          Admin must verify before a certificate becomes active and visible to students.
-        </p>
+    <div className="space-y-6 p-6">
+      {/* Page Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+          <Award size={20} className="text-amber-600" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Certificate Workflow</h1>
+          <p className="text-sm text-gray-500">Issue certificates to students who completed internships</p>
+        </div>
       </div>
 
-      {completions.length === 0 ? (
+      {/* Info Banner */}
+      <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200">
+        <AlertCircle size={16} className="text-amber-600 mt-0.5 shrink-0" />
+        <div className="text-sm text-amber-800">
+          <strong>Two-step process:</strong> You issue the certificate here. A Super Admin must then verify it before it becomes active and visible to the student.
+        </div>
+      </div>
+
+      {/* Content */}
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-xl" />)}
+        </div>
+      ) : completions.length === 0 ? (
         <EmptyState
           title="No Completed Internships"
-          message="Completed internships will appear here for certificate issuance."
+          message="Internships marked as 'Completed' in your Completion workflow will appear here for certificate issuance."
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl neo-glass">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left text-white/60 font-medium px-4 py-3">Student</th>
-                <th className="text-left text-white/60 font-medium px-4 py-3">Internship</th>
-                <th className="text-left text-white/60 font-medium px-4 py-3">Completed On</th>
-                <th className="text-left text-white/60 font-medium px-4 py-3">Status</th>
-                <th className="text-left text-white/60 font-medium px-4 py-3">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {completions.map((item) => {
-                const id = item._id ?? item.applicationId;
-                const issuedStatus = issuing[id];
-                const alreadyIssued = issuedStatus === 'issued' || item.certificateIssued;
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left text-gray-500 font-semibold text-xs uppercase tracking-wide px-4 py-3">Student</th>
+                  <th className="text-left text-gray-500 font-semibold text-xs uppercase tracking-wide px-4 py-3">Internship</th>
+                  <th className="text-left text-gray-500 font-semibold text-xs uppercase tracking-wide px-4 py-3">Completed On</th>
+                  <th className="text-left text-gray-500 font-semibold text-xs uppercase tracking-wide px-4 py-3">Certificate</th>
+                  <th className="text-left text-gray-500 font-semibold text-xs uppercase tracking-wide px-4 py-3">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {completions.map((item) => {
+                  const id = item._id ?? item.applicationId;
+                  const issuedStatus = issuing[id];
+                  const alreadyIssued = issuedStatus === 'issued' || item.certificateIssued;
+                  const isLoading = issuedStatus === 'loading';
 
-                return (
-                  <tr key={id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-4 py-3 text-white font-medium">{item.studentName}</td>
-                    <td className="px-4 py-3 text-white/80">{item.internshipTitle}</td>
-                    <td className="px-4 py-3 text-white/60">{formatDate(item.completedAt ?? item.updatedAt)}</td>
-                    <td className="px-4 py-3">
-                      {alreadyIssued ? (
-                        <span className="flex items-center gap-1.5 text-emerald-400 text-xs font-medium">
-                          <CheckCircle2 size={14} />
-                          Issued
-                        </span>
-                      ) : (
-                        <span className="text-amber-400 text-xs font-medium">Pending</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {!alreadyIssued && (
-                        <Button
-                          variant="primary"
-                          disabled={issuedStatus === 'loading'}
-                          onClick={() => handleIssueCertificate(item)}
-                        >
-                          <Award size={14} className="mr-1.5" />
-                          {issuedStatus === 'loading' ? 'Issuing…' : 'Issue Certificate'}
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  return (
+                    <tr key={id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs shrink-0">
+                            {(item.studentName || 'S').charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-medium text-gray-800">{item.studentName || '—'}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">{item.internshipTitle || '—'}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{fmt(item.completedAt ?? item.updatedAt)}</td>
+                      <td className="px-4 py-3">
+                        {alreadyIssued ? (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                            <CheckCircle2 size={12} />
+                            Issued — Pending Admin Verification
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                            <Clock size={12} />
+                            Not Issued
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {!alreadyIssued && (
+                          <button
+                            onClick={() => handleIssueCertificate(item)}
+                            disabled={isLoading}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-xs font-medium rounded-lg transition-colors"
+                          >
+                            <Plus size={13} />
+                            {isLoading ? 'Issuing…' : 'Issue Certificate'}
+                          </button>
+                        )}
+                        {alreadyIssued && (
+                          <span className="text-xs text-gray-400">Awaiting verification</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-500">
+            {completions.length} completed internship{completions.length !== 1 ? 's' : ''} eligible for certificates
+          </div>
         </div>
       )}
     </div>
