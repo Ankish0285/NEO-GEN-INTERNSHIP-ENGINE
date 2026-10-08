@@ -4,6 +4,7 @@ const {
     getUsers, updateUserRole, toggleBlockUser, 
     updatePartnerStatus, getSystemAnalytics, impersonateUser, getAuditLogs 
 } = require('../controllers/adminController');
+const { getPlatformIntelligence } = require('../controllers/adminIntelligenceController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -21,5 +22,6 @@ router.put('/partners/:id/status', updatePartnerStatus);
 router.get('/analytics', getSystemAnalytics);
 router.post('/impersonate/:id', impersonateUser);
 router.get('/logs', getAuditLogs);
+router.get('/intelligence', getPlatformIntelligence);
 
 module.exports = router;

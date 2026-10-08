@@ -28,6 +28,10 @@ export const getAllCertificates = (params) => api.get('/certificates', { params 
 
 // --- Admin ---
 export const getCareerInsights = () => api.get('/admin/career-insights');
+export const getAdminPlatformIntelligence = () => api.get('/admin/intelligence');
+
+// --- Partner Intelligence ---
+export const getPartnerIntelligence = () => api.get('/partner/intelligence');
 
 // --- Completion ---
 export const getPartnerCompletions = (params) => api.get('/completion/partner/all', { params });
@@ -68,6 +72,9 @@ export default {
   getAllCertificates,
   // Admin
   getCareerInsights,
+  getAdminPlatformIntelligence,
+  // Partner Intelligence
+  getPartnerIntelligence,
   // Completion
   getPartnerCompletions,
   updateCompletionStatus,
