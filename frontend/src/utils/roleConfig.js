@@ -25,6 +25,8 @@ import {
     GitBranch,
     Map,
     MessageSquare,
+    GraduationCap,
+    Video,
 } from 'lucide-react';
 
 export const roleConfig = {
@@ -35,6 +37,7 @@ export const roleConfig = {
         panelBadge: 'Student',
         accentClass: 'from-saffron to-[#ffad5c]',
         badgeClass: 'bg-saffron/15 text-saffron border-saffron/30',
+        // Flat list kept for backward compatibility
         menuItems: [
             { path: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
             { path: '/dashboard/profile', label: 'Profile', icon: User },
@@ -53,8 +56,66 @@ export const roleConfig = {
             { path: '/dashboard/career/paths', label: 'Career Paths', icon: Map },
             { path: '/dashboard/feedback', label: 'Company Feedback', icon: MessageSquare },
             { path: '/dashboard/passport', label: 'My Passport', icon: BookOpen },
+            { path: '/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
             { path: '/dashboard/settings', label: 'Settings', icon: Settings },
-        ]
+        ],
+        // Grouped sections for collapsible sidebar
+        sections: [
+            {
+                label: 'OVERVIEW',
+                items: [
+                    { path: '/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
+                    { path: '/dashboard/profile', label: 'Profile', icon: User },
+                    { path: '/dashboard/settings', label: 'Settings', icon: Settings },
+                ],
+            },
+            {
+                label: 'INTERNSHIPS',
+                items: [
+                    { path: '/dashboard/applications', label: 'Applications', icon: Briefcase },
+                    { path: '/dashboard/recommendations', label: 'Recommendations', icon: ThumbsUp },
+                ],
+            },
+            {
+                label: 'AI & RESUME',
+                items: [
+                    { path: '/dashboard/ats-resume', label: 'ATS Resume', icon: FileText },
+                    { path: '/dashboard/ai-intelligence', label: 'AI Intelligence', icon: Brain },
+                ],
+            },
+            {
+                label: 'CAREER DEVELOPMENT',
+                items: [
+                    { path: '/dashboard/skills/evidence', label: 'Skill Evidence', icon: ShieldCheck },
+                    { path: '/dashboard/skills/gaps', label: 'Skill Gaps', icon: Target },
+                    { path: '/dashboard/career/action-plan', label: 'Action Plan', icon: ListChecks },
+                    { path: '/dashboard/career/readiness', label: 'Readiness', icon: Gauge },
+                    { path: '/dashboard/career/digital-twin', label: 'Digital Twin', icon: GitBranch },
+                    { path: '/dashboard/career/paths', label: 'Career Paths', icon: Map },
+                ],
+            },
+            {
+                label: 'MY PROGRESS',
+                items: [
+                    { path: '/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+                    { path: '/dashboard/passport', label: 'My Passport', icon: BookOpen },
+                    { path: '/dashboard/feedback', label: 'Company Feedback', icon: MessageSquare },
+                    { path: '/dashboard/success-stories', label: 'Success Stories', icon: Star },
+                ],
+            },
+            {
+                label: 'LEARNING',
+                items: [
+                    { path: '/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
+                ],
+            },
+            {
+                label: 'HELP',
+                items: [
+                    { path: '/dashboard/support', label: 'Contact Support', icon: LifeBuoy, supportMenu: true },
+                ],
+            },
+        ],
     },
     admin: {
         basePath: '/admin/dashboard',
@@ -76,8 +137,55 @@ export const roleConfig = {
             { path: '/admin/dashboard/certificates', label: 'Certificates', icon: Award },
             { path: '/admin/dashboard/career-insights', label: 'Career Insights', icon: TrendingUp },
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+            { path: '/admin/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
-        ]
+        ],
+        sections: [
+            {
+                label: 'OVERVIEW',
+                items: [
+                    { path: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
+                    { path: '/admin/dashboard/profile', label: 'Profile', icon: User },
+                ],
+            },
+            {
+                label: 'MANAGEMENT',
+                items: [
+                    { path: '/admin/dashboard/users', label: 'Users', icon: Users },
+                    { path: '/admin/dashboard/internships', label: 'Internships', icon: Briefcase },
+                    { path: '/admin/dashboard/applications', label: 'Applications', icon: FileText },
+                ],
+            },
+            {
+                label: 'CONTENT & LEARNING',
+                items: [
+                    { path: '/admin/dashboard/website', label: 'Website Control', icon: Globe2 },
+                    { path: '/admin/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
+                    { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
+                ],
+            },
+            {
+                label: 'BILLING',
+                items: [
+                    { path: '/admin/dashboard/subscriptions', label: 'Subscriptions', icon: CreditCard },
+                ],
+            },
+            {
+                label: 'STUDENT SUCCESS',
+                items: [
+                    { path: '/admin/dashboard/certificates', label: 'Certificates', icon: Award },
+                    { path: '/admin/dashboard/career-insights', label: 'Career Insights', icon: TrendingUp },
+                    { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+                ],
+            },
+            {
+                label: 'SUPPORT',
+                items: [
+                    { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
+                    { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
+                ],
+            },
+        ],
     },
     super_admin: {
         basePath: '/admin/dashboard',
@@ -99,8 +207,55 @@ export const roleConfig = {
             { path: '/admin/dashboard/certificates', label: 'Certificates', icon: Award },
             { path: '/admin/dashboard/career-insights', label: 'Career Insights', icon: TrendingUp },
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+            { path: '/admin/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
-        ]
+        ],
+        sections: [
+            {
+                label: 'OVERVIEW',
+                items: [
+                    { path: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
+                    { path: '/admin/dashboard/profile', label: 'Profile', icon: User },
+                ],
+            },
+            {
+                label: 'MANAGEMENT',
+                items: [
+                    { path: '/admin/dashboard/users', label: 'Users', icon: Users },
+                    { path: '/admin/dashboard/internships', label: 'Internships', icon: Briefcase },
+                    { path: '/admin/dashboard/applications', label: 'Applications', icon: FileText },
+                ],
+            },
+            {
+                label: 'CONTENT & LEARNING',
+                items: [
+                    { path: '/admin/dashboard/website', label: 'Website Control', icon: Globe2 },
+                    { path: '/admin/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
+                    { path: '/admin/dashboard/success-stories', label: 'Success Stories', icon: Star },
+                ],
+            },
+            {
+                label: 'BILLING',
+                items: [
+                    { path: '/admin/dashboard/subscriptions', label: 'Subscriptions', icon: CreditCard },
+                ],
+            },
+            {
+                label: 'STUDENT SUCCESS',
+                items: [
+                    { path: '/admin/dashboard/certificates', label: 'Certificates', icon: Award },
+                    { path: '/admin/dashboard/career-insights', label: 'Career Insights', icon: TrendingUp },
+                    { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+                ],
+            },
+            {
+                label: 'SUPPORT',
+                items: [
+                    { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
+                    { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
+                ],
+            },
+        ],
     },
     partner: {
         basePath: '/partner/dashboard',
@@ -118,9 +273,48 @@ export const roleConfig = {
             { path: '/partner/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
             { path: '/partner/dashboard/completion', label: 'Completion', icon: CheckCircle2 },
             { path: '/partner/dashboard/certificates', label: 'Certificates', icon: Award },
+            { path: '/partner/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
             { path: '/partner/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/partner/dashboard/settings', label: 'Settings', icon: Settings },
-        ]
+        ],
+        sections: [
+            {
+                label: 'OVERVIEW',
+                items: [
+                    { path: '/partner/dashboard', label: 'Overview', icon: LayoutDashboard, end: true },
+                    { path: '/partner/dashboard/profile', label: 'Organization Profile', icon: User },
+                ],
+            },
+            {
+                label: 'INTERNSHIP MANAGEMENT',
+                items: [
+                    { path: '/partner/dashboard/internships', label: 'Internships', icon: Briefcase },
+                    { path: '/partner/dashboard/post-internship', label: 'Post Internship', icon: PlusCircle },
+                ],
+            },
+            {
+                label: 'CANDIDATES',
+                items: [
+                    { path: '/partner/dashboard/applications', label: 'Applications', icon: FileText },
+                    { path: '/partner/dashboard/completion', label: 'Completion', icon: CheckCircle2 },
+                    { path: '/partner/dashboard/certificates', label: 'Certificates', icon: Award },
+                ],
+            },
+            {
+                label: 'LEARNING',
+                items: [
+                    { path: '/partner/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
+                ],
+            },
+            {
+                label: 'ANALYTICS & SUPPORT',
+                items: [
+                    { path: '/partner/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
+                    { path: '/partner/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
+                    { path: '/partner/dashboard/settings', label: 'Settings', icon: Settings },
+                ],
+            },
+        ],
     }
 };
 

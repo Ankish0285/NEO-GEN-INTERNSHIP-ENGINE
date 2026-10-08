@@ -115,16 +115,13 @@ const Navbar = () => {
             >
               Internships
             </a>
-            <a 
-              href="#resources-section" 
-              className="nav-link" 
-              onClick={(e) => { 
-                e.preventDefault(); 
-                handleNavClick('#resources-section'); 
-              }}
+            <Link
+              to="/learning-resources"
+              className="nav-link"
+              onClick={() => setIsMenuOpen(false)}
             >
-              Resources
-            </a>
+              Learn
+            </Link>
             {isAuthenticated && (
               <Link 
                 to="/dashboard" 
