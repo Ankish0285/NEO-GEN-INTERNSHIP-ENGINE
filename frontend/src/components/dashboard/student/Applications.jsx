@@ -9,6 +9,7 @@ import EmptyState from '../../ui/EmptyState';
 import ApplicationService from '../../../services/applicationService';
 import { resolveResumeUrl } from '../../../utils/resolveResumeUrl';
 import { canWithdrawApplicationStatus } from '../../../utils/applicationStatus';
+import ApplicationStrengthBar from '../../career/ApplicationStrengthBar';
 
 const StatusBadge = ({ status }) => {
   const s = (status || 'Applied').toLowerCase().replace(/\s+/g, ' ');
@@ -238,6 +239,23 @@ const Applications = () => {
                                       );
                                    })}
                                 </div>
+                                {/* Application Strength */}
+                                {(app.applicationStrength !== undefined || app.strengthScore !== undefined) ? (
+                                  <div className="mt-6 border-t border-slate-100 pt-5">
+                                    <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-3">
+                                      Application Strength
+                                    </h4>
+                                    <ApplicationStrengthBar
+                                      strength={app.applicationStrength ?? app.strengthScore ?? 0}
+                                      breakdown={app.strengthBreakdown ?? {}}
+                                    />
+                                  </div>
+                                ) : (
+                                  <p className="mt-5 text-xs text-slate-400 border-t border-slate-100 pt-4">
+                                    Application strength is not yet available for this application.
+                                  </p>
+                                )}
+
                                 <div className="mt-8 flex flex-col gap-4 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
                                    <div className="flex flex-wrap gap-3">
                                       {getResumeUrl(app) && (

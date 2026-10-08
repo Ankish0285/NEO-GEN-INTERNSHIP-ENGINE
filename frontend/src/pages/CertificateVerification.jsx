@@ -194,7 +194,31 @@ const CertificateVerification = () => {
                   <p className="text-white/40 text-xs uppercase tracking-wider mb-0.5">Issued On</p>
                   <p className="text-white/80">{formatDate(certificate.issuedAt)}</p>
                 </div>
+                {certificate.duration && (
+                  <div>
+                    <p className="text-white/40 text-xs uppercase tracking-wider mb-0.5">Duration</p>
+                    <p className="text-white/80">{certificate.duration}</p>
+                  </div>
+                )}
+                {certificate.verifiedAt && (
+                  <div>
+                    <p className="text-white/40 text-xs uppercase tracking-wider mb-0.5">Verified On</p>
+                    <p className="text-white/80">{formatDate(certificate.verifiedAt)}</p>
+                  </div>
+                )}
               </div>
+
+              {/* QR Code */}
+              {certificate.status === 'active' && certificate.qrCodeData && (
+                <div className="flex flex-col items-center gap-2 pt-2">
+                  <p className="text-white/40 text-xs uppercase tracking-wider">QR Code</p>
+                  <img
+                    src={certificate.qrCodeData}
+                    alt="Certificate QR"
+                    className="w-32 h-32 rounded-lg border border-white/20 bg-white p-1"
+                  />
+                </div>
+              )}
 
               {/* Skills */}
               {Array.isArray(certificate.skills) && certificate.skills.length > 0 && (

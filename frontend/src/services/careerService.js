@@ -24,7 +24,11 @@ export const verifyCertificate = (id) => api.get('/certificates/verify/' + id);
 export const issueCertificate = (data) => api.post('/certificates', data);
 export const verifyCertificateAdmin = (id) => api.put('/certificates/' + id + '/verify', {});
 export const revokeCertificate = (id) => api.put('/certificates/' + id + '/revoke', {});
+export const revokeCertificateAdmin = (certificateId, reason) => api.put(`/certificates/${certificateId}/revoke`, { reason });
 export const getAllCertificates = (params) => api.get('/certificates', { params });
+export const getAdminCertificates = (params) => api.get('/certificates/admin/all', { params });
+export const getPartnerCertificates = () => api.get('/certificates/partner');
+export const getPublicCertificate = (certificateId) => api.get(`/certificates/verify/${certificateId}`);
 
 // --- Admin ---
 export const getCareerInsights = () => api.get('/admin/career-insights');
@@ -35,7 +39,9 @@ export const getPartnerIntelligence = () => api.get('/partner/intelligence');
 
 // --- Completion ---
 export const getPartnerCompletions = (params) => api.get('/completion/partner/all', { params });
-export const updateCompletionStatus = (id, data) => api.put('/completion/' + id, data);
+export const updateCompletionStatus = (applicationId, newStatus, performanceRating) =>
+  api.put(`/completion/${applicationId}/status`, { newStatus, performanceRating });
+export const getCompletionStatus = (applicationId) => api.get(`/completion/${applicationId}`);
 
 // --- Internship Quality ---
 export const getInternshipQuality = (internshipId) => api.get(`/internship-quality/${internshipId}`);
@@ -69,7 +75,11 @@ export default {
   issueCertificate,
   verifyCertificateAdmin,
   revokeCertificate,
+  revokeCertificateAdmin,
   getAllCertificates,
+  getAdminCertificates,
+  getPartnerCertificates,
+  getPublicCertificate,
   // Admin
   getCareerInsights,
   getAdminPlatformIntelligence,
@@ -78,6 +88,7 @@ export default {
   // Completion
   getPartnerCompletions,
   updateCompletionStatus,
+  getCompletionStatus,
   // Internship Quality
   getInternshipQuality,
   // Interview Log Analysis

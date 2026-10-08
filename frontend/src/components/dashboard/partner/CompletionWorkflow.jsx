@@ -50,7 +50,7 @@ const CompletionWorkflow = () => {
     const { applicationId, newStatus } = confirmModal;
     setConfirmModal({ open: false, applicationId: null, newStatus: '' });
     try {
-      await updateCompletionStatus(applicationId, { status: newStatus });
+      await updateCompletionStatus(applicationId, newStatus);
       toast.success(`Status updated to "${newStatus}".`);
       fetchCompletions();
     } catch (err) {

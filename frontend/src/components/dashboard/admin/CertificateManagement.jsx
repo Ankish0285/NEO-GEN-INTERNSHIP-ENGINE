@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Award, Search, Filter } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { getAllCertificates, verifyCertificateAdmin, revokeCertificate } from '../../../services/careerService';
+import { getAllCertificates, verifyCertificateAdmin, revokeCertificateAdmin } from '../../../services/careerService';
 import { api } from '../../../services/api';
 import Button from '../../ui/Button';
 import Modal from '../../ui/Modal';
@@ -26,7 +26,7 @@ const CertificateManagement = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [revokeModal, setRevokeModal] = useState({ open: false, certId: null });
+  const [revokeModal, setRevokeModal] = useState({ open: false, certId: null, reason: '' });
 
   const fetchCertificates = async () => {
     setLoading(true);
@@ -58,10 +58,10 @@ const CertificateManagement = () => {
   };
 
   const handleRevoke = async () => {
-    const { certId } = revokeModal;
-    setRevokeModal({ open: false, certId: null });
+    const { certId, reason } = revokeModal;
+    setRevokeModal({ open: false, certId: null, reason: '' });
     try {
-      await revokeCertificate(certId);
+      await revokeCertificateAdmin(certId, reason);
       toast.success('Certificate revoked.');
       fetchCertificates();
     } catch (err) {
@@ -176,7 +176,7 @@ const CertificateManagement = () => {
                       {cert.status !== 'revoked' && (
                         <Button
                           variant="danger"
-                          onClick={() => setRevokeModal({ open: true, certId: cert._id ?? cert.certificateId })}
+                          onClick={() => setRevokeModal({ open: true, certId: cert._id ?? cert.certificateId, reason: '' })}
                         >
                           Revoke
                         </Button>
@@ -193,7 +193,7 @@ const CertificateManagement = () => {
       {/* Revoke confirmation modal */}
       <Modal
         isOpen={revokeModal.open}
-        onClose={() => setRevokeModal({ open: false, certId: null })}
+        onClose={() => setRevokeModal({ open: false, certId: null, reason: '' })}
         title="Revoke Certificate"
       >
         <div className="space-y-4">
@@ -201,8 +201,18 @@ const CertificateManagement = () => {
             Are you sure you want to revoke this certificate? This action will immediately
             invalidate the certificate for the student.
           </p>
+          <div>
+            <label className="text-white/60 text-sm block mb-1">Reason (optional)</label>
+            <input
+              type="text"
+              value={revokeModal.reason}
+              onChange={(e) => setRevokeModal((prev) => ({ ...prev, reason: e.target.value }))}
+              placeholder="Enter revocation reason…"
+              className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-amber-400"
+            />
+          </div>
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setRevokeModal({ open: false, certId: null })}>
+            <Button variant="outline" onClick={() => setRevokeModal({ open: false, certId: null, reason: '' })}>
               Cancel
             </Button>
             <Button variant="danger" onClick={handleRevoke}>
