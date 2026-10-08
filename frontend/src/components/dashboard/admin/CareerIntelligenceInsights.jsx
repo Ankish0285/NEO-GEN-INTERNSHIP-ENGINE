@@ -10,15 +10,15 @@ const STAT_CARDS = [
     key: 'totalCertificates',
     label: 'Total Certificates Issued',
     icon: Award,
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/10',
+    color: 'text-[#FF9933]',
+    bg: 'bg-[#fff4e8]',
   },
   {
     key: 'activeCertificates',
     label: 'Active Certificates',
     icon: CheckCircle2,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/10',
+    color: 'text-[#138808]',
+    bg: 'bg-[#e8f5e6]',
   },
   {
     key: 'totalCompletions',
@@ -125,7 +125,7 @@ const CareerIntelligenceInsights = () => {
       {/* Top skill gaps */}
       <div className="neo-glass p-5 rounded-xl">
         <div className="flex items-center gap-2 mb-4">
-          <BarChart2 size={18} className="text-amber-400" />
+          <BarChart2 size={18} className="text-[#FF9933]" />
           <h3 className="text-white font-semibold">Top 10 Skill Gaps</h3>
         </div>
 
@@ -143,7 +143,7 @@ const CareerIntelligenceInsights = () => {
                   </div>
                   <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full transition-all duration-500"
+                      className="h-full bg-gradient-to-r from-[#FF9933] to-[#ffbb77] rounded-full transition-all duration-500"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -165,8 +165,8 @@ const CareerIntelligenceInsights = () => {
         <>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="neo-glass p-5 rounded-xl flex flex-col gap-2">
-              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                <Award size={18} className="text-amber-400" />
+              <div className="w-9 h-9 rounded-lg bg-[#fff4e8] flex items-center justify-center">
+                <Award size={18} className="text-[#FF9933]" />
               </div>
               <p className="text-2xl font-bold text-white">
                 {platformIntel.certificates?.total ?? '—'}
@@ -174,8 +174,8 @@ const CareerIntelligenceInsights = () => {
               <p className="text-white/60 text-xs leading-snug">Total Certificates (Platform)</p>
             </div>
             <div className="neo-glass p-5 rounded-xl flex flex-col gap-2">
-              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <CheckCircle2 size={18} className="text-emerald-400" />
+              <div className="w-9 h-9 rounded-lg bg-[#e8f5e6] flex items-center justify-center">
+                <CheckCircle2 size={18} className="text-[#138808]" />
               </div>
               <p className="text-2xl font-bold text-white">
                 {platformIntel.certificates?.active ?? '—'}
@@ -215,7 +215,7 @@ const CareerIntelligenceInsights = () => {
           {Array.isArray(platformIntel.completionStats) && platformIntel.completionStats.length > 0 && (
             <div className="neo-glass p-5 rounded-xl">
               <div className="flex items-center gap-2 mb-4">
-                <CheckCircle2 size={18} className="text-emerald-400" />
+                <CheckCircle2 size={18} className="text-[#138808]" />
                 <h3 className="text-white font-semibold">Completion Status Breakdown</h3>
               </div>
               <div className="space-y-2">

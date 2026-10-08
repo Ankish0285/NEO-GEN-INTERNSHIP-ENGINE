@@ -212,7 +212,7 @@ const AdminLearningResources = () => {
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-[#FF9933] text-white rounded-lg text-sm font-semibold hover:bg-[#e68a2e] transition-colors"
         >
           <Plus size={16} /> Add Resource
         </button>
@@ -242,7 +242,7 @@ const AdminLearningResources = () => {
           <p className="text-slate-500 font-medium">No resources found.</p>
           <button
             onClick={openCreate}
-            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 bg-[#FF9933] text-white rounded-lg text-sm font-semibold hover:bg-[#e68a2e] transition-colors"
           >
             Create First Resource
           </button>
@@ -262,8 +262,8 @@ const AdminLearningResources = () => {
                   onClick={(e) => { e.stopPropagation(); handleTogglePublish(resource); }}
                   className={`p-1.5 bg-white rounded-lg shadow border transition-colors ${
                     resource.status === 'published'
-                      ? 'text-amber-500 hover:bg-amber-50 border-amber-100'
-                      : 'text-emerald-600 hover:bg-emerald-50 border-emerald-100'
+                      ? 'text-[#e68a2e] hover:bg-[#fff4e8] border-amber-100'
+                      : 'text-[#138808] hover:bg-[#e8f5e6] border-green-100'
                   }`}
                   title={resource.status === 'published' ? 'Unpublish' : 'Publish'}
                 >
@@ -271,7 +271,7 @@ const AdminLearningResources = () => {
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); openEdit(resource); }}
-                  className="p-1.5 bg-white rounded-lg shadow text-indigo-600 hover:bg-indigo-50 border border-indigo-100"
+                  className="p-1.5 bg-white rounded-lg shadow text-[#FF9933] hover:bg-[#fff4e8] border border-amber-100"
                   title="Edit resource"
                 >
                   <Edit2 size={14} />
@@ -288,8 +288,8 @@ const AdminLearningResources = () => {
               <span
                 className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-semibold z-10 ${
                   resource.status === 'published'
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-amber-100 text-amber-700'
+                    ? 'bg-[#e8f5e6] text-[#138808]'
+                    : 'bg-[#fff4e8] text-[#e68a2e]'
                 }`}
               >
                 {resource.status === 'published' ? 'Published' : 'Draft'}
@@ -459,7 +459,7 @@ const AdminLearningResources = () => {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-indigo-600 text-white rounded-lg py-2 text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="flex-1 bg-[#FF9933] text-white rounded-lg py-2 text-sm font-semibold hover:bg-[#e68a2e] disabled:opacity-50 transition-colors"
             >
               {saving ? 'Saving…' : editing ? 'Update Resource' : 'Create Resource'}
             </button>

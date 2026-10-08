@@ -14,7 +14,7 @@ import EmptyState from '../../ui/EmptyState';
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 const STATUS_BADGE = {
-  pending: 'bg-amber-100 text-amber-700 border border-amber-200',
+  pending: 'bg-[#fff4e8] text-[#e68a2e] border border-amber-200',
   active:  'bg-green-100  text-green-700  border border-green-200',
   revoked: 'bg-red-100   text-red-700    border border-red-200',
 };
@@ -165,8 +165,8 @@ const CertificateManagement = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-            <Award size={20} className="text-amber-600" />
+          <div className="w-10 h-10 rounded-xl bg-[#fff4e8] flex items-center justify-center">
+            <Award size={20} className="text-[#e68a2e]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Certificate Management</h1>
@@ -175,7 +175,7 @@ const CertificateManagement = () => {
         </div>
         <button
           onClick={() => setIssueModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF9933] hover:bg-[#e68a2e] text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
         >
           <Plus size={16} />
           Issue Certificate
@@ -186,8 +186,8 @@ const CertificateManagement = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Total',   value: counts.all,     color: 'bg-gray-50   border-gray-200  text-gray-700' },
-          { label: 'Pending', value: counts.pending, color: 'bg-amber-50  border-amber-200 text-amber-700' },
-          { label: 'Active',  value: counts.active,  color: 'bg-green-50  border-green-200 text-green-700' },
+          { label: 'Pending', value: counts.pending, color: 'bg-[#fff4e8] border-amber-200 text-[#e68a2e]' },
+          { label: 'Active',  value: counts.active,  color: 'bg-[#e8f5e6] border-green-200 text-[#138808]' },
           { label: 'Revoked', value: counts.revoked, color: 'bg-red-50    border-red-200   text-red-700'   },
         ].map(({ label, value, color }) => (
           <div key={label} className={`rounded-xl border p-4 ${color}`}>
@@ -206,7 +206,7 @@ const CertificateManagement = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by Certificate ID or Organization…"
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -218,7 +218,7 @@ const CertificateManagement = () => {
                 onClick={() => setStatusFilter(value)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   statusFilter === value
-                    ? 'bg-amber-500 text-white shadow-sm'
+                    ? 'bg-[#FF9933] text-white shadow-sm'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -277,7 +277,7 @@ const CertificateManagement = () => {
                             <button
                               onClick={() => handleVerify(id)}
                               disabled={verifyingId === id}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white text-xs font-medium rounded-lg transition-colors"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#138808] hover:bg-[#0f7006] disabled:opacity-60 text-white text-xs font-medium rounded-lg transition-colors"
                             >
                               <CheckCircle size={13} />
                               {verifyingId === id ? 'Verifying…' : 'Verify'}
@@ -340,7 +340,7 @@ const CertificateManagement = () => {
                     value={studentSearch}
                     onChange={(e) => setStudentSearch(e.target.value)}
                     placeholder="Type student name or email…"
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100"
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100"
                   />
                   {searchingStudents && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">Searching…</span>}
                 </div>
@@ -349,8 +349,8 @@ const CertificateManagement = () => {
                     {studentResults.map((s) => (
                       <button key={s._id} type="button"
                         onClick={() => { setSelectedStudent(s); setStudentSearch(''); setStudentResults([]); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 text-left transition-colors border-b border-gray-100 last:border-0">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs shrink-0">
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#fff4e8] text-left transition-colors border-b border-gray-100 last:border-0">
+                        <div className="w-8 h-8 rounded-full bg-[#fff4e8] flex items-center justify-center text-[#e68a2e] font-bold text-xs shrink-0">
                           {s.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
@@ -377,7 +377,7 @@ const CertificateManagement = () => {
               type="text" value={form.role}
               onChange={(e) => setForm(p => ({ ...p, role: e.target.value }))}
               placeholder="e.g. Frontend Developer Intern"
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100"
               required
             />
           </div>
@@ -391,7 +391,7 @@ const CertificateManagement = () => {
               type="text" value={form.organization}
               onChange={(e) => setForm(p => ({ ...p, organization: e.target.value }))}
               placeholder="e.g. NEO GEN Internship Engine"
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100"
               required
             />
           </div>
@@ -404,7 +404,7 @@ const CertificateManagement = () => {
                 type="text" value={form.duration}
                 onChange={(e) => setForm(p => ({ ...p, duration: e.target.value }))}
                 placeholder="e.g. 3 months"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100"
+                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100"
               />
             </div>
             <div>
@@ -413,7 +413,7 @@ const CertificateManagement = () => {
                 type="text" value={form.skills}
                 onChange={(e) => setForm(p => ({ ...p, skills: e.target.value }))}
                 placeholder="e.g. React, Node.js"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100"
+                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100"
               />
             </div>
           </div>
@@ -426,7 +426,7 @@ const CertificateManagement = () => {
               onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))}
               placeholder="Internal notes about this certificate…"
               rows={2}
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100 resize-none"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-700 focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100 resize-none"
             />
           </div>
 
@@ -443,7 +443,7 @@ const CertificateManagement = () => {
               Cancel
             </button>
             <button type="submit" disabled={submitting || !selectedStudent}
-              className="inline-flex items-center gap-2 px-5 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-medium rounded-xl transition-colors">
+              className="inline-flex items-center gap-2 px-5 py-2 bg-[#FF9933] hover:bg-[#e68a2e] disabled:opacity-60 text-white text-sm font-medium rounded-xl transition-colors">
               <Award size={15} />
               {submitting ? 'Issuing…' : 'Issue Certificate'}
             </button>
