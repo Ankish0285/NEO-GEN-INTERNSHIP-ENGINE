@@ -3,6 +3,7 @@ const FeedbackForm = require('../models/FeedbackForm');
 const FeedbackResponse = require('../models/FeedbackResponse');
 const ActivityLog = require('../models/ActivityLog');
 const SkillAssessment = require('../models/SkillAssessment');
+const AIStudentProfile = require('../models/AIStudentProfile');
 const { createAndNotify } = require('../utils/notificationHelper');
 
 // Dimension → skill name mapping for company feedback
@@ -190,7 +191,37 @@ const submitFeedbackResponse = asyncHandler(async (req, res) => {
       link: '/dashboard/career',
     });
   }
-  // --- End Feature #24-25 ---
+
+  // --- Feature: Update AIStudentProfile strengths/weaknesses from feedback ---
+  if (highRatedDimensions.length > 0) {
+    const profile = await AIStudentProfile.findOne({ user: studentId }) ||
+      new AIStudentProfile({ user: studentId, skillProfile: [], strengths: [], weaknesses: [] });
+
+    for (const [dim, rating] of highRatedDimensions) {
+      const skillName = DIMENSION_SKILL_MAP[dim];
+      if (!skillName) continue;
+
+      // Add to skillProfile if not already present
+      if (!profile.skillProfile.includes(skillName)) {
+        profile.skillProfile.push(skillName);
+      }
+
+      if (rating >= 4) {
+        // Add to strengths if not present
+        if (!profile.strengths.includes(skillName)) {
+          profile.strengths.push(skillName);
+        }
+        // Remove from weaknesses if present
+        const weakIdx = profile.weaknesses.indexOf(skillName);
+        if (weakIdx !== -1) {
+          profile.weaknesses.splice(weakIdx, 1);
+        }
+      }
+    }
+
+    await profile.save();
+  }
+  // --- End AIStudentProfile update ---
 
   res.status(201).json(response);
 });

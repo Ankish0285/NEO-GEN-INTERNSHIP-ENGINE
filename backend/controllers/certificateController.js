@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const QRCode = require('qrcode');
 const PlacementRecord = require('../models/PlacementRecord');
+const ActivityLog = require('../models/ActivityLog');
 const { createAndNotify } = require('../utils/notificationHelper');
 
 const generateCertificateId = () => {
@@ -29,6 +30,13 @@ const issueCertificate = asyncHandler(async (req, res) => {
     message: `Your internship certificate has been issued. Certificate ID: ${certificateId}`,
     type: 'success', priority: 'high', link: `/dashboard/passport`,
   });
+  await ActivityLog.create({
+    user: req.user.id,
+    action: 'certificate_issued',
+    details: { certificateId: cert.certificateId, studentId, internshipId },
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+  });
   res.status(201).json({ success: true, data: cert });
 });
 
@@ -48,6 +56,13 @@ const verifyCertificate = asyncHandler(async (req, res) => {
     message: `Your certificate ${cert.certificateId} has been verified and is now active!`,
     type: 'success', priority: 'high', link: `/dashboard/passport`,
   });
+  await ActivityLog.create({
+    user: req.user.id,
+    action: 'certificate_verified',
+    details: { certificateId: req.params.certificateId },
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+  });
   res.json({ success: true, data: cert });
 });
 
@@ -61,6 +76,13 @@ const revokeCertificate = asyncHandler(async (req, res) => {
     { new: true }
   );
   if (!cert) { res.status(404); throw new Error('Certificate not found'); }
+  await ActivityLog.create({
+    user: req.user.id,
+    action: 'certificate_revoked',
+    details: { certificateId: req.params.certificateId, reason: req.body.reason },
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+  });
   res.json({ success: true, data: cert });
 });
 

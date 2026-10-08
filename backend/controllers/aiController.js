@@ -274,7 +274,7 @@ const analyzeResumeAI = asyncHandler(async (req, res) => {
   const isSubscribed = req.resumeAccess?.isSubscribed ?? false;
   await incrementUsage(authenticatedUserId, isSubscribed);
 
-  res.json({ success: true, data: analysis });
+  res.json({ success: true, data: { ...analysis, isEstimate: true, disclaimer: 'Based on available profile data' } });
 });
 
 // @route GET /api/ai/recommendations
@@ -666,6 +666,91 @@ const checkConsistency = asyncHandler(async (req, res) => {
   res.json({ success: true, data });
 });
 
+// @route POST /api/ai/generate-application
+const generateApplication = asyncHandler(async (req, res) => {
+  const { internshipId } = req.body;
+
+  if (!internshipId) {
+    res.status(400);
+    throw new Error('internshipId is required');
+  }
+
+  // Load User with profile fields
+  const user = await User.findById(req.user.id).select('skills projects experience education');
+  
+  // Load SkillEvidence for user
+  const SkillEvidence = require('../models/SkillEvidence');
+  const evidenceDocs = await SkillEvidence.find({ user: req.user.id });
+
+  // Load Internship
+  const internship = await Internship.findById(internshipId);
+  if (!internship) {
+    res.status(404);
+    throw new Error('Internship not found');
+  }
+
+  // Guard: if user has no skills and SkillEvidence is empty
+  const hasSkills = user.skills && user.skills.length > 0;
+  const hasEvidence = evidenceDocs && evidenceDocs.length > 0;
+
+  if (!hasSkills && !hasEvidence) {
+    res.status(400);
+    throw new Error('Please complete your profile with skills before generating an application.');
+  }
+
+  // Compose prompt context
+  const profileSkills = user.skills || [];
+  const evidenceSkills = evidenceDocs.map((e) => ({
+    skillName: e.skillName,
+    confidenceScore: e.confidenceScore,
+  }));
+
+  const context = {
+    profileSkills,
+    evidenceSkills,
+    internshipTitle: internship.title,
+    internshipOrg: internship.organization,
+    internshipRequiredSkills: internship.requiredSkills || internship.skills || [],
+    internshipDescription: internship.description,
+    projects: user.projects || [],
+    experience: user.experience || [],
+  };
+
+  // Call AI service to generate cover letter
+  let coverLetter = '';
+  let truthGuardIssues = [];
+
+  const instruction = `Generate a professional cover letter using ONLY the provided profile data. Do not fabricate company names, certifications, or experiences not listed. Context: ${JSON.stringify(context)}`;
+
+  if (await aiClient.isAvailable()) {
+    try {
+      const aiResponse = await aiClient.chat(instruction, context);
+      coverLetter = aiResponse.reply || 'Unable to generate cover letter at this time.';
+
+      // Run truthGuard check on result
+      const truthGuardResult = await aiClient.truthGuard({
+        application_text: coverLetter,
+        profile_data: context,
+      });
+      truthGuardIssues = truthGuardResult?.issues || [];
+    } catch (e) {
+      console.error('AI generation error:', e);
+      coverLetter = 'AI service error. Please try again later.';
+    }
+  } else {
+    // Fallback if AI is offline
+    coverLetter = `Dear Hiring Manager,\n\nI am writing to express my interest in the ${internship.title} position at ${internship.organization}.\n\nI have experience with the following skills: ${profileSkills.join(', ')}.\n\nI am eager to contribute and learn.\n\nSincerely,\n${user.name || 'Applicant'}`;
+  }
+
+  res.json({
+    success: true,
+    coverLetter,
+    truthGuardIssues,
+    isEstimate: true,
+    disclaimer: 'Based on available profile data. Always review before submitting.',
+  });
+});
+
 module.exports = {
   getAIStatus,
   getAIProfile,
@@ -679,4 +764,5 @@ module.exports = {
   runAIPipelineForUser,
   checkTruthGuard,
   checkConsistency,
+  generateApplication,
 };

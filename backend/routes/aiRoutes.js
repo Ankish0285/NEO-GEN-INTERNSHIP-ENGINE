@@ -21,6 +21,7 @@ const {
   rankStudentsForInternship,
   checkTruthGuard,
   checkConsistency,
+  generateApplication,
 } = require('../controllers/aiController');
 
 // ── Public / read-only ────────────────────────────────────────────────────────
@@ -51,5 +52,8 @@ router.post('/truth-guard', protect, checkTruthGuard);
 
 // ── Application Consistency Checker (Feature #15) ────────────────────────────
 router.post('/consistency-check', protect, checkConsistency);
+
+// ── AI Application Generator (FEAT-003) ──────────────────────────────────────
+router.post('/generate-application', protect, generateApplication);
 
 module.exports = router;

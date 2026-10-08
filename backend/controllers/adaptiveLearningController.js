@@ -2,6 +2,10 @@ const asyncHandler = require('express-async-handler');
 const AdaptiveLearning = require('../models/AdaptiveLearning');
 const Guide = require('../models/Guide');
 const AIStudentProfile = require('../models/AIStudentProfile');
+const SkillEvidence = require('../models/SkillEvidence');
+const MicroAssessment = require('../models/MicroAssessment');
+const { calculateConfidence } = require('./skillEvidenceController');
+const { createAndNotify } = require('../utils/notificationHelper');
 
 // @desc    Get the adaptive learning plan for the current user
 // @route   GET /api/adaptive-learning
@@ -157,10 +161,141 @@ const getAdaptiveLearningRecommendations = asyncHandler(async (req, res) => {
   res.json({ success: true, data: { recommendations } });
 });
 
+// @desc    Complete adaptive learning guide and update skill evidence
+// @route   PUT /api/adaptive-learning/:guideId/complete-learning
+// @access  Private
+const completeLearning = asyncHandler(async (req, res) => {
+  const { assessmentScore, skillsTargeted } = req.body;
+
+  if (!skillsTargeted || !Array.isArray(skillsTargeted)) {
+    res.status(400);
+    throw new Error('skillsTargeted array is required');
+  }
+
+  const updated = [];
+
+  for (const skillName of skillsTargeted) {
+    if (!skillName) continue;
+
+    let evidenceDoc = await SkillEvidence.findOne({ user: req.user.id, skillName });
+
+    if (!evidenceDoc) {
+      evidenceDoc = new SkillEvidence({
+        user: req.user.id,
+        skillName,
+        proficiency: 'beginner',
+        evidenceSources: [],
+      });
+    }
+
+    const score = Number(assessmentScore) || 0;
+    const strength = score > 80 ? 'strong' : score > 60 ? 'moderate' : 'weak';
+
+    evidenceDoc.evidenceSources.push({
+      type: 'learning',
+      description: 'Completed adaptive learning guide',
+      strength,
+      verifiedAt: new Date(),
+    });
+
+    evidenceDoc.confidenceScore = calculateConfidence(evidenceDoc.evidenceSources, evidenceDoc.isVerified);
+    await evidenceDoc.save();
+    updated.push(skillName);
+  }
+
+  await createAndNotify(req.app, {
+    recipient: req.user.id,
+    title: 'Learning Completed!',
+    message: 'Great work! Your skill evidence has been updated.',
+    type: 'success',
+    priority: 'medium',
+    link: '/dashboard/career',
+  });
+
+  res.json({
+    updated,
+    disclaimer: 'Confidence scores updated based on assessment',
+  });
+});
+
+// @desc    Submit a micro-assessment and update skill evidence
+// @route   POST /api/adaptive-learning/assessment
+// @access  Private
+const submitAssessment = asyncHandler(async (req, res) => {
+  const { skillName, questions, userAnswers } = req.body;
+
+  if (!skillName) {
+    res.status(400);
+    throw new Error('skillName is required');
+  }
+
+  const qs = questions || [];
+  const answers = userAnswers || [];
+
+  // Calculate score
+  let score = 0;
+  for (let i = 0; i < qs.length; i++) {
+    if (answers[i] !== undefined && answers[i] === qs[i].correctIndex) {
+      score++;
+    }
+  }
+  const maxScore = qs.length;
+  const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+
+  // Save MicroAssessment
+  const microAssessment = await MicroAssessment.create({
+    user: req.user.id,
+    skillName,
+    questions: qs,
+    userAnswers: answers,
+    score,
+    maxScore,
+  });
+
+  // Find or create SkillEvidence
+  let evidenceDoc = await SkillEvidence.findOne({ user: req.user.id, skillName });
+
+  if (!evidenceDoc) {
+    evidenceDoc = new SkillEvidence({
+      user: req.user.id,
+      skillName,
+      proficiency: 'beginner',
+      evidenceSources: [],
+    });
+  }
+
+  const strength = percentage > 80 ? 'strong' : percentage > 60 ? 'moderate' : 'weak';
+
+  evidenceDoc.evidenceSources.push({
+    type: 'assessment',
+    description: `Micro-assessment: ${score}/${maxScore} (${percentage}%)`,
+    strength,
+    verifiedAt: new Date(),
+  });
+
+  const newConfidenceScore = calculateConfidence(evidenceDoc.evidenceSources, evidenceDoc.isVerified);
+  evidenceDoc.confidenceScore = newConfidenceScore;
+  await evidenceDoc.save();
+
+  // Mark evidence as added on MicroAssessment
+  microAssessment.evidenceAdded = true;
+  await microAssessment.save();
+
+  res.json({
+    score,
+    maxScore,
+    percentage,
+    skillConfidenceUpdated: true,
+    newConfidenceScore,
+  });
+});
+
 module.exports = {
   getMyAdaptivePlan,
   refreshAdaptivePlan,
   markGuideCompleted,
   adminGetAllAdaptivePlans,
   getAdaptiveLearningRecommendations,
+  completeLearning,
+  submitAssessment,
 };
