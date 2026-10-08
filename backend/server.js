@@ -130,6 +130,7 @@ app.use('/api/adaptive-learning',    require('./routes/adaptiveLearningRoutes'))
 app.use('/api/career-intelligence',  require('./routes/careerIntelligenceRoutes'));
 app.use('/api/internship-quality',   require('./routes/internshipQualityRoutes'));
 app.use('/api/certificates',         require('./routes/certificateRoutes'));
+app.use('/api/skill-evidence',       require('./routes/skillEvidenceRoutes'));
 app.use('/api/completion',           require('./routes/completionRoutes'));
 
 // Serve static files from the uploads directory

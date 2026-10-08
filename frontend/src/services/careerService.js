@@ -13,6 +13,15 @@ export const getReadiness = () => api.get('/career/readiness');
 export const getDigitalTwin = () => api.get('/career/digital-twin');
 export const getCareerPaths = () => api.get('/career/career-paths');
 
+// --- Career Intelligence ---
+export const getSkillGapPriority = () => api.get('/career-intelligence/skill-gap-priority');
+export const simulateWhatIf = (data) => api.post('/career-intelligence/what-if', data);
+export const getOpportunityUnlock = (skill) => api.get('/career-intelligence/opportunity-unlock', { params: { skill } });
+export const getOpportunityCost = () => api.get('/career-intelligence/opportunity-cost');
+export const getWhyNotApply = (internshipId) => api.get(`/career-intelligence/why-not-apply/${internshipId}`);
+export const getCounterfactual = (data) => api.post('/career-intelligence/counterfactual', data);
+export const getExplainableRec = (internshipId) => api.get(`/career-intelligence/explain/${internshipId}`);
+
 // --- Outcomes ---
 export const recordOutcome = (data) => api.post('/outcomes', data);
 export const getOutcomePatterns = () => api.get('/outcomes/patterns');
@@ -65,6 +74,14 @@ export default {
   getReadiness,
   getDigitalTwin,
   getCareerPaths,
+  // Career Intelligence
+  getSkillGapPriority,
+  simulateWhatIf,
+  getOpportunityUnlock,
+  getOpportunityCost,
+  getWhyNotApply,
+  getCounterfactual,
+  getExplainableRec,
   // Outcomes
   recordOutcome,
   getOutcomePatterns,
