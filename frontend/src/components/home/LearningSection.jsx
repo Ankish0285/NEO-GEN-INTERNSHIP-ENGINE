@@ -134,8 +134,20 @@ const LearningSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Don't render section if no public resources exist
-  if (!loading && resources.length === 0) return null;
+  // Don't render section if still loading
+  if (loading) {
+    return (
+      <section className="neo-section" id="learning-section">
+        <div className="neo-container">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-2xl bg-gray-100 animate-pulse h-64" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="neo-section" id="learning-section">
@@ -161,6 +173,28 @@ const LearningSection = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3].map((i) => (
               <div key={i} className="rounded-2xl bg-gray-100 animate-pulse h-64" />
+            ))}
+          </div>
+        ) : resources.length === 0 ? (
+          // Empty state — no public resources yet
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: '🎯', title: 'Interview Prep', desc: 'Ace your interviews with expert tips and mock questions' },
+              { icon: '📄', title: 'Resume Building', desc: 'Craft a standout resume that gets noticed by top companies' },
+              { icon: '🚀', title: 'Career Growth', desc: 'Learn skills that make you the ideal internship candidate' },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                className="neo-glass rounded-2xl p-6 flex flex-col items-center text-center gap-3"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-[#fff4e8] flex items-center justify-center text-2xl">
+                  {item.icon}
+                </div>
+                <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+                <span className="text-xs text-[#e68a2e] font-medium mt-1">Coming Soon</span>
+              </motion.div>
             ))}
           </div>
         ) : (
