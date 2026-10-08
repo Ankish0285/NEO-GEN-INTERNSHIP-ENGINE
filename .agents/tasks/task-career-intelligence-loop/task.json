@@ -1,0 +1,7 @@
+{
+  "task_id": "task-career-intelligence-loop",
+  "task_description": "Implement the NEO GEN Career Intelligence Loop: 8 new Mongoose models, extensions to Internship.js and Application.js, 8 controllers, 8 routes, server.js registrations, Python career intelligence engine + FastAPI endpoints, aiServiceClient addition, and a frontend service file.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

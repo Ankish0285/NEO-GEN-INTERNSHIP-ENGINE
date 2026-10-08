@@ -1,0 +1,32 @@
+{
+  "project_type": "MERN stack monorepo: Express/Node.js backend + React/Vite frontend",
+  "language": "JavaScript (ES modules in frontend, JSX for components)",
+  "build_system": "Frontend: Vite 5 (npm run build from frontend/). No test runner — verification is solely npm run build. ES modules throughout (type: module in package.json).",
+  "test_framework": "None. Verification is: npm run build from frontend/ directory — must complete with exit 0.",
+  "build_command": "cd 'd:\\my code\\my project\\NEO GEN INTERNSHIP ENGINE/frontend' && npm run build",
+  "test_command": "cd 'd:\\my code\\my project\\NEO GEN INTERNSHIP ENGINE/frontend' && npm run build 2>&1",
+  "verification_instructions": "From the frontend/ directory run: npm run build. The build must succeed (exit 0) with no import errors, missing modules, or TypeScript/JS errors reported. Fix any error Vite reports before declaring complete.",
+  "snapshot_or_generated_files": null,
+  "environment_constraints": "Windows (PowerShell). Paths with spaces must be quoted. Node v24+ installed. Never restart dev server. Never push to git. ES modules only — no require(). All new exports must be default exports per task rules. lucide-react v0.363.0 installed.",
+  "contribution_requirements": "ABSOLUTE RULES: (1) DO NOT delete, modify, or remove any existing component, page, route, or style. (2) Only ADD new files or EXTEND existing files minimally. (3) All new pages must be responsive. (4) Use existing ui/ components (Card, Button, Modal, LoadingSpinner, Skeleton, EmptyState, MotionReveal). (5) Match existing styling: neo-glass class (defined in index.css), glass-card, Tailwind CSS, framer-motion. (6) Use api from '../../../services/api' pattern. (7) All exports must be default exports. (8) ES module imports only. (9) All lucide-react icon names must actually exist in lucide-react.",
+  "key_patterns": "Card.jsx: motion.div with neo-glass class, optional title/action header. Button.jsx: variants primary/secondary/success/outline/danger/ghost. Modal.jsx: createPortal + AnimatePresence + framer-motion scale animation. Skeleton.jsx: named export Skeleton (not default). LoadingSpinner.jsx: default export with size/text/overlay props. EmptyState.jsx: default export with title/message/actionLabel/onAction. Recommendations.jsx: useEffect fetch pattern, motion.div cards, neo-glass p-6, status badges with tailwind color classes. ATSResume.jsx: Skeleton for loading state, clsx for conditional classes, toast for notifications. index.css defines: .glass-card (glassmorphism with saffron/green tint), .neo-glass (referenced in Card.jsx but defined in full CSS file), .btn-primary, .btn-secondary, .text-sub. Framer-motion: motion.div with initial/animate/whileHover/transition. api.js: named export { api } with .get/.post/.put/.patch/.delete methods. careerIntelligenceService.js already exists at frontend/src/services/ — new careerService.js is a SEPARATE file.",
+  "relevant_files": [
+    "frontend/src/components/ui/Card.jsx",
+    "frontend/src/components/ui/Button.jsx",
+    "frontend/src/components/ui/Modal.jsx",
+    "frontend/src/components/ui/LoadingSpinner.jsx",
+    "frontend/src/components/ui/Skeleton.jsx",
+    "frontend/src/components/ui/EmptyState.jsx",
+    "frontend/src/components/ui/AnimatedCounter.jsx",
+    "frontend/src/components/ui/MotionReveal.jsx",
+    "frontend/src/components/dashboard/student/Recommendations.jsx",
+    "frontend/src/components/dashboard/student/ATSResume.jsx",
+    "frontend/src/routes/AppRoutes.jsx",
+    "frontend/src/utils/roleConfig.js",
+    "frontend/src/services/api.js",
+    "frontend/src/services/careerIntelligenceService.js",
+    "frontend/src/context/AuthContext.jsx",
+    "frontend/src/index.css"
+  ],
+  "directory_structure": "frontend/src/components/ui/ — shared UI primitives (Card, Button, Modal, Skeleton, etc.). frontend/src/components/dashboard/student/ — student section components. frontend/src/components/dashboard/partner/ — partner section components. frontend/src/components/dashboard/admin/ — admin section components. frontend/src/components/career/ — NEW shared career intelligence components (to create). frontend/src/pages/ — top-level page files (Home.jsx, FindInternship.jsx, etc.) and auth/, dashboard/ subdirs. frontend/src/services/ — API service files. frontend/src/routes/AppRoutes.jsx — single route config file. frontend/src/utils/roleConfig.js — nav/role config. .agents/tasks/task-career-ui/ — FEAT artifacts for this task (NOT inside worktree commits)."
+}

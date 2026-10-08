@@ -1,0 +1,7 @@
+{
+  "task_id": "task-career-ui",
+  "task_description": "Create all new Career Intelligence UI components, pages, routing, and navigation config: careerService.js, 10 shared career components, 9 student dashboard sections, 3 partner dashboard components, 2 admin dashboard components, 1 public page, plus AppRoutes.jsx and roleConfig.js extensions. Build must pass after all FEATs.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"],
+  "blocked_reason": null
+}

@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-005",
+  "type": "fix",
+  "description": "Mobile responsiveness fixes for SkillGapItem and CertificateCard, plus adding missing difficultTopics/interviewStage/selfAssessment fields to InterviewLog model. All other components audited and confirmed already responsive. This completes the 57-task master plan.",
+  "status": "pending",
+  "steps": [
+    "Edit frontend/src/components/career/SkillGapItem.jsx: On the outer flex div (contains rank badge, skill name, priority badge, and learningEffort badge), change class from 'flex items-center gap-3' to 'flex flex-col sm:flex-row sm:items-start gap-2'. Wrap the two trailing badge spans (priority and learningEffort) together in a new div with class 'flex items-center gap-2 flex-wrap' so they group neatly on all screen sizes.",
+    "Edit frontend/src/components/career/CertificateCard.jsx: On the div at line ~41 that contains the date span and status badge (class 'flex items-center gap-2 flex-wrap'), change to 'flex flex-col sm:flex-row sm:items-center gap-2 flex-wrap'. This prevents the badge from overflowing on 375px screens.",
+    "Edit backend/models/InterviewLog.js: After the 'outcome' field definition and before the closing brace of interviewLogSchema's fields object, add three new optional fields: difficultTopics: { type: [String], default: [] }, interviewStage: { type: String, default: '' }, selfAssessment: { type: String, default: '' }. These fields are accessed by interviewLogController.js:getInterviewLearning (log.difficultTopics || []) — without them the Interview Weak Areas feature always returns empty.",
+    "Run cd frontend && npm run build to verify the frontend compiles without errors.",
+    "Run cd backend && node --check models/InterviewLog.js to verify no syntax errors in the model.",
+    "Commit all changes with message: 'feat: FEAT-005 mobile responsiveness + InterviewLog missing fields'."
+  ],
+  "acceptance_criteria": [
+    "SkillGapItem renders priority and effort badges on a new line below the skill name at 375px viewport width, with no horizontal overflow.",
+    "CertificateCard shows date and status badge stacking vertically on small screens.",
+    "InterviewLog.js schema contains difficultTopics ([String]), interviewStage (String), and selfAssessment (String) fields.",
+    "cd frontend && npm run build exits with code 0.",
+    "cd backend && node --check models/InterviewLog.js exits with code 0.",
+    "No other components (SkillEvidenceHub, CareerActionPlan, InternshipReadiness, DigitalPassport, ApplicationOutcomes, Applications, CompletionWorkflow, CertificateVerification) were modified — they are already responsive."
+  ],
+  "verification": [
+    "cd frontend && npm run build",
+    "cd backend && node --check models/InterviewLog.js"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

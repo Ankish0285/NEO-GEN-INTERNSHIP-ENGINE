@@ -1,0 +1,39 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Create 8 new Mongoose model files and extend Internship.js + Application.js with optional fields. These models are the data foundation all controllers depend on.",
+  "status": "completed",
+  "steps": [
+    "Create backend/models/CareerGoal.js: mongoose.Schema with fields: user (ObjectId ref 'User', required, unique), targetRoles ([String] default []), targetDomains ([String] default []), targetCompanies ([String] default []), preferredLocation (String default ''), expectedSalary (String default ''), targetTimeline (String default ''), notes (String default ''). timestamps:true. module.exports = mongoose.model('CareerGoal', schema).",
+    "Create backend/models/SkillAssessment.js: fields: user (ObjectId ref 'User', required), skill (String required), level (String enum ['beginner','intermediate','advanced'] default 'beginner'), score (Number default 0), source (String default 'self'), assessedAt (Date default Date.now). timestamps:true.",
+    "Create backend/models/InterviewLog.js: fields: user (ObjectId ref 'User', required), application (ObjectId ref 'Application' default null), internship (ObjectId ref 'Internship' default null), interviewDate (Date default null), interviewType (String enum ['phone','video','onsite','technical','hr'] default 'video'), status (String enum ['scheduled','completed','cancelled','no_show'] default 'scheduled'), notes (String default ''), rating (Number default 0), outcome (String enum ['pending','passed','failed','waitlisted'] default 'pending'). timestamps:true.",
+    "Create backend/models/FeedbackForm.js: fields: title (String required), description (String default ''), targetAudience (String enum ['student','partner','all'] default 'student'), questions ([{ question: String required, type: String enum ['text','rating','mcq','boolean'] default 'text', options: [String] default [], required: Boolean default false }]), isActive (Boolean default true), createdBy (ObjectId ref 'User' required). timestamps:true.",
+    "Create backend/models/FeedbackResponse.js: fields: form (ObjectId ref 'FeedbackForm' required), respondent (ObjectId ref 'User' default null), answers ([{ question: String, answer: Mixed }]), submittedAt (Date default Date.now). timestamps:true.",
+    "Create backend/models/CareerEvent.js: fields: title (String required), description (String default ''), eventType (String enum ['webinar','workshop','fair','mock_interview','networking'] default 'webinar'), host (String default ''), eventDate (Date default null), registrationDeadline (Date default null), meetLink (String default ''), maxParticipants (Number default 0), registeredUsers ([{ type: ObjectId, ref: 'User' }] default []), status (String enum ['upcoming','live','completed','cancelled'] default 'upcoming'), createdBy (ObjectId ref 'User' required). timestamps:true.",
+    "Create backend/models/PlacementRecord.js: fields: student (ObjectId ref 'User' required), internship (ObjectId ref 'Internship' default null), company (String default ''), role (String default ''), stipend (String default ''), startDate (Date default null), endDate (Date default null), isVerified (Boolean default false), verifiedBy (ObjectId ref 'User' default null), certificate (String default ''), notes (String default ''). timestamps:true.",
+    "Create backend/models/AdaptiveLearning.js: fields: user (ObjectId ref 'User' required, unique), recommendedGuides ([{ guide: ObjectId ref 'Guide', reason: String, priority: Number }] default []), completedGuides ([{ type: ObjectId, ref: 'Guide' }] default []), currentSkillGaps ([String] default []), learningPath ([{ skill: String, course: String, priority: Number, estimatedWeeks: Number }] default []), lastUpdated (Date default null). timestamps:true.",
+    "Extend backend/models/Internship.js: ADD (do not modify anything) these three optional fields inside internshipSchema before the closing brace of the schema fields object: aiMatchMetadata (Mixed default null), placementCount (Number default 0), tags ([String] default []). Pattern: use a comment '// Career Intelligence Loop additions' before the block.",
+    "Extend backend/models/Application.js: ADD these five optional fields inside applicationSchema before the closing brace: interviewScheduled (Boolean default false), interviewDate (Date default null), interviewNotes (String default ''), feedbackGiven (Boolean default false), placementConfirmed (Boolean default false). Comment '// Career Intelligence Loop additions'."
+  ],
+  "acceptance_criteria": [
+    "All 8 new model files exist at their specified paths.",
+    "node --check on each of the 8 new model files exits 0.",
+    "node --check backend/models/Internship.js exits 0.",
+    "node --check backend/models/Application.js exits 0.",
+    "No existing field in Internship.js or Application.js has been removed or altered."
+  ],
+  "verification": [
+    "node --check backend/models/CareerGoal.js",
+    "node --check backend/models/SkillAssessment.js",
+    "node --check backend/models/InterviewLog.js",
+    "node --check backend/models/FeedbackForm.js",
+    "node --check backend/models/FeedbackResponse.js",
+    "node --check backend/models/CareerEvent.js",
+    "node --check backend/models/PlacementRecord.js",
+    "node --check backend/models/AdaptiveLearning.js",
+    "node --check backend/models/Internship.js",
+    "node --check backend/models/Application.js"
+  ],
+  "blocked_reason": null,
+  "findings": "All 8 model files created at backend/models/{CareerGoal,SkillAssessment,InterviewLog,FeedbackForm,FeedbackResponse,CareerEvent,PlacementRecord,AdaptiveLearning}.js. Internship.js: 3 new fields (aiMatchMetadata, placementCount, tags) appended after the existing stats block, separated by a trailing comma on stats and a '// Career Intelligence Loop additions' comment. Application.js: 5 new fields (interviewScheduled, interviewDate, interviewNotes, feedbackGiven, placementConfirmed) appended after coverLetter, with a trailing comma added to coverLetter and a '// Career Intelligence Loop additions' comment. All new fields are optional with safe defaults. No existing fields were removed or altered. node --check could not be executed in this shell session because node.exe is not on the system or user PATH in the sandboxed environment (confirmed via registry PATH query); the code was verified by manual read-back against the spec."
+}

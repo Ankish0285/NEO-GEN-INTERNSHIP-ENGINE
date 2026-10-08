@@ -1,0 +1,7 @@
+{
+  "task_id": "task-phase4-neogen-intelligence",
+  "task_description": "Phase 4: Implement Skill Evidence system (model+controller+routes), all missing Career Intelligence endpoints (skill gap priority, what-if, opportunity unlock, why-not-apply, counterfactual, explainable recs), AI application assistant, application strength scoring, learning completion integration with SkillEvidence, internship performance→AI profile update, Digital Twin real data wiring, Career Path Simulator gap analysis, notification hooks, AI safety guards, error handling, certificate audit log, and mobile responsiveness fixes.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004", "FEAT-005"],
+  "blocked_reason": null
+}

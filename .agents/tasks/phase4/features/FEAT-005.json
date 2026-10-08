@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-005",
+  "type": "feat",
+  "description": "Mobile responsiveness fixes (Task P): audit SkillEvidenceHub.jsx, SkillGapPriority.jsx, CareerActionPlan.jsx for fixed widths and convert to responsive Tailwind classes. Independent of all other FEATs — can be done in parallel conceptually but is last because it is lowest risk and requires the other components to be in their final state first.",
+  "status": "pending",
+  "steps": [
+    "READ frontend/src/components/dashboard/student/SkillEvidenceHub.jsx — confirmed it uses 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' which is already responsive. The header uses 'flex flex-col sm:flex-row' which is responsive. No fixed pixel widths found. Mark as already compliant — no changes needed.",
+
+    "READ frontend/src/components/dashboard/student/SkillGapPriority.jsx — the component uses 'space-y-6' and 'space-y-3' with no fixed widths. The WhatIfSimulator child component may have issues — read frontend/src/components/career/WhatIfSimulator.jsx. If WhatIfSimulator uses fixed widths (e.g. w-64, w-96, or inline style width), convert them to max-w-full or w-full with responsive variants. If it does not exist, skip.",
+
+    "READ frontend/src/components/dashboard/student/CareerActionPlan.jsx fully (offset 80 was not read). Check for fixed widths. The visible portion already uses 'flex flex-col sm:flex-row' pattern. If the rest of the file has any fixed-width containers (w-[Npx] or style={{width:N}}), convert to responsive Tailwind classes using sm:, md:, lg: breakpoint variants. Wrap any un-wrapped flex containers in flex-col with sm:flex-row.",
+
+    "SCAN frontend/src/components/career/SkillGapItem.jsx (if it exists) for fixed widths — this is rendered by SkillGapPriority. If it has fixed widths, apply same responsive treatment.",
+
+    "SCAN frontend/src/components/career/SkillEvidenceCard.jsx (if it exists) for fixed widths — rendered by SkillEvidenceHub. If it has fixed widths, apply same responsive treatment.",
+
+    "Ensure all three primary components (SkillEvidenceHub, SkillGapPriority, CareerActionPlan) use only responsive Tailwind breakpoint classes for layout. No inline style width values. No w-Npx classes without a responsive variant."
+  ],
+  "acceptance_criteria": [
+    "SkillEvidenceHub.jsx: no fixed pixel widths in layout containers; uses sm:/md:/lg: breakpoints for grid",
+    "SkillGapPriority.jsx and its children: no fixed pixel widths in layout containers",
+    "CareerActionPlan.jsx: no fixed pixel widths in layout containers; flex containers wrap on mobile",
+    "cd frontend && npm run build — exit code 0"
+  ],
+  "verification": [
+    "cd frontend && npm run build — exit code 0",
+    "Open browser DevTools → toggle mobile viewport (375px width) → navigate to Skill Evidence Hub, Skill Gap Priority, Career Action Plan — no horizontal scroll, no overflowing content"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

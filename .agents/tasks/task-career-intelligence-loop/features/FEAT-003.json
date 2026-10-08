@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-003",
+  "type": "chore",
+  "description": "Integration verification pass: run full syntax checks, Python compilation, and frontend build to confirm all FEATs integrate cleanly. Independent of FEAT-001 and FEAT-002 in terms of code changes — this FEAT is purely a verification and commit step that runs after both are complete.",
+  "status": "completed",
+  "steps": [
+    "Run node --check on every new and modified JS file from FEAT-001 and FEAT-002. Fix any syntax errors found (do not introduce new changes beyond fixes).",
+    "Run python -m py_compile on backend/ai/engines/career_intelligence_engine.py and backend/ai/server.py. Fix any syntax errors.",
+    "Run npm run build from the frontend/ directory. Fix any import-resolution or build errors in careerIntelligenceService.js.",
+    "Confirm backend/server.js still has all original app.use() registrations intact (none removed) by reading the file and checking.",
+    "Confirm backend/ai/server.py still has all original @app endpoints intact by reading the file.",
+    "Stage and commit all new and modified files with message 'feat: career intelligence loop — models, controllers, routes, python engine, frontend service'."
+  ],
+  "acceptance_criteria": [
+    "node --check exits 0 for all 26 JS files listed in the plan's Step 8.",
+    "python -m py_compile exits 0 for both Python files.",
+    "npm run build from frontend/ completes without errors.",
+    "git status shows no untracked or modified files remaining outside .agents/."
+  ],
+  "verification": [
+    "node --check backend/models/CareerGoal.js && node --check backend/models/SkillAssessment.js && node --check backend/models/InterviewLog.js && node --check backend/models/FeedbackForm.js && node --check backend/models/FeedbackResponse.js && node --check backend/models/CareerEvent.js && node --check backend/models/PlacementRecord.js && node --check backend/models/AdaptiveLearning.js",
+    "node --check backend/models/Internship.js && node --check backend/models/Application.js",
+    "node --check backend/controllers/careerGoalController.js && node --check backend/controllers/skillAssessmentController.js && node --check backend/controllers/interviewLogController.js && node --check backend/controllers/feedbackController.js && node --check backend/controllers/careerEventController.js && node --check backend/controllers/placementController.js && node --check backend/controllers/adaptiveLearningController.js && node --check backend/controllers/careerIntelligenceController.js",
+    "node --check backend/routes/careerGoalRoutes.js && node --check backend/routes/skillAssessmentRoutes.js && node --check backend/routes/interviewLogRoutes.js && node --check backend/routes/feedbackRoutes.js && node --check backend/routes/careerEventRoutes.js && node --check backend/routes/placementRoutes.js && node --check backend/routes/adaptiveLearningRoutes.js && node --check backend/routes/careerIntelligenceRoutes.js",
+    "node --check backend/server.js && node --check backend/services/aiServiceClient.js",
+    "python -m py_compile backend/ai/engines/career_intelligence_engine.py && python -m py_compile backend/ai/server.py",
+    "cd frontend && npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": "Full integration verification pass completed. All 10 model files (8 new + Internship.js + Application.js): node --check exit 0. All 8 controllers: node --check exit 0. All 8 routes: node --check exit 0. backend/server.js: node --check exit 0; all 19 original app.use() lines verified intact, 8 new Career Intelligence Loop routes confirmed present. backend/services/aiServiceClient.js: node --check exit 0. backend/ai/engines/career_intelligence_engine.py: python -m py_compile exit 0. backend/ai/server.py: python -m py_compile exit 0; original endpoints confirmed present. frontend npm run build: exit 0, dist/index.html produced. git status shows only .agents/ untracked (intentional). Final commit made."
+}

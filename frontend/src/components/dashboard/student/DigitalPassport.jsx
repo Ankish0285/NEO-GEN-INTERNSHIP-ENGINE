@@ -103,12 +103,17 @@ const DigitalPassport = () => {
     }
   };
 
-  // Initial fetch for skills tab
+  // Initial fetch: skills on mount, plus eagerly fetch counts for Achievements tab
   useEffect(() => {
     fetchSkills();
+    // Eagerly prefetch certs, internships and assessments so the Achievements
+    // tab has the counts even if the user navigates there first.
+    fetchCerts();
+    fetchInternships();
+    fetchAssessments();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Lazy fetch when switching to certificates tab
+  // Lazy fetch remaining tabs on first activation
   useEffect(() => {
     if (activeTab === 'certificates') {
       fetchCerts();
@@ -311,6 +316,24 @@ const DigitalPassport = () => {
           )
         ) : activeTab === 'achievements' ? (
           (() => {
+            // All four data sources are eagerly loaded on mount, so counts are
+            // available regardless of which tab the user visits first.
+            const allLoaded =
+              fetchedTabs.has('internships') &&
+              fetchedTabs.has('certificates') &&
+              fetchedTabs.has('assessments') &&
+              fetchedTabs.has('skills');
+
+            if (!allLoaded) {
+              return (
+                <PassportSection
+                  title="Achievements"
+                  items={[]}
+                  emptyMessage="Loading achievements… please wait a moment."
+                />
+              );
+            }
+
             const completedInternships = placementData.filter((p) => p.status === 'completed' || p.verified).length;
             const activeCerts = certData.filter((c) => c.status === 'active').length;
             const passedAssessments = assessmentData.filter((a) => (a.score ?? a.result ?? 0) >= 70).length;
