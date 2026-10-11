@@ -17,6 +17,7 @@ const {
   getAIRecommendations,
   matchSingleInternship,
   aiChat,
+  publicChat,
   getAdminAIInsights,
   rankStudentsForInternship,
   checkTruthGuard,
@@ -26,6 +27,7 @@ const {
 
 // ── Public / read-only ────────────────────────────────────────────────────────
 router.get('/status', getAIStatus);
+router.post('/public-chat', publicChat);  // No auth — public visitors
 
 // ── Admin only (no usage gate — internal analytics) ───────────────────────────
 router.get('/admin/insights', protect, getAdminAIInsights);

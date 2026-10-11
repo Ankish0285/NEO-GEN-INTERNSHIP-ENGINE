@@ -751,6 +751,39 @@ const generateApplication = asyncHandler(async (req, res) => {
   });
 });
 
+// @route POST /api/ai/public-chat (no auth required — for public visitors)
+const publicChat = asyncHandler(async (req, res) => {
+  const { message } = req.body;
+  if (!message || !message.trim()) {
+    return res.status(400).json({ success: false, message: 'Message is required' });
+  }
+
+  let data;
+  if (await aiClient.isAvailable()) {
+    data = await aiClient.chat(message.trim(), {
+      isPublic: true,
+      career_domain: 'internship',
+      context: 'You are NeoGen AI, a helpful career assistant for students looking for internships. Answer questions about internship search, resume tips, interview preparation, and career guidance. Keep responses concise and helpful.',
+    });
+  } else {
+    // Fallback responses when AI is unavailable
+    const fallbacks = {
+      default: 'I can help with internship search, resume tips, and career guidance. What would you like to know?',
+      resume: 'For a strong resume: keep it to 1 page, highlight relevant skills, use action verbs, and tailor it to each internship.',
+      interview: 'Interview tips: research the company, practice common questions, dress professionally, and send a thank-you email after.',
+      internship: 'To find internships: use NEO GEN to discover opportunities, network on LinkedIn, and apply early. Sign up for personalized AI recommendations!',
+    };
+    const msg = message.toLowerCase();
+    const reply = msg.includes('resume') ? fallbacks.resume
+      : msg.includes('interview') ? fallbacks.interview
+      : msg.includes('internship') || msg.includes('job') ? fallbacks.internship
+      : fallbacks.default;
+    data = { reply };
+  }
+
+  res.json({ success: true, data });
+});
+
 module.exports = {
   getAIStatus,
   getAIProfile,
@@ -759,6 +792,7 @@ module.exports = {
   getAIRecommendations,
   matchSingleInternship,
   aiChat,
+  publicChat,
   getAdminAIInsights,
   rankStudentsForInternship,
   runAIPipelineForUser,

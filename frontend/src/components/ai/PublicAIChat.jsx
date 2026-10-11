@@ -64,11 +64,10 @@ const PublicAIChat = () => {
     setMsgCount((c) => c + 1);
 
     try {
-      const res = await api.post('/ai/chat', {
+      const res = await api.post('/ai/public-chat', {
         message: userMsg,
-        context: { isPublic: true },
       });
-      const reply = res?.data?.reply || res?.reply || res?.data?.message || 'I can help with internship and career questions!';
+      const reply = res?.data?.reply || res?.reply || 'I can help with internship and career questions!';
       setMessages((m) => [...m, { role: 'assistant', text: reply }]);
     } catch {
       setMessages((m) => [
