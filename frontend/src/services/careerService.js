@@ -40,6 +40,7 @@ export const getPartnerCertificates = () => api.get('/certificates/partner');
 export const getPublicCertificate = (certificateId) => api.get(`/certificates/verify/${certificateId}`);
 export const adminIssueCertificate = (data) => api.post('/certificates/admin/issue', data);
 export const searchStudentsForCert = (q) => api.get(`/certificates/admin/students/search?q=${encodeURIComponent(q)}`);
+export const getPartnerAcceptedApplications = () => api.get('/certificates/partner/accepted-applications');
 
 
 // --- Admin ---

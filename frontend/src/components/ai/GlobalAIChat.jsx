@@ -1,43 +1,39 @@
 /**
  * GlobalAIChat
  * ─────────────────────────────────────────────────────────────────────────────
- * Mounted once in App.jsx — renders the NeoGen AI Coach chatbot for
- * authenticated students only.
+ * Mounted once in App.jsx — renders the NeoGen AI chatbot for ALL users:
  *
- * Rules:
- *  • Unauthenticated visitors  → nothing rendered
- *  • Admin / super_admin        → nothing (they have their own support tools)
- *  • Partner                   → nothing
- *  • Student                   → AIChatAssistant with SubscriptionProvider
- *
- * SubscriptionProvider must wrap AIChatAssistant because that component calls
- * useSubscription().  The StudentDashboard already wraps its own tree with
- * SubscriptionProvider; when the student navigates OUTSIDE the dashboard
- * (e.g. /find-internship, /success-stories) the provider needs to be here too.
- * We use a lazy inner provider that only mounts when needed.
+ *  • Authenticated student   → full AI Chat with subscription gating
+ *  • Unauthenticated visitor → basic chat (public mode, no subscription needed)
+ *  • Admin / super_admin     → nothing (they have their own tools)
+ *  • Partner                 → nothing
  */
 
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { SubscriptionProvider } from '../../context/SubscriptionContext';
 import AIChatAssistant from './AIChatAssistant';
+import PublicAIChat from './PublicAIChat';
 
 const GlobalAIChat = () => {
   const { user, isAuthenticated } = useAuth();
 
-  // Only render for authenticated students
-  if (!isAuthenticated || !user) return null;
-  if (user.role !== 'student') return null;
+  // Hide for admin and partner — they have their own tools
+  if (isAuthenticated && user && (user.role === 'admin' || user.role === 'super_admin' || user.role === 'partner')) {
+    return null;
+  }
 
-  return (
-    // SubscriptionProvider here ensures the chat works even on non-dashboard pages.
-    // When the student IS on the dashboard, SubscriptionProvider is already in the
-    // tree from StudentDashboard.jsx — React context nesting is safe; the inner
-    // provider will simply re-fetch and the closest provider wins.
-    <SubscriptionProvider>
-      <AIChatAssistant />
-    </SubscriptionProvider>
-  );
+  // Authenticated student → full AI Chat with subscription
+  if (isAuthenticated && user && user.role === 'student') {
+    return (
+      <SubscriptionProvider>
+        <AIChatAssistant />
+      </SubscriptionProvider>
+    );
+  }
+
+  // Unauthenticated / public visitor → basic public chat
+  return <PublicAIChat />;
 };
 
 export default GlobalAIChat;

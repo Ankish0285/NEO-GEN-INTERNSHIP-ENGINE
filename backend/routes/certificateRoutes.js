@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
-const { issueCertificate, verifyCertificate, revokeCertificate, getMyCertificates, getPublicCertificate, getPartnerCertificates, getAdminCertificates, adminIssueCertificate, searchStudents } = require('../controllers/certificateController');
+const { issueCertificate, verifyCertificate, revokeCertificate, getMyCertificates, getPublicCertificate, getPartnerCertificates, getAdminCertificates, adminIssueCertificate, searchStudents, getPartnerAcceptedApplications } = require('../controllers/certificateController');
 
 router.post('/', protect, issueCertificate);
-router.post('/admin/issue', protect, adminIssueCertificate);       // Admin direct issue
-router.get('/admin/students/search', protect, searchStudents);     // Search students
+router.post('/admin/issue', protect, adminIssueCertificate);
+router.get('/admin/students/search', protect, searchStudents);
+router.get('/partner/accepted-applications', protect, getPartnerAcceptedApplications); // NEW
 router.put('/:certificateId/verify', protect, verifyCertificate);
 router.put('/:certificateId/revoke', protect, revokeCertificate);
 router.get('/my', protect, getMyCertificates);

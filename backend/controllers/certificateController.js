@@ -186,4 +186,26 @@ const searchStudents = asyncHandler(async (req, res) => {
   res.json({ success: true, data: students });
 });
 
-module.exports = { issueCertificate, verifyCertificate, revokeCertificate, getMyCertificates, getPublicCertificate, getPartnerCertificates, getAdminCertificates, adminIssueCertificate, searchStudents };
+// Get partner's accepted/selected applications (for certificate issuance)
+const getPartnerAcceptedApplications = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'partner') { res.status(403); throw new Error('Partner only'); }
+
+  // Get partner's internship IDs
+  const Internship = require('../models/Internship');
+  const internships = await Internship.find({ createdBy: req.user._id }).select('_id title organization');
+  const internshipIds = internships.map(i => i._id);
+
+  // Find accepted/selected/completed applications for those internships
+  const applications = await Application.find({
+    internship: { $in: internshipIds },
+    status: { $in: ['Accepted', 'Selected', 'Shortlisted'] }
+  })
+    .populate('user', 'name email university course')
+    .populate('internship', 'title organization duration')
+    .sort({ updatedAt: -1 })
+    .limit(50);
+
+  res.json({ success: true, data: applications });
+});
+
+module.exports = { issueCertificate, verifyCertificate, revokeCertificate, getMyCertificates, getPublicCertificate, getPartnerCertificates, getAdminCertificates, adminIssueCertificate, searchStudents, getPartnerAcceptedApplications };
