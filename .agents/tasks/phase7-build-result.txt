@@ -1,0 +1,46 @@
+# Phase 7 — Build Result
+Generated: 2026-10-13
+
+## Step 7a: Frontend Production Build
+
+Command: node frontend/node_modules/vite/bin/vite.js build
+Working directory: frontend/
+Result: ✅ SUCCESS — built in ~17-18s
+
+### Artifacts produced
+- dist/index.html                     5.83 kB  (gzip: 1.77 kB)
+- dist/assets/logo-EFmGWgiU.png   2,231.39 kB
+- dist/assets/index-wuZG8Dpx.css    243.81 kB  (gzip: 38.40 kB)
+- dist/assets/index-DedzJ6ea.js   1,617.52 kB  (gzip: 424.82 kB)
+
+### Warnings (pre-existing, not errors)
+- resumeTemplates.js is both dynamically and statically imported (pre-existing)
+- Some chunks larger than 500 kB (pre-existing; no chunking config in place)
+
+## Step 7b: Backend Lint
+
+No lint script in backend/package.json. Node.js syntax checks run instead:
+- backend/controllers/aiController.js  ✅ PASS
+- backend/controllers/metricsController.js  ✅ PASS
+- backend/routes/metricsRoutes.js  ✅ PASS
+
+## Step 7c: Commit
+
+Commit hash: a2d551e
+Message: fix: centralized student metrics sync - readiness route, fabricated 75, atsScore sync, || to ?? fixes
+
+### Files changed in this commit
+- backend/controllers/aiController.js
+  - employabilityScore: `|| 0` → `?? null` (never fabricate 0 for missing value)
+  - internshipReadinessScore: `|| 0` → `?? null` (same)
+  - aiConfidenceScore: `|| 0` → `?? null` (same)
+  - latestMatchPercentage: `|| 0` → `?? null` (same)
+  - ai_confidence_score fallback path: `60` → `null` (no fabricated confidence when AI service offline)
+
+## Summary of all phases
+- Phase 2: canonical metricsController.js + metricsRoutes.js (GET /api/metrics/student)
+- Phase 3: useStudentMetrics.js hook; StudentDashboardContext ?? fixes
+- Phase 4: AIIntelligenceHub, Overview, Analytics, InternshipReadiness consume canonical data
+- Phase 5: AIChatAssistant — no fabricated scores in chat responses
+- Phase 6: test files (backend/__tests__/unit/metricsScoring.test.js, frontend/src/__tests__/utils/metricsScoring.test.js)
+- Phase 7: frontend build ✅, backend syntax checks ✅, commit a2d551e
