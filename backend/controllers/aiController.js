@@ -78,16 +78,16 @@ const persistAIProfile = async (userId, pipeline, user) => {
       careerDomain: pipeline.profile.career_domain,
       strengths: pipeline.profile.strengths || [],
       weaknesses: pipeline.profile.weaknesses || [],
-      employabilityScore: pipeline.profile.employability_score || 0,
-      internshipReadinessScore: pipeline.profile.internship_readiness_score || 0,
+      employabilityScore: pipeline.profile.employability_score ?? null,
+      internshipReadinessScore: pipeline.profile.internship_readiness_score ?? null,
       profileSummary: pipeline.profile.profile_summary || '',
       growthAnalysis: pipeline.profile.growth_analysis || {},
       futureTechnologies: pipeline.profile.future_technologies || [],
       recommendedCareerPath: pipeline.profile.recommended_career_path || [],
       learningRoadmap: pipeline.profile.learning_roadmap || [],
       latestAtsScore: atsScore,
-      latestMatchPercentage: pipeline.ats?.match_percentage || 0,
-      aiConfidenceScore: pipeline.ats?.ai_confidence_score || 0,
+      latestMatchPercentage: pipeline.ats?.match_percentage ?? null,
+      aiConfidenceScore: pipeline.ats?.ai_confidence_score ?? null,
       interests: user?.interests || existing?.interests || [],
       atsHistory,
       recommendationHistory: recHistory,
@@ -261,7 +261,7 @@ const analyzeResumeAI = asyncHandler(async (req, res) => {
       matched_skills: scoreData.matched,
       missing_skills: scoreData.missing,
       improvement_tips: generateSuggestions(scoreData),
-      ai_confidence_score: 60,
+      ai_confidence_score: null, // no AI service — do not fabricate a confidence score
     };
   }
 
