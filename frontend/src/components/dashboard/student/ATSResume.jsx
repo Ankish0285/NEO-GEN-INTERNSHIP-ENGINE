@@ -555,7 +555,7 @@ const ATSResume = () => {
     }
   };
 
-  const score      = atsScoreData?.score || 0;
+  const score      = atsScoreData?.score ?? 0;
   const scoreColor = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
 
   const containerVariants = {

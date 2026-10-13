@@ -266,8 +266,13 @@ const analyzeResumeAI = asyncHandler(async (req, res) => {
   }
 
   resume.aiAnalysis = analysis;
-  resume.atsScore = analysis.ats_score || resume.atsScore;
+  resume.atsScore = analysis.ats_score ?? resume.atsScore;
   await resume.save();
+
+  // Sync User.atsScore to keep AI pipeline context fresh
+  if (analysis.ats_score != null) {
+    await User.findByIdAndUpdate(req.user._id, { atsScore: analysis.ats_score });
+  }
 
   // Increment usage after successful analysis
   const { incrementUsage } = require('../middleware/subscriptionMiddleware');

@@ -123,9 +123,9 @@ const AIIntelligenceHub = () => {
     score: v.score || 0,
   }));
 
-  const atsScore = profile?.latestAtsScore || ats.ats_score || atsScoreData?.score || 0;
-  const employability = profile?.employabilityScore || intel?.profile?.employability_score || 0;
-  const readiness = profile?.internshipReadinessScore || intel?.profile?.internship_readiness_score || 0;
+  const atsScore = profile?.latestAtsScore ?? ats.ats_score ?? atsScoreData?.score ?? 0;
+  const employability = profile?.employabilityScore ?? intel?.profile?.employability_score ?? 0;
+  const readiness = profile?.internshipReadinessScore ?? intel?.profile?.internship_readiness_score ?? 0;
 
   const tabRecs = {
     best: groups.bestMatch,
@@ -245,7 +245,7 @@ const AIIntelligenceHub = () => {
           { label: 'ATS Score', value: `${Math.round(atsScore)}%`, icon: Target, color: '#FF9933' },
           { label: 'Employability', value: `${Math.round(employability)}%`, icon: TrendingUp, color: '#138808' },
           { label: 'Readiness', value: `${Math.round(readiness)}%`, icon: GraduationCap, color: '#138808' },
-          { label: 'AI Confidence', value: `${profile?.aiConfidenceScore || ats.ai_confidence_score || 75}%`, icon: Zap, color: '#FF9933' },
+          { label: 'AI Confidence', value: profile?.aiConfidenceScore != null ? `${profile.aiConfidenceScore}%` : (ats?.ai_confidence_score != null ? `${ats.ai_confidence_score}%` : 'Not analyzed'), icon: Zap, color: '#FF9933' },
           {
             label: 'Career Domain',
             value: profile?.careerDomain?.label || intel?.profile?.career_domain?.label || 'Analyzing...',

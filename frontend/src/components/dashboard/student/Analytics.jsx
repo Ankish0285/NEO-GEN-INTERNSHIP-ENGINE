@@ -34,7 +34,7 @@ const Analytics = () => {
 
   const atsScoreChart = useMemo(() => {
     const score = atsScoreData?.score ?? dashboardData?.atsScore ?? 0;
-    if (!score) return [];
+    if (score == null) return [];
     return [{ version: 'Latest', score }];
   }, [atsScoreData, dashboardData]);
 

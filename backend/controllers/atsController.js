@@ -94,7 +94,7 @@ const uploadResume = asyncHandler(async (req, res) => {
     let suggestions = [];
     let aiAnalysis = null;
     let matchPercentage = 0;
-    let aiConfidenceScore = 70;
+    let aiConfidenceScore = null;
 
     try {
       const aiAts = await aiClient.analyzeATS(parsedText, jobDesc);
@@ -102,7 +102,7 @@ const uploadResume = asyncHandler(async (req, res) => {
       suggestions = aiAts.improvement_tips || [];
       aiAnalysis = aiAts;
       matchPercentage = aiAts.match_percentage || scoreData.score;
-      aiConfidenceScore = aiAts.ai_confidence_score || 75;
+      aiConfidenceScore = aiAts.ai_confidence_score != null ? aiAts.ai_confidence_score : null;
     } catch (aiErr) {
       console.warn('[ATS] AI analyze failed, using JS fallback:', aiErr.message);
       scoreData = calculateATSScore(parsedText, jobDesc.split(/\s+/));

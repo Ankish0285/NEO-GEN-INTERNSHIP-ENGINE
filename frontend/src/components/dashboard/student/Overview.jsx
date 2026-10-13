@@ -269,7 +269,7 @@ const Overview = () => {
 
   const recommendations = dashboardData?.recommendedInternships || [];
   const pct   = profileData?.profileCompletionPercentage || 0;
-  const ats   = dashboardData?.atsScore || atsScoreData?.score || 0;
+  const ats   = dashboardData?.atsScore ?? atsScoreData?.score ?? 0;
   const total = dashboardData?.totalApplications || 0;
   const pending = dashboardData?.pendingReviews ?? 0;
   const interviews = applications?.filter(a =>

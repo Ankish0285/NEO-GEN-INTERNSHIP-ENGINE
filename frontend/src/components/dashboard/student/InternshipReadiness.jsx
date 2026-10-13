@@ -35,6 +35,9 @@ const InternshipReadiness = () => {
   const applicationScore = Math.max(0, Math.min(100, readiness.applicationScore ?? 0));
   const interviewScore = Math.max(0, Math.min(100, readiness.interviewScore ?? 0));
 
+  // True when the API returned no data (empty object or explicit no_data status)
+  const hasNoData = readiness.overallScore == null || readiness.dataStatus === 'no_data';
+
   return (
     <div className="space-y-6">
       <h1 className="neo-h2 flex items-center gap-2">
@@ -48,6 +51,12 @@ const InternshipReadiness = () => {
           <Skeleton className="h-10 rounded-xl" />
           <Skeleton className="h-10 rounded-xl" />
           <Skeleton className="h-10 rounded-xl" />
+        </div>
+      ) : hasNoData ? (
+        <div className="neo-glass p-8 text-center">
+          <p className="text-sm text-gray-500">
+            Run AI Analysis first to see your readiness scores.
+          </p>
         </div>
       ) : (
         <>
