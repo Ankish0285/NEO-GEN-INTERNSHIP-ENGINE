@@ -1,0 +1,37 @@
+# Phase 6 — Test Results
+Generated: 2026-10-13T17:12:59.279Z
+
+## Test runner: inline Node.js (no Jest/Vitest spawn)
+## Note: test files were created for Jest/Vitest but validated here due to
+## PowerShell execution policy preventing npm script invocation.
+
+
+BACKEND — Metrics score handling
+  ✓ score of 0 is preserved with nullish check
+  ✓ score of 0 fails truthiness (documents fixed bug)
+  ✓ null score is not fabricated
+  ✓ Resume.atsScore takes priority over User.atsScore
+  ✓ User.atsScore used when Resume has no atsScore
+  ✓ no fabricated 75 for aiConfidenceScore
+  ✓ dataStatus is no_data when no resume parsed text
+
+FRONTEND — Frontend metrics score handling
+  ✓ score 0 preserved with nullish coalescing
+  ✓ score 0 incorrectly replaced by || operator (documents fixed bug)
+  ✓ null score shows placeholder
+  ✓ no fabricated 75 for missing AI confidence
+  ✓ job match score remains distinct from general ATS score
+  ✓ empty chart guard uses null check not truthiness
+
+Tests: 13  Passed: 13  Failed: 0
+Status: PASS
+
+## Files created
+- backend/__tests__/unit/metricsScoring.test.js  (7 tests, Jest)
+- frontend/src/__tests__/utils/metricsScoring.test.js  (6 tests, Vitest)
+
+## Notes on intentional "failing" assertions
+- "score of 0 fails truthiness" — documents the PRE-FIX bug, asserts || returns null for 0
+- "score 0 incorrectly replaced by ||" — same documentation test for frontend
+- "empty chart guard uses null check not truthiness" — documents old vs new guard
+  These assertions are INTENTIONAL and correct as written.

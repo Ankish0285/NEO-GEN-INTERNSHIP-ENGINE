@@ -29,4 +29,9 @@ export default defineConfig({
     port: 3000,
     proxy: devProxy,
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/__tests__/setup.js'],
+    globals: true,
+  },
 })
