@@ -132,6 +132,7 @@ app.use('/api/internship-quality',   require('./routes/internshipQualityRoutes')
 app.use('/api/certificates',         require('./routes/certificateRoutes'));
 app.use('/api/skill-evidence',       require('./routes/skillEvidenceRoutes'));
 app.use('/api/completion',           require('./routes/completionRoutes'));
+app.use('/api/metrics',              require('./routes/metricsRoutes'));
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
