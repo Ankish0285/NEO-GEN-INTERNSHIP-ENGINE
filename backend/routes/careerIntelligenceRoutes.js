@@ -11,6 +11,7 @@ const {
   getCounterfactualRecommendation,
   getExplainableRecommendation,
   rankApplicationsByValue,
+  getInternshipReadiness,
 } = require('../controllers/careerIntelligenceController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -27,5 +28,8 @@ router.get('/why-not-apply/:internshipId', protect, getWhyNotApply);
 router.post('/counterfactual', protect, getCounterfactualRecommendation);
 router.get('/explain/:internshipId', protect, getExplainableRecommendation);
 router.get('/opportunity-cost', protect, rankApplicationsByValue);
+
+// ─── Readiness ────────────────────────────────────────────────────────────────
+router.get('/readiness', protect, getInternshipReadiness);
 
 module.exports = router;

@@ -9,7 +9,7 @@ export const addSkillEvidence = (data) => api.post('/skill-evidence', data);
 export const getSkillGaps = () => api.get('/career/skill-gaps');
 export const getActionPlan = () => api.get('/career/action-plan');
 export const updateActionItem = (id) => api.patch('/career/action-plan/' + id, {});
-export const getReadiness = () => api.get('/career/readiness');
+export const getReadiness = () => api.get('/career-intelligence/readiness');
 export const getDigitalTwin = () => api.get('/career/digital-twin');
 export const getCareerPaths = () => api.get('/career/career-paths');
 

@@ -9,6 +9,7 @@ const InterviewLog = require('../models/InterviewLog');
 const aiClient = require('../services/aiServiceClient');
 const SkillEvidence = require('../models/SkillEvidence');
 const Internship = require('../models/Internship');
+const Resume = require('../models/Resume');
 const { calculateConfidence } = require('./skillEvidenceController');
 const { calculateQualityScore } = require('./internshipQualityController');
 
@@ -602,6 +603,66 @@ const rankApplicationsByValue = asyncHandler(async (req, res) => {
   res.json(ranked);
 });
 
+// @desc    Get internship readiness scores for current user
+// @route   GET /api/career-intelligence/readiness
+// @access  Private
+const getInternshipReadiness = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const [profile, resume, skillEvidence, applications] = await Promise.all([
+    AIStudentProfile.findOne({ user: userId }),
+    Resume.findOne({ user: userId }).sort({ createdAt: -1 }),
+    SkillEvidence.find({ user: userId }),
+    Application.find({ user: userId }),
+  ]);
+
+  const resumeScore = resume?.atsScore != null ? Math.round(resume.atsScore) : null;
+  const skillsScore = profile?.internshipReadinessScore != null
+    ? Math.round(profile.internshipReadinessScore)
+    : null;
+  const evidenceScore = skillEvidence.length > 0
+    ? Math.min(
+        100,
+        Math.round(
+          (skillEvidence.filter((s) => s.confidenceScore > 40).length /
+            Math.max(skillEvidence.length, 1)) *
+            100
+        )
+      )
+    : null;
+  const applicationScore = applications.length > 0
+    ? Math.min(
+        100,
+        Math.round(
+          (applications.filter((a) =>
+            ['Shortlisted', 'Interview', 'Selected', 'Accepted'].includes(a.status)
+          ).length /
+            applications.length) *
+            100
+        )
+      )
+    : null;
+
+  const defined = [resumeScore, skillsScore, evidenceScore].filter((s) => s != null);
+  const overallScore =
+    defined.length > 0
+      ? Math.round(defined.reduce((a, b) => a + b, 0) / defined.length)
+      : null;
+
+  res.json({
+    success: true,
+    data: {
+      overallScore,
+      resumeScore,
+      skillsScore,
+      evidenceScore,
+      applicationScore,
+      interviewScore: null,
+      dataStatus: overallScore != null ? 'available' : 'no_data',
+    },
+  });
+});
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -615,4 +676,5 @@ module.exports = {
   getCounterfactualRecommendation,
   getExplainableRecommendation,
   rankApplicationsByValue,
+  getInternshipReadiness,
 };
