@@ -116,11 +116,17 @@ export const StudentDashboardProvider = ({ children }) => {
                 /* no resume on server yet */
             }
 
-            if (!scoreData?.resumeUploaded && scoreData?.score === 0) {
-                scoreData = getResumeFromStorage();
+            // Only fall back to localStorage when the server has no resume at all
+            // (resumeUploaded: false). Do NOT fall back just because score is 0 —
+            // 0 is a valid score and should be shown as-is.
+            if (scoreData && scoreData.resumeUploaded === false) {
+                const stored = getResumeFromStorage();
+                if (stored && stored.resumeUploaded) {
+                    scoreData = stored;
+                }
             }
 
-            if (!scoreData || (!scoreData.resumeUploaded && (scoreData.score ?? scoreData.atsScore ?? 0) === 0)) {
+            if (!scoreData || scoreData.resumeUploaded === false) {
                 setAtsScoreData(null);
                 return;
             }

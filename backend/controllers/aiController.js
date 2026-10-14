@@ -52,9 +52,11 @@ const buildMemoryFromProfile = (profile, user) => ({
 const persistAIProfile = async (userId, pipeline, user) => {
   if (!pipeline?.profile) return null;
   const existing = await AIStudentProfile.findOne({ user: userId });
-  const atsScore = pipeline.ats?.ats_score || 0;
+  // Use ?? null so a genuine 0 from the AI engine is preserved, not discarded
+  const atsScore = pipeline.ats?.ats_score ?? null;
   const atsHistory = [...(existing?.atsHistory || [])];
-  if (atsScore > 0) {
+  // Only push to history when score is a real number (not null)
+  if (atsScore != null && atsScore > 0) {
     atsHistory.push({ score: atsScore, at: new Date() });
     if (atsHistory.length > 20) atsHistory.shift();
   }
@@ -85,7 +87,7 @@ const persistAIProfile = async (userId, pipeline, user) => {
       futureTechnologies: pipeline.profile.future_technologies || [],
       recommendedCareerPath: pipeline.profile.recommended_career_path || [],
       learningRoadmap: pipeline.profile.learning_roadmap || [],
-      latestAtsScore: atsScore,
+      latestAtsScore: atsScore,  // null when AI didn't return a score — never fabricate 0
       latestMatchPercentage: pipeline.ats?.match_percentage ?? null,
       aiConfidenceScore: pipeline.ats?.ai_confidence_score ?? null,
       interests: user?.interests || existing?.interests || [],
@@ -450,7 +452,7 @@ const aiChat = asyncHandler(async (req, res) => {
       data = await aiClient.chatWithIntelligence(message, pipeline || {});
     } else {
       data = await aiClient.chat(message, {
-        ats_score: profile?.latestAtsScore || user?.atsScore || 0,
+        ats_score: profile?.latestAtsScore ?? user?.atsScore ?? null,
         skills: profile?.skillProfile || user?.skills || [],
         career_domain: profile?.careerDomain?.label || 'technology',
       });

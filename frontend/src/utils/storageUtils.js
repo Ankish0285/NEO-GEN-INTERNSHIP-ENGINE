@@ -32,7 +32,7 @@ export const saveResumeToStorage = (resumeData, fileName = null) => {
             fileName: fileName || resumeData.fileName || 'resume',
             fileSize: resumeData.fileSize || 0,
             resumeUploaded: true,
-            atsScore: resumeData.score || resumeData.atsScore || resumeData.overallScore || 0
+        atsScore: resumeData.score ?? resumeData.atsScore ?? resumeData.overallScore ?? 0
         };
         localStorage.setItem('userResume', JSON.stringify(resumeStorage));
         localStorage.setItem('resumeUploaded', 'true');
@@ -40,7 +40,7 @@ export const saveResumeToStorage = (resumeData, fileName = null) => {
         // Also save just the ATS score for quick access
         if (resumeData.score !== undefined || resumeData.atsScore !== undefined) {
             localStorage.setItem('resumeAtsScore', JSON.stringify({
-                score: resumeData.score || resumeData.atsScore || resumeData.overallScore || 0,
+                score: resumeData.score ?? resumeData.atsScore ?? resumeData.overallScore ?? 0,
                 breakdown: resumeData.breakdown || {},
                 uploadedAt: new Date().toISOString()
             }));

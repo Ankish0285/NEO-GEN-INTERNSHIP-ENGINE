@@ -109,23 +109,23 @@ const AIIntelligenceHub = () => {
   const radarData = Object.keys(sectionDetail).length
     ? Object.entries(sectionDetail).map(([k, v]) => ({
         subject: v.label || k,
-        value: v.score || 0,
+        value: v.score ?? 0,
       }))
     : [
-        { subject: 'Technical', value: ats.breakdown?.technical || 0 },
-        { subject: 'Experience', value: ats.breakdown?.experience || 0 },
-        { subject: 'Education', value: ats.breakdown?.education || 0 },
-        { subject: 'Format', value: ats.breakdown?.formatting || 0 },
+        { subject: 'Technical', value: ats.breakdown?.technical ?? 0 },
+        { subject: 'Experience', value: ats.breakdown?.experience ?? 0 },
+        { subject: 'Education', value: ats.breakdown?.education ?? 0 },
+        { subject: 'Format', value: ats.breakdown?.formatting ?? 0 },
       ];
 
   const barSections = Object.entries(sectionDetail).map(([k, v]) => ({
     name: (v.label || k).slice(0, 12),
-    score: v.score || 0,
+    score: v.score ?? 0,
   }));
 
-  const atsScore = profile?.latestAtsScore ?? ats.ats_score ?? atsScoreData?.score ?? 0;
-  const employability = profile?.employabilityScore ?? intel?.profile?.employability_score ?? 0;
-  const readiness = profile?.internshipReadinessScore ?? intel?.profile?.internship_readiness_score ?? 0;
+  const atsScore = profile?.latestAtsScore ?? ats.ats_score ?? atsScoreData?.score ?? null;
+  const employability = profile?.employabilityScore ?? intel?.profile?.employability_score ?? null;
+  const readiness = profile?.internshipReadinessScore ?? intel?.profile?.internship_readiness_score ?? null;
 
   const tabRecs = {
     best: groups.bestMatch,
@@ -242,13 +242,13 @@ const AIIntelligenceHub = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {[
-          { label: 'ATS Score', value: `${Math.round(atsScore)}%`, icon: Target, color: '#FF9933' },
-          { label: 'Employability', value: `${Math.round(employability)}%`, icon: TrendingUp, color: '#138808' },
-          { label: 'Readiness', value: `${Math.round(readiness)}%`, icon: GraduationCap, color: '#138808' },
+          { label: 'ATS Score', value: atsScore != null ? `${Math.round(atsScore)}%` : 'Not analyzed', icon: Target, color: '#FF9933' },
+          { label: 'Employability', value: employability != null ? `${Math.round(employability)}%` : 'Not analyzed', icon: TrendingUp, color: '#138808' },
+          { label: 'Readiness', value: readiness != null ? `${Math.round(readiness)}%` : 'Not analyzed', icon: GraduationCap, color: '#138808' },
           { label: 'AI Confidence', value: profile?.aiConfidenceScore != null ? `${profile.aiConfidenceScore}%` : (ats?.ai_confidence_score != null ? `${ats.ai_confidence_score}%` : 'Not analyzed'), icon: Zap, color: '#FF9933' },
           {
             label: 'Career Domain',
-            value: profile?.careerDomain?.label || intel?.profile?.career_domain?.label || 'Analyzing...',
+            value: profile?.careerDomain?.label || intel?.profile?.career_domain?.label || 'Not analyzed',
             icon: Sparkles,
             color: '#138808',
           },
