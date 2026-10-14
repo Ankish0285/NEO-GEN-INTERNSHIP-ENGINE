@@ -4,7 +4,9 @@ const Application = require('../models/Application');
 const Internship = require('../models/Internship');
 const ActivityLog = require('../models/ActivityLog');
 const Resume = require('../models/Resume');
+const AIStudentProfile = require('../models/AIStudentProfile');
 const aiClient = require('../services/aiServiceClient');
+const { pickAtsScore } = require('../utils/studentMetrics');
 
 // @desc    Get dashboard summary
 // @route   GET /api/dashboard/summary
@@ -20,11 +22,12 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
     status: { $in: ['Interview', 'Shortlisted'] },
   });
 
-  // Get latest resume score
-  const latestResume = await Resume.findOne({ user: userId }).sort({ createdAt: -1 });
-  const atsScore = latestResume ? latestResume.atsScore : 0;
-
-  const user = await User.findById(userId);
+  const [latestResume, aiProfile, user] = await Promise.all([
+    Resume.findOne({ user: userId }).sort({ createdAt: -1 }),
+    AIStudentProfile.findOne({ user: userId }),
+    User.findById(userId),
+  ]);
+  const atsScore = pickAtsScore({ latestResume, user, aiProfile });
   let recommendedInternships = [];
 
   const allInternships = await Internship.find({

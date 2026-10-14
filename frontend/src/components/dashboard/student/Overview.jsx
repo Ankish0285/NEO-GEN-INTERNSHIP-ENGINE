@@ -255,7 +255,7 @@ const ProTipCard = ({ profileData, atsScore, onNavigate }) => {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 const Overview = () => {
-  const { dashboardData, profileData, applications, loading, atsScoreData } = useStudentDashboard();
+  const { dashboardData, profileData, applications, loading, atsScoreData, metrics } = useStudentDashboard();
   const navigate = useNavigate();
 
   const onNavigate = (path) => {
@@ -269,7 +269,8 @@ const Overview = () => {
 
   const recommendations = dashboardData?.recommendedInternships || [];
   const pct   = profileData?.profileCompletionPercentage || 0;
-  const ats   = dashboardData?.atsScore ?? atsScoreData?.score ?? 0;
+  // Canonical ATS score from /api/metrics/student — null means "not analyzed", not 0
+  const ats   = metrics?.atsScore ?? dashboardData?.atsScore ?? atsScoreData?.score ?? null;
   const total = dashboardData?.totalApplications || 0;
   const pending = dashboardData?.pendingReviews ?? 0;
   const interviews = applications?.filter(a =>
@@ -331,8 +332,8 @@ const Overview = () => {
         />
         <StatCard
           title="ATS Score"
-          value={loading ? '—' : (ats > 0 ? `${Math.round(ats)}` : '—')}
-          sub={ats >= 80 ? 'Excellent · Top 20%' : ats >= 60 ? 'Good · Keep improving' : ats > 0 ? 'Needs improvement' : 'Upload resume to score'}
+          value={loading ? '—' : (ats != null ? `${Math.round(ats)}` : '—')}
+          sub={loading ? '' : (ats != null ? (ats >= 80 ? 'Excellent · Top 20%' : ats >= 60 ? 'Good · Keep improving' : 'Needs improvement') : 'Upload resume to score')}
           icon={FileText}
           accentColor="#FF9933"
           barValue={ats}

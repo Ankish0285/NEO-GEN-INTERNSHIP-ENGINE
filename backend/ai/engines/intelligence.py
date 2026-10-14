@@ -65,13 +65,15 @@ def _build_chat_context(intelligence: dict[str, Any]) -> dict[str, Any]:
     profile = intelligence.get('profile') or {}
     recs = intelligence.get('recommendations') or []
     groups = intelligence.get('recommendation_groups') or {}
+    career = profile.get('career_domain') or {}
+    career_label = career.get('label') if isinstance(career, dict) else career
     return {
-        'ats_score': ats.get('ats_score', 0),
+        'ats_score': ats.get('ats_score'),
         'skills': profile.get('skill_profile', []),
-        'career_domain': profile.get('career_domain', {}).get('label', 'Technology'),
+        'career_domain': career_label,
         'missing_skills': ats.get('missing_skills', []),
-        'employability_score': profile.get('employability_score', 0),
-        'internship_readiness': profile.get('internship_readiness_score', 0),
+        'employability_score': profile.get('employability_score'),
+        'internship_readiness': profile.get('internship_readiness_score'),
         'top_internships': [r.get('title') for r in recs[:3]],
         'best_match': [r.get('title') for r in groups.get('best_match', [])[:2]],
         'easiest': [r.get('title') for r in groups.get('easiest_selection', [])[:2]],

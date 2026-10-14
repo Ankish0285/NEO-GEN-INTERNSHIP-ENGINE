@@ -3,6 +3,8 @@ const router = express.Router();
 const {
     getInternships,
     getInternshipById,
+    getInternshipBySlug,
+    getInternshipSeedUrls,
     createInternship,
     updateInternship,
     deleteInternship,
@@ -20,6 +22,10 @@ router.put('/:id/approve', protect, admin, approveInternship);
 // Authenticated user (partner / admin) own posted internships
 // NOTE: MUST be declared before /:id otherwise Express matches "mine" as an :id
 router.get('/mine', protect, getMyInternships);
+
+// SEO endpoints (public) — declared before /:id so "by-slug" / "seed" are not parsed as ids
+router.get('/by-slug/:slug', getInternshipBySlug);
+router.get('/seed/urls', getInternshipSeedUrls);
 
 // Public & shared routes
 router.route('/').get(getInternships).post(protect, createInternship);

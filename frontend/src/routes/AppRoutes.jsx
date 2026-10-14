@@ -74,6 +74,7 @@ import CareerIntelligenceInsights from '../components/dashboard/admin/CareerInte
 
 // Public Pages
 import CertificateVerification from '../pages/CertificateVerification';
+import NotFound from '../pages/NotFound';
 
 // Learning Resources
 import LearningResourcesPublic from '../pages/LearningResourcesPublic';
@@ -160,8 +161,8 @@ const AppRoutes = () => {
       {/* Certificate Verification */}
       <Route path="/certificate/verify/:certificateId" element={<CertificateVerification />} />
 
-      {/* Catch all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Catch all — 404 with noindex */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

@@ -137,9 +137,23 @@ const chatWithIntelligence = (message, intelligence) =>
   callAI(
     '/api/v1/chat/intelligence',
     'chat_intel',
-    { message, intelligence },
+    { message, intelligence, context: { intelligence } },
     true
-  ).catch(() => chat(message, { intelligence }));
+  ).catch(() =>
+    chat(message, {
+      ats_score: intelligence?.ats?.ats_score ?? null,
+      employability_score: intelligence?.profile?.employability_score ?? null,
+      internship_readiness: intelligence?.profile?.internship_readiness_score ?? null,
+      skills: intelligence?.profile?.skill_profile || [],
+      career_domain: intelligence?.profile?.career_domain?.label
+        || intelligence?.profile?.career_domain
+        || null,
+      missing_skills: intelligence?.ats?.missing_skills || [],
+      why_low: intelligence?.ats?.why_score_is_low || [],
+      weak_sections: intelligence?.ats?.weak_sections || [],
+      learning_roadmap: intelligence?.profile?.learning_roadmap || [],
+    })
+  );
 
 const matchInternship = (resumeText, internship) =>
   callAI('/api/v1/match/internship', 'match', {

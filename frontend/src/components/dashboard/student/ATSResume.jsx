@@ -555,8 +555,8 @@ const ATSResume = () => {
     }
   };
 
-  const score      = atsScoreData?.score ?? 0;
-  const scoreColor = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
+  const score      = atsScoreData?.score != null ? atsScoreData.score : null;
+  const scoreColor = score == null ? '#9ca3af' : score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
 
   const containerVariants = {
     hidden:  { opacity: 0, y: 20 },
@@ -607,12 +607,12 @@ const ATSResume = () => {
               ATS Resume Checker
             </h1>
             <p className="text-sub mt-2 text-lg">
-              {atsScoreData?.score > 0
+              {atsScoreData?.score != null
                 ? 'Your latest ATS analysis — upload again to refresh scores.'
                 : 'Upload your resume to get a real ATS score and keyword analysis.'}
             </p>
           </div>
-          {atsScoreData?.score > 0 && (
+          {atsScoreData?.score != null && (
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
               className="btn-secondary flex items-center">
               <Download size={16} className="mr-2" /> Download Report
@@ -722,7 +722,7 @@ const ATSResume = () => {
             )}
           </motion.div>
 
-          {/* Score card — always show (shows 0 if no upload yet) */}
+          {/* Score card — shows real score or honest "not analyzed" state */}
           <motion.div variants={itemVariants} className="glass-card p-8 flex flex-col relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-5"><Target size={160} /></div>
             <h3 className="text-xl font-bold text-[#111827] mb-6 flex items-center gap-2 relative z-10">
@@ -732,7 +732,7 @@ const ATSResume = () => {
               <div className="relative w-56 h-56">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={[{ value: score }, { value: 100 - score }]}
+                    <Pie data={score != null ? [{ value: score }, { value: 100 - score }] : [{ value: 0 }, { value: 100 }]}
                       cx="50%" cy="50%" innerRadius={70} outerRadius={90}
                       startAngle={90} endAngle={-270} dataKey="value" stroke="none">
                       <Cell fill={scoreColor} />
@@ -741,22 +741,25 @@ const ATSResume = () => {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <motion.span key={`score-${score}`} initial={{ scale: 0 }} animate={{ scale: 1 }}
+                  <motion.span key={`score-${score ?? 'na'}`} initial={{ scale: 0 }} animate={{ scale: 1 }}
                     transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.2 }}
                     className="text-5xl font-black text-gray-900 tracking-tighter">
-                    {score}
+                    {score != null ? score : '—'}
                   </motion.span>
-                  <span className="text-xs text-gray-500 uppercase font-bold tracking-widest mt-1">Out of 100</span>
+                  <span className="text-xs text-gray-500 uppercase font-bold tracking-widest mt-1">
+                    {score != null ? 'Out of 100' : 'Not analyzed'}
+                  </span>
                 </div>
               </div>
               <div className="mt-2 text-center">
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
                   className={clsx('inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border', {
-                    'bg-green-50 text-green-700 border-green-200':   score >= 80,
-                    'bg-yellow-50 text-yellow-700 border-yellow-200': score >= 60 && score < 80,
-                    'bg-red-50 text-red-700 border-red-200':          score < 60,
+                    'bg-green-50 text-green-700 border-green-200':   score != null && score >= 80,
+                    'bg-yellow-50 text-yellow-700 border-yellow-200': score != null && score >= 60 && score < 80,
+                    'bg-red-50 text-red-700 border-red-200':          score != null && score < 60,
+                    'bg-gray-50 text-gray-400 border-gray-200':        score == null,
                   })}>
-                  {score >= 80 ? 'Excellent Profile' : score >= 60 ? 'Good Start' : score > 0 ? 'Needs Improvement' : 'No resume yet'}
+                  {score == null ? 'Upload resume to analyze' : score >= 80 ? 'Excellent Profile' : score >= 60 ? 'Good Start' : score > 0 ? 'Needs Improvement' : 'Needs Improvement'}
                 </motion.div>
               </div>
             </div>
@@ -766,12 +769,12 @@ const ATSResume = () => {
                 <div key={key} className="space-y-2">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-[#111827]/70 font-semibold">{label}</span>
-                    <span className="font-bold text-[#111827]">{atsScoreData?.breakdown?.[key] || 0}%</span>
+                    <span className="font-bold text-[#111827]">{atsScoreData?.breakdown?.[key] ?? 0}%</span>
                   </div>
                   <div className="w-full bg-navy/5 rounded-full h-2.5 overflow-hidden shadow-inner">
                     <motion.div key={`bar-${key}-${atsScoreData?.breakdown?.[key]}`}
                       initial={{ width: 0 }}
-                      animate={{ width: `${atsScoreData?.breakdown?.[key] || 0}%` }}
+                      animate={{ width: `${atsScoreData?.breakdown?.[key] ?? 0}%` }}
                       transition={{ duration: 0.6 }}
                       className={`${color} h-2.5 rounded-full`}
                     />

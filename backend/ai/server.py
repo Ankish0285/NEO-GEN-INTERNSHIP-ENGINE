@@ -45,6 +45,7 @@ class RecommendRequest(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     context: dict = Field(default_factory=dict)
+    intelligence: dict = Field(default_factory=dict)
 
 
 class MatchRequest(BaseModel):
@@ -74,7 +75,9 @@ def full_intelligence(body: RecommendRequest):
 
 @app.post('/api/v1/chat/intelligence')
 def chat_intel(body: ChatRequest):
-    intel = body.context.get('intelligence') or {}
+    intel = body.intelligence or body.context.get('intelligence') or {}
+    if not intel and (body.context.get('ats') or body.context.get('profile')):
+        intel = body.context
     if intel:
         return {'success': True, 'data': chat_with_intelligence(body.message, intel)}
     return {'success': True, 'data': chat_response(body.message, body.context)}

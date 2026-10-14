@@ -15,7 +15,7 @@ const EmptyChart = ({ message }) => (
 );
 
 const Analytics = () => {
-  const { loading, applications, atsScoreData, profileData, dashboardData } = useStudentDashboard();
+  const { loading, applications, atsScoreData, profileData, dashboardData, metrics } = useStudentDashboard();
 
   const applicationData = useMemo(() => {
     const buckets = {};
@@ -33,10 +33,10 @@ const Analytics = () => {
   }, [applications]);
 
   const atsScoreChart = useMemo(() => {
-    const score = atsScoreData?.score ?? dashboardData?.atsScore ?? 0;
+    const score = metrics?.atsScore ?? atsScoreData?.score ?? dashboardData?.atsScore ?? null;
     if (score == null) return [];
     return [{ version: 'Latest', score }];
-  }, [atsScoreData, dashboardData]);
+  }, [metrics, atsScoreData, dashboardData]);
 
   const skillDemandData = useMemo(() => {
     const skills = profileData?.skills || [];

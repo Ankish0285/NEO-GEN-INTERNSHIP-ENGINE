@@ -15,7 +15,9 @@ const aiClient = require('../services/aiServiceClient');
 const { runAIPipelineForUser } = require('./aiController');
 
 const mapAiToScoreData = (aiAts, parsedText) => ({
-  score: Math.round(aiAts.ats_score || 0),
+  score: aiAts.ats_score != null && !Number.isNaN(Number(aiAts.ats_score))
+    ? Math.round(aiAts.ats_score)
+    : null,
   matched: aiAts.matched_skills || [],
   missing: aiAts.missing_skills || [],
   breakdown: aiAts.breakdown || {
@@ -101,7 +103,7 @@ const uploadResume = asyncHandler(async (req, res) => {
       scoreData = mapAiToScoreData(aiAts, parsedText);
       suggestions = aiAts.improvement_tips || [];
       aiAnalysis = aiAts;
-      matchPercentage = aiAts.match_percentage || scoreData.score;
+      matchPercentage = aiAts.match_percentage != null ? aiAts.match_percentage : scoreData.score;
       aiConfidenceScore = aiAts.ai_confidence_score != null ? aiAts.ai_confidence_score : null;
     } catch (aiErr) {
       console.warn('[ATS] AI analyze failed, using JS fallback:', aiErr.message);

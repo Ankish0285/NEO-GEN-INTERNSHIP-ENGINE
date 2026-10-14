@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
+import { unwrapData } from '../utils/apiData';
 
 /**
  * useStudentMetrics — canonical hook for all student career metrics.
@@ -18,7 +19,7 @@ const useStudentMetrics = () => {
     setError(null);
     try {
       const res = await api.get('/metrics/student');
-      setMetrics(res?.data ?? res ?? null);
+      setMetrics(unwrapData(res) ?? null);
     } catch (err) {
       setError(err?.message || 'Failed to load metrics');
       setMetrics(null);

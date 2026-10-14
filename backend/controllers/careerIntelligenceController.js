@@ -12,6 +12,7 @@ const Internship = require('../models/Internship');
 const Resume = require('../models/Resume');
 const { calculateConfidence } = require('./skillEvidenceController');
 const { calculateQualityScore } = require('./internshipQualityController');
+const { pickAtsScore, pickAnalyzedScore, hasCompletedAnalysis } = require('../utils/studentMetrics');
 
 // ─── Existing handlers (unchanged) ────────────────────────────────────────────
 
@@ -613,13 +614,21 @@ const getInternshipReadiness = asyncHandler(async (req, res) => {
     AIStudentProfile.findOne({ user: userId }),
     Resume.findOne({ user: userId }).sort({ createdAt: -1 }),
     SkillEvidence.find({ user: userId }),
-    Application.find({ user: userId }),
+    Application.find({ student: userId }),
   ]);
 
-  const resumeScore = resume?.atsScore != null ? Math.round(resume.atsScore) : null;
-  const skillsScore = profile?.internshipReadinessScore != null
-    ? Math.round(profile.internshipReadinessScore)
-    : null;
+  const resumeScoreRaw = pickAtsScore({
+    latestResume: resume,
+    user: { resumeUploaded: !!resume?.parsedText, atsScore: resume?.atsScore },
+    aiProfile: profile,
+  });
+  const resumeScore = resumeScoreRaw != null ? Math.round(resumeScoreRaw) : null;
+  const overallScoreRaw = pickAnalyzedScore(profile, 'internshipReadinessScore');
+  const overallScore = overallScoreRaw != null ? Math.round(overallScoreRaw) : null;
+  const employabilityScoreRaw = pickAnalyzedScore(profile, 'employabilityScore');
+  const employabilityScore = employabilityScoreRaw != null ? Math.round(employabilityScoreRaw) : null;
+  const aiConfidenceScore = pickAnalyzedScore(profile, 'aiConfidenceScore');
+
   const evidenceScore = skillEvidence.length > 0
     ? Math.min(
         100,
@@ -643,22 +652,25 @@ const getInternshipReadiness = asyncHandler(async (req, res) => {
       )
     : null;
 
-  const defined = [resumeScore, skillsScore, evidenceScore].filter((s) => s != null);
-  const overallScore =
-    defined.length > 0
-      ? Math.round(defined.reduce((a, b) => a + b, 0) / defined.length)
-      : null;
+  const analyzed = hasCompletedAnalysis(profile);
+  let dataStatus = 'no_data';
+  if (analyzed && overallScore != null) dataStatus = 'available';
+  else if (analyzed) dataStatus = 'partial';
+  else if (resume?.parsedText) dataStatus = 'partial';
 
   res.json({
     success: true,
     data: {
       overallScore,
       resumeScore,
-      skillsScore,
+      skillsScore: employabilityScore, // displayed as Employability in UI — pipeline score, not a new formula
       evidenceScore,
       applicationScore,
       interviewScore: null,
-      dataStatus: overallScore != null ? 'available' : 'no_data',
+      employabilityScore,
+      aiConfidenceScore,
+      internshipReadinessScore: overallScore,
+      dataStatus,
     },
   });
 });

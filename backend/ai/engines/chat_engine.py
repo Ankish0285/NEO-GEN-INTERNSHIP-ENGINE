@@ -24,13 +24,17 @@ def chat_response(message: str, context: dict | None = None) -> dict[str, Any]:
     return _builtin_chat(msg, context)
 
 
+def _fmt_pct(value) -> str:
+    return f'{value}%' if value is not None else 'not analyzed'
+
+
 def _builtin_chat(msg: str, context: dict) -> dict[str, Any]:
-    ats = context.get('ats_score', 0)
+    ats = context.get('ats_score')
     skills = context.get('skills', [])
-    domain = context.get('career_domain', 'Technology')
+    domain = context.get('career_domain') or 'not analyzed'
     missing = context.get('missing_skills', [])
-    readiness = context.get('internship_readiness', 0)
-    employability = context.get('employability_score', 0)
+    readiness = context.get('internship_readiness')
+    employability = context.get('employability_score')
     top = context.get('top_internships', [])
     best = context.get('best_match', [])
     easiest = context.get('easiest', [])
@@ -40,13 +44,13 @@ def _builtin_chat(msg: str, context: dict) -> dict[str, Any]:
 
     if any(w in msg for w in ['why', 'low', 'weak']) and (why_low or weak):
         reply = (
-            f'ATS {ats}% — reasons: {"; ".join(why_low[:3]) or "review section scores"}. '
+            f'ATS {_fmt_pct(ats)} — reasons: {"; ".join(why_low[:3]) or "review section scores"}. '
             f'Weak areas: {", ".join(weak[:4]) or "see AI Intelligence dashboard"}. '
             'Open AI Intelligence for section-wise breakdown.'
         )
     elif any(w in msg for w in ['ats', 'score', 'resume']):
         reply = (
-            f'Your ATS score is {ats}%. Readiness: {readiness}%. Employability: {employability}%. '
+            f'Your ATS score is {_fmt_pct(ats)}. Readiness: {_fmt_pct(readiness)}. Employability: {_fmt_pct(employability)}. '
             + (f'Improve: {", ".join(missing[:4])}.' if missing else 'Resume is competitive — add metrics to projects.')
             + (f' Weak sections: {", ".join(weak[:3])}.' if weak else '')
         )
@@ -82,7 +86,7 @@ def _builtin_chat(msg: str, context: dict) -> dict[str, Any]:
         )
     elif any(w in msg for w in ['profile', 'readiness', 'employability']):
         reply = (
-            f'Employability {employability}%, internship readiness {readiness}%. '
+            f'Employability {_fmt_pct(employability)}, internship readiness {_fmt_pct(readiness)}. '
             f'Domain: {domain}. Strengths in your AI Profile. '
             'Update skills and re-upload resume after changes.'
         )

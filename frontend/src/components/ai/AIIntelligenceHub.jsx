@@ -24,7 +24,7 @@ const TABS = [
 ];
 
 const AIIntelligenceHub = () => {
-  const { atsScoreData, refreshDashboard, refreshAtsScore } = useStudentDashboard();
+  const { atsScoreData, metrics, refreshDashboard, refreshAtsScore, refreshAfterAnalysis } = useStudentDashboard();
   const {
     isSubscribed, isBlocked, freeUsed, freeLimit,
     subscription, openUpgrade, closeUpgrade, showUpgrade, refresh: refreshSub,
@@ -88,6 +88,7 @@ const AIIntelligenceHub = () => {
     try {
       await analyzeResumeAI();
       toast.success('AI analysis complete');
+      await refreshAfterAnalysis?.();
       await refreshAtsScore?.();
       await load();
       refreshDashboard?.();
@@ -123,9 +124,9 @@ const AIIntelligenceHub = () => {
     score: v.score ?? 0,
   }));
 
-  const atsScore = profile?.latestAtsScore ?? ats.ats_score ?? atsScoreData?.score ?? null;
-  const employability = profile?.employabilityScore ?? intel?.profile?.employability_score ?? null;
-  const readiness = profile?.internshipReadinessScore ?? intel?.profile?.internship_readiness_score ?? null;
+  const atsScore = profile?.latestAtsScore ?? metrics?.atsScore ?? ats.ats_score ?? atsScoreData?.score ?? null;
+  const employability = profile?.employabilityScore ?? metrics?.employabilityScore ?? intel?.profile?.employability_score ?? null;
+  const readiness = profile?.internshipReadinessScore ?? metrics?.internshipReadinessScore ?? intel?.profile?.internship_readiness_score ?? null;
 
   const tabRecs = {
     best: groups.bestMatch,
@@ -245,7 +246,7 @@ const AIIntelligenceHub = () => {
           { label: 'ATS Score', value: atsScore != null ? `${Math.round(atsScore)}%` : 'Not analyzed', icon: Target, color: '#FF9933' },
           { label: 'Employability', value: employability != null ? `${Math.round(employability)}%` : 'Not analyzed', icon: TrendingUp, color: '#138808' },
           { label: 'Readiness', value: readiness != null ? `${Math.round(readiness)}%` : 'Not analyzed', icon: GraduationCap, color: '#138808' },
-          { label: 'AI Confidence', value: profile?.aiConfidenceScore != null ? `${profile.aiConfidenceScore}%` : (ats?.ai_confidence_score != null ? `${ats.ai_confidence_score}%` : 'Not analyzed'), icon: Zap, color: '#FF9933' },
+          { label: 'AI Confidence', value: (profile?.aiConfidenceScore ?? metrics?.aiConfidenceScore) != null ? `${profile?.aiConfidenceScore ?? metrics?.aiConfidenceScore}%` : (ats?.ai_confidence_score != null ? `${ats.ai_confidence_score}%` : 'Not analyzed'), icon: Zap, color: '#FF9933' },
           {
             label: 'Career Domain',
             value: profile?.careerDomain?.label || intel?.profile?.career_domain?.label || 'Not analyzed',

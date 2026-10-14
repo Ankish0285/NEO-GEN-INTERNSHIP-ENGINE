@@ -1,10 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { api } from '../services/api';
 import ApplicationService from '../services/applicationService';
+import { unwrapData } from '../utils/apiData';
 import {
-    getResumeFromStorage,
     normalizeAtsPayload,
     saveResumeToStorage,
 } from '../utils/storageUtils';
@@ -15,23 +15,28 @@ export const useStudentDashboard = () => {
     return useContext(StudentDashboardContext);
 };
 
+const dispatchMetricsRefresh = () => {
+    window.dispatchEvent(new CustomEvent('ai:refresh'));
+};
+
 export const StudentDashboardProvider = ({ children }) => {
     const { user, isAuthenticated, updateUser } = useAuth();
+    const userId = user?._id || user?.id;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
-    // Dashboard Data
+    const [metrics, setMetrics] = useState(null);
+    const [loadingMetrics, setLoadingMetrics] = useState(false);
+
     const [dashboardData, setDashboardData] = useState({
         totalApplications: 0,
         pendingReviews: 0,
         accepted: 0,
-        atsScore: 0,
+        atsScore: null,
         recommendedInternships: []
     });
 
     const [applications, setApplications] = useState([]);
 
-    // Profile State
     const [profileData, setProfileData] = useState({
         name: user?.name || '',
         email: user?.email || '',
@@ -43,25 +48,73 @@ export const StudentDashboardProvider = ({ children }) => {
         profileCompletionPercentage: user?.profileCompletionPercentage || 0
     });
 
-    // ATS State — null until a real resume is analyzed
     const [atsScoreData, setAtsScoreData] = useState(null);
     const [loadingAtsScore, setLoadingAtsScore] = useState(false);
 
-    const loadDashboardData = async () => {
+    const loadMetrics = useCallback(async () => {
+        if (!isAuthenticated) return null;
+        setLoadingMetrics(true);
+        try {
+            const res = await api.get('/metrics/student');
+            const data = unwrapData(res);
+            setMetrics(data);
+            if (data?.atsScore != null) {
+                setDashboardData((prev) => ({ ...prev, atsScore: data.atsScore }));
+            }
+            return data;
+        } catch (err) {
+            console.error('Error fetching student metrics', err);
+            return null;
+        } finally {
+            setLoadingMetrics(false);
+        }
+    }, [isAuthenticated]);
+
+    const loadAtsScore = useCallback(async () => {
+        try {
+            setLoadingAtsScore(true);
+
+            let scoreData = null;
+            try {
+                scoreData = await api.get('/resume/score');
+            } catch {
+                /* no resume on server yet */
+            }
+
+            // Server is the canonical source. Do NOT fall back to stale localStorage
+            // when the server reports no resume — that would fabricate a score.
+            if (!scoreData || scoreData.resumeUploaded === false) {
+                setAtsScoreData(null);
+                return;
+            }
+
+            const canonical = await loadMetrics();
+            const normalized = normalizeAtsPayload(scoreData);
+            if (canonical?.atsScore != null) {
+                normalized.score = canonical.atsScore;
+            }
+            setAtsScoreData(normalized);
+        } catch {
+            console.log('No resume score available yet');
+            setAtsScoreData(null);
+        } finally {
+            setLoadingAtsScore(false);
+        }
+    }, [loadMetrics]);
+
+    const loadDashboardData = useCallback(async () => {
         if (!isAuthenticated) return;
         try {
             setLoading(true);
             setError('');
-            
-            // 1. Fetch dashboard summary
+
             try {
                 const summary = await api.get('/dashboard/summary');
                 setDashboardData(summary);
             } catch (err) {
-                console.error("Error fetching summary", err);
+                console.error('Error fetching summary', err);
             }
-            
-            // 2. Fetch complete profile data
+
             try {
                 const profileDataResponse = await api.get('/profile/me');
                 setProfileData({
@@ -82,83 +135,62 @@ export const StudentDashboardProvider = ({ children }) => {
                     course: profileDataResponse.course || '',
                     profileCompletionPercentage: profileDataResponse.profileCompletionPercentage ?? 0,
                 });
-            } catch (err) {
+            } catch {
                 console.log('Profile data not available, using user context');
             }
-            
-            // 3. Fetch applications
+
             try {
                 const applicationsData = await ApplicationService.getMyApplications();
                 setApplications(applicationsData);
             } catch (err) {
-                console.error("Error fetching applications", err);
+                console.error('Error fetching applications', err);
             }
 
-            // 4. Fetch ATS score
             await loadAtsScore();
-
+            await loadMetrics();
         } catch (err) {
             console.error('Dashboard load error:', err);
             setError('Failed to load dashboard data');
         } finally {
             setLoading(false);
         }
-    };
-
-    const loadAtsScore = async () => {
-        try {
-            setLoadingAtsScore(true);
-
-            let scoreData = null;
-            try {
-                scoreData = await api.get('/resume/score');
-            } catch {
-                /* no resume on server yet */
-            }
-
-            // Only fall back to localStorage when the server has no resume at all
-            // (resumeUploaded: false). Do NOT fall back just because score is 0 —
-            // 0 is a valid score and should be shown as-is.
-            if (scoreData && scoreData.resumeUploaded === false) {
-                const stored = getResumeFromStorage();
-                if (stored && stored.resumeUploaded) {
-                    scoreData = stored;
-                }
-            }
-
-            if (!scoreData || scoreData.resumeUploaded === false) {
-                setAtsScoreData(null);
-                return;
-            }
-
-            setAtsScoreData(normalizeAtsPayload(scoreData));
-        } catch (error) {
-            console.log('No resume score available yet');
-            setAtsScoreData(null);
-        } finally {
-            setLoadingAtsScore(false);
-        }
-    };
+    }, [isAuthenticated, loadAtsScore, loadMetrics]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (isAuthenticated) {
             loadDashboardData();
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, loadDashboardData]);
 
     const handleResumeUploadSuccess = (data) => {
         if (!data) return;
 
         const raw = data?.data || data;
         const safeScoreData = normalizeAtsPayload(raw);
-        saveResumeToStorage({ ...raw, ...safeScoreData }, raw?.fileName);
+        saveResumeToStorage({ ...raw, ...safeScoreData }, raw?.fileName, userId);
 
         setAtsScoreData(safeScoreData);
-        setDashboardData((prev) => ({ ...prev, atsScore: safeScoreData.score }));
+        if (safeScoreData.score != null) {
+            setDashboardData((prev) => ({ ...prev, atsScore: safeScoreData.score }));
+        }
 
         api.get('/dashboard/summary')
             .then((summary) => setDashboardData(summary))
             .catch((err) => console.error('Error updating summary:', err));
+
+        loadMetrics().then(() => dispatchMetricsRefresh());
+    };
+
+    const refreshAfterAnalysis = async () => {
+        await loadMetrics();
+        await loadAtsScore();
+        try {
+            const summary = await api.get('/dashboard/summary');
+            setDashboardData(summary);
+        } catch (err) {
+            console.error('Error updating summary:', err);
+        }
+        dispatchMetricsRefresh();
     };
 
     const value = {
@@ -166,12 +198,16 @@ export const StudentDashboardProvider = ({ children }) => {
         profileData,
         setProfileData,
         atsScoreData,
+        metrics,
+        loadingMetrics,
         applications,
         loading,
         loadingAtsScore,
         onResumeUploadSuccess: handleResumeUploadSuccess,
         refreshDashboard: loadDashboardData,
         refreshAtsScore: loadAtsScore,
+        refreshMetrics: loadMetrics,
+        refreshAfterAnalysis,
     };
 
     return (

@@ -7,6 +7,12 @@ const AIStudentProfile = require('../models/AIStudentProfile');
 const aiClient = require('../services/aiServiceClient');
 const { calculateATSScore, generateSuggestions, extractResumeInfo } = require('../utils/atsScoring');
 const { emitAIUpdate } = require('../utils/aiSocket');
+const {
+  isPresentNumber,
+  buildAIProfileSet,
+  buildResumeSyncSet,
+  buildCoachIntelligence,
+} = require('../utils/studentMetrics');
 
 const mapInternshipForAI = (doc) => ({
   _id: doc._id,
@@ -50,54 +56,32 @@ const buildMemoryFromProfile = (profile, user) => ({
 });
 
 const persistAIProfile = async (userId, pipeline, user) => {
+  // Missing/failed pipeline must not wipe last valid scores with zeros or nulls
   if (!pipeline?.profile) return null;
-  const existing = await AIStudentProfile.findOne({ user: userId });
-  // Use ?? null so a genuine 0 from the AI engine is preserved, not discarded
-  const atsScore = pipeline.ats?.ats_score ?? null;
-  const atsHistory = [...(existing?.atsHistory || [])];
-  // Only push to history when score is a real number (not null)
-  if (atsScore != null && atsScore > 0) {
-    atsHistory.push({ score: atsScore, at: new Date() });
-    if (atsHistory.length > 20) atsHistory.shift();
-  }
-  const recHistory = [...(existing?.recommendationHistory || [])];
-  (pipeline.recommendations || []).slice(0, 5).forEach((r) => {
-    recHistory.push({
-      internshipId: r.internship_id,
-      title: r.title,
-      matchPercentage: r.match_percentage,
-      at: new Date(),
-    });
-  });
-  if (recHistory.length > 30) recHistory.splice(0, recHistory.length - 30);
 
-  return AIStudentProfile.findOneAndUpdate(
+  const existing = await AIStudentProfile.findOne({ user: userId });
+  const $set = buildAIProfileSet(pipeline, user, existing);
+
+  const profile = await AIStudentProfile.findOneAndUpdate(
     { user: userId },
-    {
-      user: userId,
-      skillProfile: pipeline.profile.skill_profile || [],
-      softSkills: pipeline.profile.soft_skills || [],
-      careerDomain: pipeline.profile.career_domain,
-      strengths: pipeline.profile.strengths || [],
-      weaknesses: pipeline.profile.weaknesses || [],
-      employabilityScore: pipeline.profile.employability_score ?? null,
-      internshipReadinessScore: pipeline.profile.internship_readiness_score ?? null,
-      profileSummary: pipeline.profile.profile_summary || '',
-      growthAnalysis: pipeline.profile.growth_analysis || {},
-      futureTechnologies: pipeline.profile.future_technologies || [],
-      recommendedCareerPath: pipeline.profile.recommended_career_path || [],
-      learningRoadmap: pipeline.profile.learning_roadmap || [],
-      latestAtsScore: atsScore,  // null when AI didn't return a score — never fabricate 0
-      latestMatchPercentage: pipeline.ats?.match_percentage ?? null,
-      aiConfidenceScore: pipeline.ats?.ai_confidence_score ?? null,
-      interests: user?.interests || existing?.interests || [],
-      atsHistory,
-      recommendationHistory: recHistory,
-      lastAnalyzedAt: new Date(),
-      rawAnalysis: pipeline,
-    },
+    { $set, $setOnInsert: { user: userId } },
     { upsert: true, new: true }
   );
+
+  const resumeSet = buildResumeSyncSet(pipeline);
+  if (Object.keys(resumeSet).length > 0) {
+    const latestResume = await Resume.findOne({ user: userId }).sort({ createdAt: -1 });
+    if (latestResume && latestResume.user.toString() === userId.toString()) {
+      Object.assign(latestResume, resumeSet);
+      await latestResume.save();
+    }
+  }
+
+  if (isPresentNumber(pipeline.ats?.ats_score)) {
+    await User.findByIdAndUpdate(userId, { atsScore: pipeline.ats.ats_score });
+  }
+
+  return profile;
 };
 
 const runAIPipelineForUser = async (userId, resumeText, req = null) => {
@@ -246,14 +230,18 @@ const analyzeResumeAI = asyncHandler(async (req, res) => {
   }
 
   let analysis;
+  let pipeline = null;
   if (await aiClient.isAvailable()) {
     analysis = await aiClient.analyzeATS(resume.parsedText, jobDescription || '');
-    const pipeline = await runAIPipelineForUser(authenticatedUserId, resume.parsedText, req);
+    pipeline = await runAIPipelineForUser(authenticatedUserId, resume.parsedText, req);
     analysis.recommendations = pipeline?.recommendations;
     analysis.recommendation_groups = pipeline?.recommendation_groups;
     analysis.student_profile = pipeline?.profile;
     analysis.section_wise_scores = pipeline?.ats?.section_wise_scores;
     analysis.why_score_is_low = pipeline?.ats?.why_score_is_low;
+    if (!isPresentNumber(analysis.ats_score) && isPresentNumber(pipeline?.ats?.ats_score)) {
+      analysis.ats_score = pipeline.ats.ats_score;
+    }
   } else {
     const scoreData = calculateATSScore(resume.parsedText);
     analysis = {
@@ -267,13 +255,21 @@ const analyzeResumeAI = asyncHandler(async (req, res) => {
     };
   }
 
+  const pipelineAts = pipeline?.ats?.ats_score;
+  const resolvedAts = isPresentNumber(analysis.ats_score)
+    ? analysis.ats_score
+    : (isPresentNumber(pipelineAts) ? pipelineAts : null);
+  if (isPresentNumber(resolvedAts)) {
+    resume.atsScore = resolvedAts;
+  }
   resume.aiAnalysis = analysis;
-  resume.atsScore = analysis.ats_score ?? resume.atsScore;
+  if (pipeline?.ats) {
+    Object.assign(resume, buildResumeSyncSet(pipeline));
+  }
   await resume.save();
 
-  // Sync User.atsScore to keep AI pipeline context fresh
-  if (analysis.ats_score != null) {
-    await User.findByIdAndUpdate(req.user._id, { atsScore: analysis.ats_score });
+  if (isPresentNumber(resolvedAts)) {
+    await User.findByIdAndUpdate(req.user._id, { atsScore: resolvedAts });
   }
 
   // Increment usage after successful analysis
@@ -444,17 +440,25 @@ const aiChat = asyncHandler(async (req, res) => {
 
   let data;
   if (await aiClient.isAvailable()) {
-    const intelligence = profile?.rawAnalysis;
-    if (intelligence?.ats && resume?.parsedText) {
+    const intelligence = buildCoachIntelligence(profile, resume, user);
+    const hasPersistedAts = intelligence?.ats && Object.keys(intelligence.ats).length > 0;
+    if (hasPersistedAts) {
       data = await aiClient.chatWithIntelligence(message, intelligence);
     } else if (resume?.parsedText) {
-      const pipeline = await runAIPipelineForUser(req.user.id, resume.parsedText);
-      data = await aiClient.chatWithIntelligence(message, pipeline || {});
+      await runAIPipelineForUser(req.user.id, resume.parsedText);
+      const refreshed = await AIStudentProfile.findOne({ user: req.user.id });
+      const latestResume = await Resume.findOne({ user: req.user.id }).sort({ createdAt: -1 });
+      data = await aiClient.chatWithIntelligence(
+        message,
+        buildCoachIntelligence(refreshed, latestResume, user)
+      );
     } else {
       data = await aiClient.chat(message, {
         ats_score: profile?.latestAtsScore ?? user?.atsScore ?? null,
+        employability_score: profile?.employabilityScore ?? null,
+        internship_readiness: profile?.internshipReadinessScore ?? null,
         skills: profile?.skillProfile || user?.skills || [],
-        career_domain: profile?.careerDomain?.label || 'technology',
+        career_domain: profile?.careerDomain?.label || profile?.careerDomain || null,
       });
     }
   } else {

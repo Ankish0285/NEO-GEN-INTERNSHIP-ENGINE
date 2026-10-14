@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Search, MapPin, Calendar, DollarSign, Clock, ArrowRight, Filter, Briefcase, Building } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { api } from '../../services/api';
@@ -8,6 +8,7 @@ import { getResumeFromStorage, isResumeUploaded } from '../../utils/storageUtils
 import ApplicationService from '../../services/applicationService';
 import MotionReveal from '../ui/MotionReveal';
 import AIApplicationModal from './AIApplicationModal';
+import { internshipSlug } from '../../seo/slugify';
 
 const InternshipList = () => {
   const navigate = useNavigate();
@@ -472,7 +473,14 @@ const InternshipList = () => {
                   </div>
                   
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827', marginBottom: '12px', lineHeight: '1.4' }}>
-                    {internship.title}
+                    <Link
+                      to={`/internships/${internshipSlug(internship)}`}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ color: 'inherit', textDecoration: 'none' }}
+                      aria-label={`${internship.title} at ${internship.organization || internship.department} in ${internship.location}`}
+                    >
+                      {internship.title}
+                    </Link>
                   </h3>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
@@ -511,6 +519,27 @@ const InternshipList = () => {
                         <Calendar size={14} /> Apply by: {internship.deadline || '2025-02-28'}
                      </div>
                      <div style={{ display: 'flex', gap: '8px' }}>
+                       <Link
+                         to={`/internships/${internshipSlug(internship)}`}
+                         onClick={(e) => e.stopPropagation()}
+                         style={{
+                           padding: '10px 16px',
+                           backgroundColor: '#fff',
+                           color: '#374151',
+                           border: '1.5px solid #e5e7eb',
+                           borderRadius: '8px',
+                           fontWeight: '600',
+                           cursor: 'pointer',
+                           display: 'flex',
+                           alignItems: 'center',
+                           gap: '6px',
+                           transition: 'all 0.2s',
+                           textDecoration: 'none',
+                           fontSize: '0.85rem',
+                         }}
+                       >
+                         Details
+                       </Link>
                        {appliedInternships.has(internship._id || internship.id) ? (
                          <button 
                             onClick={(e) => {

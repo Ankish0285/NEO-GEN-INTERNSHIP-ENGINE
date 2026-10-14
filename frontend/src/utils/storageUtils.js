@@ -5,7 +5,7 @@ export const normalizeAtsPayload = (raw) => {
     const data = raw?.data || raw || {};
     const breakdown = data.breakdown || {};
     return {
-        score: data.atsScore ?? data.overallScore ?? data.score ?? 0,
+        score: data.atsScore ?? data.overallScore ?? data.score ?? null,
         breakdown: {
             technical: breakdown.technical ?? data.technical ?? 0,
             softSkills: breakdown.softSkills ?? data.softSkills ?? 0,
@@ -24,25 +24,31 @@ export const normalizeAtsPayload = (raw) => {
     };
 };
 
-export const saveResumeToStorage = (resumeData, fileName = null) => {
+const resumeKey = (userId) => (userId ? `userResume:${userId}` : null);
+const atsKey = (userId) => (userId ? `resumeAtsScore:${userId}` : null);
+
+export const saveResumeToStorage = (resumeData, fileName = null, userId = null) => {
     try {
+        const score = resumeData.score ?? resumeData.atsScore ?? resumeData.overallScore ?? null;
         const resumeStorage = {
             ...resumeData,
             uploadedAt: new Date().toISOString(),
             fileName: fileName || resumeData.fileName || 'resume',
             fileSize: resumeData.fileSize || 0,
             resumeUploaded: true,
-        atsScore: resumeData.score ?? resumeData.atsScore ?? resumeData.overallScore ?? 0
+            atsScore: score,
+            ownerId: userId || null,
         };
-        localStorage.setItem('userResume', JSON.stringify(resumeStorage));
+        const key = resumeKey(userId);
+        if (key) localStorage.setItem(key, JSON.stringify(resumeStorage));
         localStorage.setItem('resumeUploaded', 'true');
-        
-        // Also save just the ATS score for quick access
-        if (resumeData.score !== undefined || resumeData.atsScore !== undefined) {
-            localStorage.setItem('resumeAtsScore', JSON.stringify({
-                score: resumeData.score ?? resumeData.atsScore ?? resumeData.overallScore ?? 0,
+
+        if (score !== undefined && atsKey(userId)) {
+            localStorage.setItem(atsKey(userId), JSON.stringify({
+                score,
                 breakdown: resumeData.breakdown || {},
-                uploadedAt: new Date().toISOString()
+                uploadedAt: new Date().toISOString(),
+                ownerId: userId || null,
             }));
         }
         return true;
@@ -52,9 +58,11 @@ export const saveResumeToStorage = (resumeData, fileName = null) => {
     }
 };
 
-export const getResumeFromStorage = () => {
+export const getResumeFromStorage = (userId = null) => {
     try {
-        const resumeData = localStorage.getItem('userResume');
+        const key = resumeKey(userId);
+        if (!key) return null;
+        const resumeData = localStorage.getItem(key);
         return resumeData ? JSON.parse(resumeData) : null;
     } catch (error) {
         console.error('Failed to get resume from localStorage:', error);
@@ -62,9 +70,11 @@ export const getResumeFromStorage = () => {
     }
 };
 
-export const getAtsScoreFromStorage = () => {
+export const getAtsScoreFromStorage = (userId = null) => {
     try {
-        const scoreData = localStorage.getItem('resumeAtsScore');
+        const key = atsKey(userId);
+        if (!key) return null;
+        const scoreData = localStorage.getItem(key);
         return scoreData ? JSON.parse(scoreData) : null;
     } catch (error) {
         console.error('Failed to get ATS score from localStorage:', error);
@@ -72,8 +82,12 @@ export const getAtsScoreFromStorage = () => {
     }
 };
 
-export const clearResumeStorage = () => {
+export const clearResumeStorage = (userId = null) => {
     try {
+        const key = resumeKey(userId);
+        const scoreKey = atsKey(userId);
+        if (key) localStorage.removeItem(key);
+        if (scoreKey) localStorage.removeItem(scoreKey);
         localStorage.removeItem('userResume');
         localStorage.removeItem('resumeUploaded');
         localStorage.removeItem('resumeAtsScore');

@@ -105,6 +105,82 @@ const getInternshipById = asyncHandler(async (req, res) => {
     res.status(200).json(internship);
 });
 
+/* ── SEO helpers ────────────────────────────────────────────────────────── */
+
+/**
+ * Build a URL-safe, lowercase, kebab-case slug from an internship.
+ * Mirrors frontend/src/seo/slugify.js so the two stay in sync.
+ * @param {object} internship
+ * @returns {string}
+ */
+function buildInternshipSlug(internship) {
+    if (!internship) return '';
+    const parts = [
+        internship.title,
+        internship.organization || internship.department,
+        internship.location,
+    ].filter(Boolean);
+
+    return parts
+        .map(part =>
+            String(part)
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s-]/g, ' ')
+                .trim()
+                .replace(/[\s-]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+        )
+        .filter(Boolean)
+        .join('-');
+}
+
+// @desc    Get single internship by SEO slug (title-organization-location)
+// @route   GET /api/internships/by-slug/:slug
+// @access  Public (active/published only)
+const getInternshipBySlug = asyncHandler(async (req, res) => {
+    const { slug } = req.params;
+    if (!slug) {
+        res.status(400);
+        throw new Error('Slug is required');
+    }
+
+    // Only active/published internships are publicly indexable
+    const internships = await Internship.find({
+        status: { $in: ['active', 'published'] },
+    }).lean();
+
+    const match = internships.find(i => buildInternshipSlug(i) === slug);
+
+    if (!match) {
+        res.status(404);
+        throw new Error('Internship not found');
+    }
+
+    res.status(200).json(match);
+});
+
+// @desc    Return list of slugs for all active internships (for sitemap build)
+// @route   GET /api/internships/seed/urls
+// @access  Public
+const getInternshipSeedUrls = asyncHandler(async (req, res) => {
+    const internships = await Internship.find({
+        status: { $in: ['active', 'published'] },
+    })
+        .select('title organization department location createdAt updatedAt')
+        .lean();
+
+    const urls = internships.map(i => ({
+        slug: buildInternshipSlug(i),
+        lastmod: (i.updatedAt || i.createdAt || new Date())
+            .toISOString()
+            .split('T')[0],
+    })).filter(u => u.slug);
+
+    res.status(200).json({ urls });
+});
+
 // @desc    Create new internship
 // @route   POST /api/internships
 // @access  Private
@@ -313,6 +389,8 @@ const getMyInternships = asyncHandler(async (req, res) => {
 module.exports = {
     getInternships,
     getInternshipById,
+    getInternshipBySlug,
+    getInternshipSeedUrls,
     createInternship,
     updateInternship,
     deleteInternship,

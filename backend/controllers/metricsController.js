@@ -2,6 +2,11 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const AIStudentProfile = require('../models/AIStudentProfile');
 const Resume = require('../models/Resume');
+const {
+  pickAtsScore,
+  pickAnalyzedScore,
+  hasCompletedAnalysis,
+} = require('../utils/studentMetrics');
 
 // @desc    Get canonical student metrics (single source of truth)
 // @route   GET /api/metrics/student
@@ -16,38 +21,11 @@ const getStudentMetrics = asyncHandler(async (req, res) => {
     Resume.findOne({ user: userId }).sort({ createdAt: -1 }),
   ]);
 
-  // ─── atsScore ────────────────────────────────────────────────────────────────
-  // Primary: Resume.atsScore (most recently updated by both upload and re-analysis)
-  // Fallback: User.atsScore (denormalized copy; may lag after re-analysis)
-  // Score of 0 is valid — use != null, never ||
-  let atsScore = null;
-  if (latestResume != null && latestResume.atsScore != null) {
-    atsScore = latestResume.atsScore;
-  } else if (user != null && user.atsScore != null) {
-    atsScore = user.atsScore;
-  }
-
-  // ─── employabilityScore ──────────────────────────────────────────────────────
-  // Source: AIStudentProfile.employabilityScore
-  const employabilityScore =
-    aiProfile != null && aiProfile.employabilityScore != null
-      ? aiProfile.employabilityScore
-      : null;
-
-  // ─── internshipReadinessScore ────────────────────────────────────────────────
-  // Source: AIStudentProfile.internshipReadinessScore
-  const internshipReadinessScore =
-    aiProfile != null && aiProfile.internshipReadinessScore != null
-      ? aiProfile.internshipReadinessScore
-      : null;
-
-  // ─── aiConfidenceScore ───────────────────────────────────────────────────────
-  // Source: AIStudentProfile.aiConfidenceScore
-  // Do NOT fabricate — return null when unavailable
-  const aiConfidenceScore =
-    aiProfile != null && aiProfile.aiConfidenceScore != null
-      ? aiProfile.aiConfidenceScore
-      : null;
+  // Prefer persisted AI pipeline scores. Schema default 0 is not a genuine result.
+  const atsScore = pickAtsScore({ latestResume, user, aiProfile });
+  const employabilityScore = pickAnalyzedScore(aiProfile, 'employabilityScore');
+  const internshipReadinessScore = pickAnalyzedScore(aiProfile, 'internshipReadinessScore');
+  const aiConfidenceScore = pickAnalyzedScore(aiProfile, 'aiConfidenceScore');
 
   // ─── careerDomain ────────────────────────────────────────────────────────────
   // AIStudentProfile.careerDomain can be an object { domain, label, confidence }
@@ -110,7 +88,7 @@ const getStudentMetrics = asyncHandler(async (req, res) => {
   const resumeUploaded = resumeHasParsedText || (user?.resumeUploaded === true);
 
   // ─── hasAIProfile ────────────────────────────────────────────────────────────
-  const hasAIProfile = aiProfile != null;
+  const hasAIProfile = hasCompletedAnalysis(aiProfile);
 
   // ─── dataStatus ──────────────────────────────────────────────────────────────
   // no_resume  → no parsed resume exists

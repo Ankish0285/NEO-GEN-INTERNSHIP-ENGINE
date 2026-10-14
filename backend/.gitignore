@@ -62,3 +62,8 @@ Thumbs.db
 # Build
 dist/
 build/
+
+# Temporary inspection / debug scripts
+_gen_token.js
+_inspect_metrics.js
+_test_metrics_api.js

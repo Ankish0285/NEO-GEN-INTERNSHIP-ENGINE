@@ -1,4 +1,5 @@
 import { api } from './api';
+import { clearResumeStorage } from '../utils/storageUtils';
 
 const AuthService = {
   // Register (Step 1) — turnstileToken is verified by backend before proceeding
@@ -90,6 +91,8 @@ const AuthService = {
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Clear resume/ATS localStorage to prevent one user's data leaking to the next
+    clearResumeStorage();
   },
 
   // Get Current User
