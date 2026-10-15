@@ -16,7 +16,7 @@ const issueCertificate = asyncHandler(async (req, res) => {
     res.status(403); throw new Error('Only partners or admins can issue certificates');
   }
   const certificateId = generateCertificateId();
-  const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/certificate/verify/${certificateId}`;
+  const verifyUrl = `${process.env.FRONTEND_URL || 'https://neogeninternshipengine.me'}/certificate/verify/${certificateId}`;
   let qrCodeData = '';
   try { qrCodeData = await QRCode.toDataURL(verifyUrl); } catch(e) { console.error('QR generation failed:', e); }
   const cert = await PlacementRecord.create({
@@ -138,7 +138,7 @@ const adminIssueCertificate = asyncHandler(async (req, res) => {
   if (student.role !== 'student') { res.status(400); throw new Error('User is not a student'); }
 
   const certificateId = generateCertificateId();
-  const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/certificate/verify/${certificateId}`;
+  const verifyUrl = `${process.env.FRONTEND_URL || 'https://neogeninternshipengine.me'}/certificate/verify/${certificateId}`;
   let qrCodeData = '';
   try { qrCodeData = await QRCode.toDataURL(verifyUrl); } catch(e) { console.error('QR generation failed:', e); }
 
