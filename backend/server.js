@@ -45,6 +45,7 @@ const io = new Server(server, {
       'http://127.0.0.1:3000',
       'http://127.0.0.1:5173',
       // Production
+      "https://neogeninternshipengine.me",
       'http://3.111.79.3:3000',
       'https://d19fkrmko4i5uh.cloudfront.net',
       'http://neogen-internship-engine.s3-website.ap-south-1.amazonaws.com',
