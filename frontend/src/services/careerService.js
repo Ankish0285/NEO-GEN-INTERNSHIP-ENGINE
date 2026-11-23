@@ -55,6 +55,21 @@ export const deleteCertificate = (id) => api.delete('/certificates/' + id);
 export const getCareerInsights = () => api.get('/admin/career-insights');
 export const getAdminPlatformIntelligence = () => api.get('/admin/intelligence');
 
+// --- NEO GEN Cert Branding (super_admin) ---
+export const getNeogenCertBranding = () => api.get('/admin/cert-branding');
+export const updateNeogenCertBranding = (data) => api.put('/admin/cert-branding', data);
+export const uploadNeogenCertLogo = (formData) => api.upload('/admin/cert-branding/logo', formData);
+export const uploadNeogenCertSignature = (formData) => api.upload('/admin/cert-branding/signature', formData);
+
+// --- Partner Cert Settings ---
+export const getPartnerCertSettings = () => api.get('/partner/cert-settings');
+export const updatePartnerCertSettings = (data) => api.put('/partner/cert-settings', data);
+export const uploadPartnerCertLogo = (formData) => api.upload('/partner/cert-settings/logo', formData);
+export const uploadPartnerCertSignature = (formData) => api.upload('/partner/cert-settings/signature', formData);
+
+// --- Public NEO GEN branding (for cert preview, no auth) ---
+export const getPublicNeogenBranding = () => api.get('/certificates/branding/neogen');
+
 // --- Partner Intelligence ---
 export const getPartnerIntelligence = () => api.get('/partner/intelligence');
 
@@ -130,6 +145,18 @@ export default {
   // Admin
   getCareerInsights,
   getAdminPlatformIntelligence,
+  // NEO GEN Cert Branding
+  getNeogenCertBranding,
+  updateNeogenCertBranding,
+  uploadNeogenCertLogo,
+  uploadNeogenCertSignature,
+  // Partner Cert Settings
+  getPartnerCertSettings,
+  updatePartnerCertSettings,
+  uploadPartnerCertLogo,
+  uploadPartnerCertSignature,
+  // Public NEO GEN branding
+  getPublicNeogenBranding,
   // Partner Intelligence
   getPartnerIntelligence,
   // Completion

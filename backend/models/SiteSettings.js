@@ -109,6 +109,15 @@ const siteSettingsSchema = new mongoose.Schema(
       subtitle: { type: String, default: 'The people who brought NEO GEN to life' },
       members: { type: [teamMemberSchema], default: [] },
     },
+    neogenCertBranding: {
+      logoUrl: { type: String, default: '' },
+      logoPublicId: { type: String, default: '' },
+      ceoName: { type: String, default: 'Ankish Kumar' },
+      ceoDesignation: { type: String, default: 'Founder & CEO, NEO GEN Internship Engine' },
+      ceoSignatureUrl: { type: String, default: '' },
+      ceoSignaturePublicId: { type: String, default: '' },
+      updatedAt: { type: Date },
+    },
   },
   { timestamps: true }
 );

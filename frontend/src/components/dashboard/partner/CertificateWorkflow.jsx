@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Award, CheckCircle2, Clock, AlertCircle, Plus, Upload, Wand2, X, User, Download, Search } from 'lucide-react';
+import { Award, CheckCircle2, Clock, AlertCircle, Plus, Upload, Wand2, X, User, Download, Search, Settings, Image, PenLine } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import {
   getPartnerCompletions,
@@ -7,6 +7,11 @@ import {
   uploadCertificatePartner,
   generateCertificatePartner,
   searchStudentsForPartner,
+  getPartnerCertSettings,
+  updatePartnerCertSettings,
+  uploadPartnerCertLogo,
+  uploadPartnerCertSignature,
+  getPublicNeogenBranding,
 } from '../../../services/careerService';
 import { Skeleton } from '../../ui/Skeleton';
 import EmptyState from '../../ui/EmptyState';
@@ -100,6 +105,7 @@ const StudentSearchInput = ({ selectedStudent, onSelect, onClear, fetchFn }) => 
 // ─── IssueCertificateModal ─────────────────────────────────────────────────────
 const IssueCertificateModal = ({
   isOpen, onClose, partnerOrg, prefillStudent = null, onSuccess,
+  neogenBranding = null, partnerBranding = null,
 }) => {
   const [issueTab, setIssueTab] = useState('generate');
   const [form, setForm] = useState({ ...EMPTY_FORM, organization: partnerOrg || '' });
@@ -321,6 +327,8 @@ const IssueCertificateModal = ({
                       title={form.title || 'Internship Completion Certificate'}
                       description={form.description || ''}
                       qrCodeData="https://neogeninternshipengine.me/verify/preview"
+                      neogenBranding={neogenBranding}
+                      partnerBranding={partnerBranding}
                     />
                   </div>
                 </div>
@@ -345,6 +353,190 @@ const IssueCertificateModal = ({
   );
 };
 
+// ─── PartnerCertSettings ───────────────────────────────────────────────────────
+const PartnerCertSettings = () => {
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [signatoryName, setSignatoryName] = useState('');
+  const [signatoryDesignation, setSignatoryDesignation] = useState('');
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [sigPreview, setSigPreview] = useState(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingSig, setUploadingSig] = useState(false);
+  const logoInputRef = useRef(null);
+  const sigInputRef = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await getPartnerCertSettings();
+        const d = res?.data ?? {};
+        setSettings(d);
+        setSignatoryName(d.signatoryName || '');
+        setSignatoryDesignation(d.signatoryDesignation || '');
+      } catch {
+        toast.error('Failed to load certificate settings.');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleSaveText = async () => {
+    setSaving(true);
+    try {
+      const res = await updatePartnerCertSettings({ signatoryName, signatoryDesignation });
+      setSettings(res?.data ?? settings);
+      toast.success('Settings saved.');
+    } catch {
+      toast.error('Failed to save settings.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogoChange = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!['image/png', 'image/jpeg', 'image/jpg'].includes(f.type)) {
+      toast.error('PNG or JPG only.'); return;
+    }
+    if (f.size > 5 * 1024 * 1024) { toast.error('Max 5 MB.'); return; }
+    setLogoPreview(URL.createObjectURL(f));
+    setUploadingLogo(true);
+    try {
+      const fd = new FormData();
+      fd.append('logo', f);
+      const res = await uploadPartnerCertLogo(fd);
+      setSettings(res?.data ?? settings);
+      toast.success('Logo uploaded.');
+    } catch {
+      toast.error('Logo upload failed.');
+      setLogoPreview(null);
+    } finally {
+      setUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = '';
+    }
+  };
+
+  const handleSigChange = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!['image/png', 'image/jpeg', 'image/jpg'].includes(f.type)) {
+      toast.error('PNG or JPG only.'); return;
+    }
+    if (f.size > 2 * 1024 * 1024) { toast.error('Max 2 MB.'); return; }
+    setSigPreview(URL.createObjectURL(f));
+    setUploadingSig(true);
+    try {
+      const fd = new FormData();
+      fd.append('signature', f);
+      const res = await uploadPartnerCertSignature(fd);
+      setSettings(res?.data ?? settings);
+      toast.success('Signature uploaded.');
+    } catch {
+      toast.error('Signature upload failed.');
+      setSigPreview(null);
+    } finally {
+      setUploadingSig(false);
+      if (sigInputRef.current) sigInputRef.current.value = '';
+    }
+  };
+
+  if (loading) {
+    return <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-14 rounded-xl" />)}</div>;
+  }
+
+  const currentLogoUrl = logoPreview || settings?.logoUrl || '';
+  const currentSigUrl = sigPreview || settings?.signatureUrl || '';
+
+  return (
+    <div className="space-y-6 max-w-xl">
+      <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200">
+        <AlertCircle size={16} className="text-amber-600 mt-0.5 shrink-0" />
+        <p className="text-sm text-amber-800">
+          These assets will appear on all certificates issued by your organization.
+        </p>
+      </div>
+
+      {/* Logo */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Image size={16} className="text-amber-600" />
+          <h3 className="text-sm font-semibold text-gray-800">Organization Logo</h3>
+        </div>
+        {currentLogoUrl ? (
+          <div className="border border-gray-200 rounded-xl p-3 inline-block">
+            <img src={currentLogoUrl} alt="Partner Logo" className="max-h-16 object-contain" />
+          </div>
+        ) : (
+          <div className="w-24 h-16 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-xs text-gray-400">
+            No logo
+          </div>
+        )}
+        <input ref={logoInputRef} type="file" accept="image/png,image/jpeg,image/jpg" onChange={handleLogoChange} className="hidden" />
+        <button type="button" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors disabled:opacity-60">
+          <Upload size={14} />
+          {uploadingLogo ? 'Uploading…' : 'Upload Logo'}
+        </button>
+        <p className="text-xs text-gray-400">PNG or JPG, max 5 MB</p>
+      </div>
+
+      {/* Signatory info */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <PenLine size={16} className="text-amber-600" />
+          <h3 className="text-sm font-semibold text-gray-800">Authorized Signatory</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Signatory Name</label>
+            <input type="text" value={signatoryName} onChange={(e) => setSignatoryName(e.target.value)}
+              placeholder="e.g. Jane Smith"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Designation</label>
+            <input type="text" value={signatoryDesignation} onChange={(e) => setSignatoryDesignation(e.target.value)}
+              placeholder="e.g. CEO"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-100" />
+          </div>
+        </div>
+        <button type="button" onClick={handleSaveText} disabled={saving}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition-colors disabled:opacity-60">
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+
+      {/* Signature image */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <PenLine size={16} className="text-amber-600" />
+          <h3 className="text-sm font-semibold text-gray-800">Signatory Signature</h3>
+        </div>
+        {currentSigUrl ? (
+          <div className="border border-gray-200 rounded-xl p-3 inline-block">
+            <img src={currentSigUrl} alt="Signature" className="h-12 object-contain" />
+          </div>
+        ) : (
+          <div className="w-32 h-12 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-xs text-gray-400">
+            No signature
+          </div>
+        )}
+        <input ref={sigInputRef} type="file" accept="image/png,image/jpeg,image/jpg" onChange={handleSigChange} className="hidden" />
+        <button type="button" onClick={() => sigInputRef.current?.click()} disabled={uploadingSig}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors disabled:opacity-60">
+          <Upload size={14} />
+          {uploadingSig ? 'Uploading…' : 'Upload Signature'}
+        </button>
+        <p className="text-xs text-gray-400">PNG or JPG, max 2 MB</p>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main component ────────────────────────────────────────────────────────────
 const CertificateWorkflow = ({ partnerOrg = '' }) => {
   const [activeTab, setActiveTab] = useState('completions');
@@ -353,6 +545,8 @@ const CertificateWorkflow = ({ partnerOrg = '' }) => {
   const [loading, setLoading] = useState(true);
   const [issueModal, setIssueModal] = useState(false);
   const [prefillStudent, setPrefillStudent] = useState(null);
+  const [neogenBranding, setNeogenBranding] = useState(null);
+  const [partnerBranding, setPartnerBranding] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -376,7 +570,16 @@ const CertificateWorkflow = ({ partnerOrg = '' }) => {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+    // Fetch branding for cert preview
+    getPublicNeogenBranding()
+      .then((res) => setNeogenBranding(res?.data ?? null))
+      .catch(() => {});
+    getPartnerCertSettings()
+      .then((res) => setPartnerBranding(res?.data ?? null))
+      .catch(() => {});
+  }, []); // eslint-disable-line
 
   const handleIssueFromCompletion = (item) => {
     // Pre-fill the student from the completion record
@@ -414,6 +617,7 @@ const CertificateWorkflow = ({ partnerOrg = '' }) => {
         {[
           { key: 'completions', label: 'Completed Internships' },
           { key: 'certificates', label: 'My Certificates' },
+          { key: 'settings', label: 'Certificate Settings' },
         ].map(({ key, label }) => (
           <button key={key} type="button" onClick={() => setActiveTab(key)}
             className={`px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 -mb-px transition-colors ${
@@ -487,6 +691,8 @@ const CertificateWorkflow = ({ partnerOrg = '' }) => {
             </div>
           )}
         </>
+      ) : activeTab === 'settings' ? (
+        <PartnerCertSettings />
       ) : (
         /* My Certificates tab */
         myCerts.length === 0 ? (
@@ -551,6 +757,8 @@ const CertificateWorkflow = ({ partnerOrg = '' }) => {
         partnerOrg={partnerOrg}
         prefillStudent={prefillStudent}
         onSuccess={fetchData}
+        neogenBranding={neogenBranding}
+        partnerBranding={partnerBranding}
       />
     </div>
   );

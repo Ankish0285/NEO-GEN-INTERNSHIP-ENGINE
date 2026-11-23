@@ -23,7 +23,39 @@ import { Award } from 'lucide-react';
  *   description      string
  *   qrCodeData       string  (URL for QR code)
  *   onExportReady    fn(ref) — called on mount so parent can trigger PDF export
+ *   neogenBranding   object  { logoUrl, ceoName, ceoDesignation, ceoSignatureUrl }
+ *   partnerBranding  object  { logoUrl, signatoryName, signatoryDesignation, signatureUrl }
+ *                    When null/undefined, single-org layout is shown (backward compatible).
  */
+
+// Signature image or placeholder box
+const SignatureImage = ({ url, alt }) => {
+  if (url) {
+    return (
+      <img
+        src={url}
+        alt={alt || 'signature'}
+        style={{ height: '48px', objectFit: 'contain', display: 'block' }}
+      />
+    );
+  }
+  return (
+    <div style={{
+      width: '120px',
+      height: '48px',
+      border: '1px dashed #ccc',
+      borderRadius: '4px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#ccc',
+      fontSize: '11px',
+    }}>
+      Signature
+    </div>
+  );
+};
+
 const CertificatePreview = ({
   templateId = 'classic',
   studentName = '',
@@ -38,6 +70,8 @@ const CertificatePreview = ({
   description = '',
   qrCodeData = '',
   onExportReady,
+  neogenBranding = null,
+  partnerBranding = null,
 }) => {
   const certRef = useRef(null);
 
@@ -61,6 +95,51 @@ const CertificatePreview = ({
 
   const qrValue = qrCodeData || `https://neogeninternshipengine.me/verify/${certificateId}`;
 
+  const neoCeoName = neogenBranding?.ceoName || 'Ankish Kumar';
+  const neoCeoDesig = neogenBranding?.ceoDesignation || 'Founder & CEO, NEO GEN Internship Engine';
+  const neoCeoSig = neogenBranding?.ceoSignatureUrl || '';
+  const neoLogoUrl = neogenBranding?.logoUrl || '';
+
+  const partnerSigName = partnerBranding?.signatoryName || issuerName || 'Authorized Signatory';
+  const partnerSigDesig = partnerBranding?.signatoryDesignation || '';
+  const partnerSigUrl = partnerBranding?.signatureUrl || '';
+  const partnerLogoUrl = partnerBranding?.logoUrl || '';
+
+  const isDualBranding = !!partnerBranding;
+
+  // ── Dual-branding footer ──────────────────────────────────────────────────
+  const DualBrandingFooter = ({ accentColor, lineColor, textColor, mutedColor }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px' }}>
+      {/* NEO GEN side */}
+      <div style={{ flex: 1 }}>
+        <SignatureImage url={neoCeoSig} alt="NEO GEN CEO Signature" />
+        <div style={{ width: '130px', height: '1px', background: lineColor, margin: '8px 0 6px' }} />
+        <p style={{ color: textColor, fontWeight: 700, fontSize: '13px' }}>{neoCeoName}</p>
+        <p style={{ color: mutedColor, fontSize: '11px' }}>{neoCeoDesig}</p>
+      </div>
+
+      {/* Partner side */}
+      <div style={{ flex: 1, textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+        <SignatureImage url={partnerSigUrl} alt="Partner Signature" />
+        <div style={{ width: '130px', height: '1px', background: lineColor, margin: '8px 0 6px' }} />
+        <p style={{ color: textColor, fontWeight: 700, fontSize: '13px' }}>{partnerSigName}</p>
+        {partnerSigDesig && <p style={{ color: mutedColor, fontSize: '11px' }}>{partnerSigDesig}</p>}
+        <p style={{ color: mutedColor, fontSize: '11px' }}>{organization || 'Partner Organization'}</p>
+      </div>
+    </div>
+  );
+
+  // ── Single-org footer (backward compat) ───────────────────────────────────
+  const SingleFooter = ({ lineColor, textColor, mutedColor }) => (
+    <div style={{ textAlign: 'right' }}>
+      <div style={{ width: '130px', height: '1px', background: lineColor, marginBottom: '6px', marginLeft: 'auto' }} />
+      <p style={{ color: textColor, fontWeight: 700, fontSize: '13px' }}>
+        {issuerName || 'Authorized Signatory'}
+      </p>
+      <p style={{ color: mutedColor, fontSize: '11px', fontFamily: 'Inter, sans-serif' }}>NEO GEN</p>
+    </div>
+  );
+
   if (templateId === 'modern') {
     return (
       <div
@@ -76,24 +155,44 @@ const CertificatePreview = ({
           }}
         >
           <div className="flex items-center justify-between">
+            {/* NEO GEN branding */}
             <div className="flex items-center gap-3">
-              <Award size={32} style={{ color: '#FF9933' }} />
-              <div>
-                <p style={{ color: '#FF9933', fontSize: '20px', fontWeight: 800, letterSpacing: '1px' }}>
-                  NEO GEN
+              {neoLogoUrl ? (
+                <img src={neoLogoUrl} alt="NEO GEN Logo" style={{ height: '40px', objectFit: 'contain' }} />
+              ) : (
+                <>
+                  <Award size={32} style={{ color: '#FF9933' }} />
+                  <div>
+                    <p style={{ color: '#FF9933', fontSize: '20px', fontWeight: 800, letterSpacing: '1px' }}>
+                      NEO GEN
+                    </p>
+                    <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px' }}>
+                      Internship Engine
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              {/* Partner logo in top-right when dual branding */}
+              {isDualBranding && (
+                partnerLogoUrl ? (
+                  <img src={partnerLogoUrl} alt="Partner Logo" style={{ height: '40px', objectFit: 'contain' }} />
+                ) : (
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: 600 }}>
+                    {organization || 'Partner Org'}
+                  </p>
+                )
+              )}
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  Certificate ID
                 </p>
-                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px' }}>
-                  Internship Engine
+                <p style={{ color: '#FF9933', fontFamily: 'monospace', fontSize: '12px', fontWeight: 700 }}>
+                  {certificateId || 'NEOGEN-CERT-PENDING'}
                 </p>
               </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Certificate ID
-              </p>
-              <p style={{ color: '#FF9933', fontFamily: 'monospace', fontSize: '12px', fontWeight: 700 }}>
-                {certificateId || 'NEOGEN-CERT-PENDING'}
-              </p>
             </div>
           </div>
 
@@ -187,13 +286,22 @@ const CertificatePreview = ({
           )}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-            <div>
-              <div style={{ width: '140px', height: '1px', background: '#1a1a2e', marginBottom: '6px' }} />
-              <p style={{ color: '#1a1a2e', fontWeight: 700, fontSize: '13px' }}>
-                {issuerName || 'Authorized Signatory'}
-              </p>
-              <p style={{ color: '#999', fontSize: '11px' }}>NEO GEN Internship Engine</p>
-            </div>
+            {isDualBranding ? (
+              <DualBrandingFooter
+                accentColor="#FF9933"
+                lineColor="#1a1a2e"
+                textColor="#1a1a2e"
+                mutedColor="#999"
+              />
+            ) : (
+              <div>
+                <div style={{ width: '140px', height: '1px', background: '#1a1a2e', marginBottom: '6px' }} />
+                <p style={{ color: '#1a1a2e', fontWeight: 700, fontSize: '13px' }}>
+                  {issuerName || 'Authorized Signatory'}
+                </p>
+                <p style={{ color: '#999', fontSize: '11px' }}>NEO GEN Internship Engine</p>
+              </div>
+            )}
 
             {qrValue && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
@@ -230,10 +338,28 @@ const CertificatePreview = ({
       {/* Top branding */}
       <div style={{ textAlign: 'center', marginBottom: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <Award size={28} style={{ color: '#c9a94a' }} />
-          <span style={{ fontSize: '22px', fontWeight: 900, color: '#c9a94a', letterSpacing: '3px', fontFamily: 'Inter, sans-serif' }}>
-            NEO GEN
-          </span>
+          {neoLogoUrl ? (
+            <img src={neoLogoUrl} alt="NEO GEN Logo" style={{ height: '40px', objectFit: 'contain' }} />
+          ) : (
+            <>
+              <Award size={28} style={{ color: '#c9a94a' }} />
+              <span style={{ fontSize: '22px', fontWeight: 900, color: '#c9a94a', letterSpacing: '3px', fontFamily: 'Inter, sans-serif' }}>
+                NEO GEN
+              </span>
+            </>
+          )}
+          {isDualBranding && (
+            <span style={{ color: '#c9a94a', fontSize: '18px', margin: '0 8px' }}>✦</span>
+          )}
+          {isDualBranding && (
+            partnerLogoUrl ? (
+              <img src={partnerLogoUrl} alt="Partner Logo" style={{ height: '40px', objectFit: 'contain' }} />
+            ) : (
+              <span style={{ fontSize: '14px', fontWeight: 700, color: '#5a3e00', fontFamily: 'Inter, sans-serif' }}>
+                {organization || 'Partner Org'}
+              </span>
+            )
+          )}
         </div>
         <p style={{ color: '#888', fontSize: '11px', fontFamily: 'Inter, sans-serif', letterSpacing: '2px', textTransform: 'uppercase' }}>
           Internship Engine
@@ -325,13 +451,16 @@ const CertificatePreview = ({
           )}
         </div>
 
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ width: '130px', height: '1px', background: '#c9a94a', marginBottom: '6px', marginLeft: 'auto' }} />
-          <p style={{ color: '#3a2800', fontWeight: 700, fontSize: '13px' }}>
-            {issuerName || 'Authorized Signatory'}
-          </p>
-          <p style={{ color: '#888', fontSize: '11px', fontFamily: 'Inter, sans-serif' }}>NEO GEN</p>
-        </div>
+        {isDualBranding ? (
+          <DualBrandingFooter
+            accentColor="#c9a94a"
+            lineColor="#c9a94a"
+            textColor="#3a2800"
+            mutedColor="#888"
+          />
+        ) : (
+          <SingleFooter lineColor="#c9a94a" textColor="#3a2800" mutedColor="#888" />
+        )}
       </div>
 
       {/* Cert ID */}

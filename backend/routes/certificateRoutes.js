@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
+const { getPublicCertBranding } = require('../controllers/certBrandingController');
 
 const {
   issueCertificate,
@@ -21,6 +22,9 @@ const {
   revokeCertificate,
   deleteCertificate,
 } = require('../controllers/certificateController');
+
+// ── Public NEO GEN branding (no auth) ─────────────────────────────────────────
+router.get('/branding/neogen', getPublicCertBranding);
 
 // ── Write endpoints (auth required) ──────────────────────────────────────────
 router.post('/issue', protect, issueCertificate);

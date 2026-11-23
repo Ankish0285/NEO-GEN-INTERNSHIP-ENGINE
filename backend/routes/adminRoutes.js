@@ -6,6 +6,13 @@ const {
 } = require('../controllers/adminController');
 const { getPlatformIntelligence } = require('../controllers/adminIntelligenceController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
+const {
+    getCertBranding,
+    updateCertBranding,
+    uploadCertBrandingLogo,
+    uploadCertBrandingSignature,
+} = require('../controllers/certBrandingController');
 
 const router = express.Router();
 
@@ -23,5 +30,11 @@ router.get('/analytics', getSystemAnalytics);
 router.post('/impersonate/:id', impersonateUser);
 router.get('/logs', getAuditLogs);
 router.get('/intelligence', getPlatformIntelligence);
+
+// Certificate branding (super_admin only — enforced inside controller)
+router.get('/cert-branding', getCertBranding);
+router.put('/cert-branding', updateCertBranding);
+router.post('/cert-branding/logo', upload.single('logo'), uploadCertBrandingLogo);
+router.post('/cert-branding/signature', upload.single('signature'), uploadCertBrandingSignature);
 
 module.exports = router;

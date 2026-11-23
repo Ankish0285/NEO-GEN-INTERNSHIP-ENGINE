@@ -301,6 +301,20 @@ const generateCertificate = asyncHandler(async (req, res) => {
 
   await postIssueSideEffects(req.app, cert, studentId, req.user._id);
 
+  // Fetch branding data for the frontend cert preview
+  const SiteSettings = require('../models/SiteSettings');
+  const siteSettings = await SiteSettings.findOne({ key: 'main' }).select('neogenCertBranding');
+  const neogenBranding = siteSettings?.neogenCertBranding ?? {
+    logoUrl: '',
+    ceoName: 'Ankish Kumar',
+    ceoDesignation: 'Founder & CEO, NEO GEN Internship Engine',
+    ceoSignatureUrl: '',
+  };
+
+  const partnerCertSettings = req.user.role === 'partner'
+    ? (req.user.partnerInfo?.certSettings ?? null)
+    : null;
+
   res.status(201).json({
     success: true,
     data: {
@@ -308,6 +322,8 @@ const generateCertificate = asyncHandler(async (req, res) => {
       studentName: student.name,
       issuerName: req.user.name,
     },
+    neogenBranding,
+    partnerCertSettings,
   });
 });
 

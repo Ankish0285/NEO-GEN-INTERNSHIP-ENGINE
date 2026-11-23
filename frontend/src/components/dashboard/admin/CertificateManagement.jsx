@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Award, Search, Filter, CheckCircle, XCircle, Clock, Plus, X, User, Upload, Wand2, Download, ExternalLink } from 'lucide-react';
+import { Award, Search, Filter, CheckCircle, XCircle, Clock, Plus, X, User, Upload, Wand2, Download, ExternalLink, Image, PenLine, Settings } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import {
   getAdminCertificates,
@@ -9,6 +9,10 @@ import {
   searchStudentsForCert,
   uploadCertificateAdmin,
   generateCertificateAdmin,
+  getNeogenCertBranding,
+  updateNeogenCertBranding,
+  uploadNeogenCertLogo,
+  uploadNeogenCertSignature,
 } from '../../../services/careerService';
 import Modal from '../../ui/Modal';
 import { Skeleton } from '../../ui/Skeleton';
@@ -162,8 +166,222 @@ const CommonFields = ({ form, setForm }) => (
   </div>
 );
 
+// ─── CertBrandingSettings ─────────────────────────────────────────────────────
+const CertBrandingSettings = ({ onBrandingChange }) => {
+  const [branding, setBranding] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [ceoName, setCeoName] = useState('');
+  const [ceoDesignation, setCeoDesignation] = useState('');
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [sigPreview, setSigPreview] = useState(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingSig, setUploadingSig] = useState(false);
+  const logoInputRef = useRef(null);
+  const sigInputRef = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await getNeogenCertBranding();
+        const d = res?.data ?? {};
+        setBranding(d);
+        setCeoName(d.ceoName || 'Ankish Kumar');
+        setCeoDesignation(d.ceoDesignation || 'Founder & CEO, NEO GEN Internship Engine');
+      } catch {
+        toast.error('Failed to load NEO GEN branding.');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleSaveText = async () => {
+    setSaving(true);
+    try {
+      const res = await updateNeogenCertBranding({ ceoName, ceoDesignation });
+      const updated = res?.data ?? branding;
+      setBranding(updated);
+      onBrandingChange?.(updated);
+      toast.success('Branding settings saved.');
+    } catch {
+      toast.error('Failed to save branding.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogoChange = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'].includes(f.type)) {
+      toast.error('PNG, JPG, or SVG only.'); return;
+    }
+    if (f.size > 5 * 1024 * 1024) { toast.error('Max 5 MB.'); return; }
+    setLogoPreview(URL.createObjectURL(f));
+    setUploadingLogo(true);
+    try {
+      const fd = new FormData();
+      fd.append('logo', f);
+      const res = await uploadNeogenCertLogo(fd);
+      const updated = res?.data ?? branding;
+      setBranding(updated);
+      onBrandingChange?.(updated);
+      toast.success('Logo uploaded.');
+    } catch {
+      toast.error('Logo upload failed.');
+      setLogoPreview(null);
+    } finally {
+      setUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = '';
+    }
+  };
+
+  const handleSigChange = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!['image/png', 'image/jpeg', 'image/jpg'].includes(f.type)) {
+      toast.error('PNG or JPG only.'); return;
+    }
+    if (f.size > 2 * 1024 * 1024) { toast.error('Max 2 MB.'); return; }
+    setSigPreview(URL.createObjectURL(f));
+    setUploadingSig(true);
+    try {
+      const fd = new FormData();
+      fd.append('signature', f);
+      const res = await uploadNeogenCertSignature(fd);
+      const updated = res?.data ?? branding;
+      setBranding(updated);
+      onBrandingChange?.(updated);
+      toast.success('Signature uploaded.');
+    } catch {
+      toast.error('Signature upload failed.');
+      setSigPreview(null);
+    } finally {
+      setUploadingSig(false);
+      if (sigInputRef.current) sigInputRef.current.value = '';
+    }
+  };
+
+  if (loading) {
+    return <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-14 rounded-xl" />)}</div>;
+  }
+
+  const currentLogoUrl = logoPreview || branding?.logoUrl || '';
+  const currentSigUrl = sigPreview || branding?.ceoSignatureUrl || '';
+
+  return (
+    <div className="space-y-6 max-w-xl">
+      {/* Logo */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Image size={16} className="text-[#e68a2e]" />
+          <h3 className="text-sm font-semibold text-gray-800">NEO GEN Logo</h3>
+        </div>
+        {currentLogoUrl ? (
+          <div className="border border-gray-200 rounded-xl p-3 inline-block">
+            <img src={currentLogoUrl} alt="NEO GEN Logo" className="max-h-16 object-contain" />
+          </div>
+        ) : (
+          <div className="w-24 h-16 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-xs text-gray-400">
+            No logo
+          </div>
+        )}
+        <input ref={logoInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml" onChange={handleLogoChange} className="hidden" />
+        <button type="button" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors disabled:opacity-60">
+          <Upload size={14} />
+          {uploadingLogo ? 'Uploading…' : 'Upload Logo'}
+        </button>
+        <p className="text-xs text-gray-400">PNG, JPG, or SVG, max 5 MB</p>
+      </div>
+
+      {/* CEO info */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <PenLine size={16} className="text-[#e68a2e]" />
+          <h3 className="text-sm font-semibold text-gray-800">CEO Information</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">CEO Name</label>
+            <input type="text" value={ceoName} onChange={(e) => setCeoName(e.target.value)}
+              placeholder="Ankish Kumar"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Designation</label>
+            <input type="text" value={ceoDesignation} onChange={(e) => setCeoDesignation(e.target.value)}
+              placeholder="Founder & CEO, NEO GEN Internship Engine"
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100" />
+          </div>
+        </div>
+        <button type="button" onClick={handleSaveText} disabled={saving}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-[#FF9933] hover:bg-[#e68a2e] text-white font-medium rounded-xl transition-colors disabled:opacity-60">
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+
+      {/* CEO signature */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <PenLine size={16} className="text-[#e68a2e]" />
+          <h3 className="text-sm font-semibold text-gray-800">CEO Signature</h3>
+        </div>
+        {currentSigUrl ? (
+          <div className="border border-gray-200 rounded-xl p-3 inline-block">
+            <img src={currentSigUrl} alt="CEO Signature" className="h-12 object-contain" />
+          </div>
+        ) : (
+          <div className="w-32 h-12 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-xs text-gray-400">
+            No signature
+          </div>
+        )}
+        <input ref={sigInputRef} type="file" accept="image/png,image/jpeg,image/jpg" onChange={handleSigChange} className="hidden" />
+        <button type="button" onClick={() => sigInputRef.current?.click()} disabled={uploadingSig}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors disabled:opacity-60">
+          <Upload size={14} />
+          {uploadingSig ? 'Uploading…' : 'Upload Signature'}
+        </button>
+        <p className="text-xs text-gray-400">PNG or JPG, max 2 MB</p>
+      </div>
+
+      {/* Footer preview */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <h3 className="text-sm font-semibold text-gray-800">Certificate Footer Preview</h3>
+        <p className="text-xs text-gray-400">How the footer will appear on generated certificates.</p>
+        <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 overflow-x-auto">
+          <div className="transform scale-75 origin-top-left" style={{ width: '133%' }}>
+            <CertificatePreview
+              templateId="classic"
+              studentName="Preview Student"
+              certificateId="NEOGEN-CERT-PREVIEW"
+              role="Software Developer Intern"
+              organization="NEO GEN"
+              duration="3 months"
+              skills={['React', 'Node.js']}
+              issueDate={new Date()}
+              issuerName={ceoName || 'Ankish Kumar'}
+              title="Internship Completion Certificate"
+              qrCodeData="https://neogeninternshipengine.me/verify/preview"
+              neogenBranding={{
+                logoUrl: currentLogoUrl,
+                ceoName: ceoName || 'Ankish Kumar',
+                ceoDesignation: ceoDesignation || 'Founder & CEO, NEO GEN Internship Engine',
+                ceoSignatureUrl: currentSigUrl,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Component ────────────────────────────────────────────────────────────
 const CertificateManagement = () => {
+  const [activeTab, setActiveTab] = useState('certificates');
+  const [neogenBranding, setNeogenBranding] = useState(null);
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -202,7 +420,12 @@ const CertificateManagement = () => {
     }
   };
 
-  useEffect(() => { fetchCertificates(); }, [statusFilter]); // eslint-disable-line
+  useEffect(() => {
+    fetchCertificates();
+    getNeogenCertBranding()
+      .then((res) => setNeogenBranding(res?.data ?? null))
+      .catch(() => {});
+  }, [statusFilter]); // eslint-disable-line
 
   const handleVerify = async (certId) => {
     setVerifyingId(certId);
@@ -338,7 +561,26 @@ const CertificateManagement = () => {
         </button>
       </div>
 
-      {/* Stats */}
+      {/* Top-level tabs */}
+      <div className="flex gap-1 border-b border-gray-200">
+        {[
+          { key: 'certificates', label: 'Certificates' },
+          { key: 'branding', label: 'NEO GEN Branding' },
+        ].map(({ key, label }) => (
+          <button key={key} type="button" onClick={() => setActiveTab(key)}
+            className={`px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 -mb-px transition-colors ${
+              activeTab === key
+                ? 'border-[#FF9933] text-[#e68a2e] bg-[#fff4e8]/50'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'branding' ? (
+        <CertBrandingSettings onBrandingChange={setNeogenBranding} />
+      ) : (<>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Total',   value: counts.all,     color: 'bg-gray-50   border-gray-200  text-gray-700' },
@@ -582,6 +824,7 @@ const CertificateManagement = () => {
                         title={form.title || 'Internship Completion Certificate'}
                         description={form.description || ''}
                         qrCodeData="https://neogeninternshipengine.me/verify/preview"
+                        neogenBranding={neogenBranding}
                       />
                     </div>
                   </div>
@@ -630,6 +873,7 @@ const CertificateManagement = () => {
           </div>
         </div>
       </Modal>
+    </>) }
     </div>
   );
 };

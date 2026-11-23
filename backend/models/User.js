@@ -53,6 +53,15 @@ const userSchema = mongoose.Schema(
       organization: { type: String },
       contactName: { type: String },
       contactPhone: { type: String },
+      certSettings: {
+        logoUrl: { type: String, default: '' },
+        logoPublicId: { type: String, default: '' },
+        signatoryName: { type: String, default: '' },
+        signatoryDesignation: { type: String, default: '' },
+        signatureUrl: { type: String, default: '' },
+        signaturePublicId: { type: String, default: '' },
+        updatedAt: { type: Date },
+      },
     },
     // Profile Fields
     profilePicture: { type: String }, // Cloudinary URL
