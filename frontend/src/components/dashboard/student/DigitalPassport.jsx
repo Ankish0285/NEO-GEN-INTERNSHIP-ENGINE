@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Shield, Briefcase, Award, Code, Star, Share2, CheckCircle, Clock } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import { getSkillEvidence, getMyCertificates, getMyPlacements, getMySkillAssessments } from '../../../services/careerService';
 import ProfileService from '../../../services/profileService';
 import { api } from '../../../services/api';
@@ -126,10 +125,6 @@ const DigitalPassport = () => {
     }
   }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleShare = () => {
-    toast.success('Coming Soon — passport sharing will be available soon!');
-  };
-
   const verifiedSkillNames = skillData
     .filter((item) => item.skillName || item.skill)
     .map((item) => item.skillName || item.skill);
@@ -141,14 +136,11 @@ const DigitalPassport = () => {
           <BookOpen className="text-[#FF9933]" />
           Digital Passport
         </h1>
-        <button
-          type="button"
-          onClick={handleShare}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#FF9933]/40 text-[#FF9933] text-sm font-semibold hover:bg-[#FF9933]/5 transition-colors"
-        >
+        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-400 text-sm font-medium cursor-default select-none">
           <Share2 size={15} />
           Share Passport
-        </button>
+          <span className="ml-1 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Coming Soon</span>
+        </span>
       </div>
 
       {/* Tab bar */}

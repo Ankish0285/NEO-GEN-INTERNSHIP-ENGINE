@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CheckCircle2, Clock, XCircle, Award, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { api } from '../services/api';
-import { verifyCertificate } from '../services/careerService';
+import { verifyCertificate, verifyByVerificationId } from '../services/careerService';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '—';
@@ -26,6 +25,8 @@ const formatStudentName = (fullName) => {
   const lastInitial = parts[parts.length - 1][0]?.toUpperCase() ?? '';
   return `${firstName} ${lastInitial}.`;
 };
+
+const isUUID = (str) => typeof str === 'string' && str.includes('-');
 
 const StatusDisplay = ({ status }) => {
   if (status === 'active') {
@@ -66,7 +67,9 @@ const StatusDisplay = ({ status }) => {
 };
 
 const CertificateVerification = () => {
-  const { certificateId } = useParams();
+  // Support both /verify/:verificationId (UUID) and /certificate/verify/:certificateId (old)
+  const { certificateId, verificationId } = useParams();
+  const lookupKey = verificationId ?? certificateId;
   const navigate = useNavigate();
 
   const [certificate, setCertificate] = useState(null);
@@ -76,14 +79,17 @@ const CertificateVerification = () => {
   const [searchId, setSearchId] = useState('');
 
   useEffect(() => {
-    if (!certificateId) return;
+    if (!lookupKey) return;
     const fetchCertificate = async () => {
       setLoading(true);
       setError(null);
       setNotFound(false);
       setCertificate(null);
       try {
-        const data = await verifyCertificate(certificateId);
+        // If it's a UUID, use the new verification endpoint; otherwise use legacy
+        const data = isUUID(lookupKey)
+          ? await verifyByVerificationId(lookupKey)
+          : await verifyCertificate(lookupKey);
         const cert = data?.data ?? data ?? null;
         if (!cert) {
           setNotFound(true);
@@ -91,7 +97,7 @@ const CertificateVerification = () => {
           setCertificate(cert);
         }
       } catch (err) {
-        if (err?.response?.status === 404) {
+        if (err?.response?.status === 404 || err?.status === 404) {
           setNotFound(true);
         } else {
           setError('Unable to verify certificate. Please try again.');
@@ -101,12 +107,16 @@ const CertificateVerification = () => {
       }
     };
     fetchCertificate();
-  }, [certificateId]);
+  }, [lookupKey]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     const trimmed = searchId.trim();
-    if (trimmed) {
+    if (!trimmed) return;
+    // Route based on whether the input looks like a UUID
+    if (isUUID(trimmed)) {
+      navigate(`/verify/${trimmed}`);
+    } else {
       navigate(`/certificate/verify/${trimmed}`);
     }
   };
@@ -147,7 +157,7 @@ const CertificateVerification = () => {
             <XCircle size={48} className="text-red-400 mx-auto" />
             <p className="text-red-400 font-semibold">{error}</p>
             <p className="text-white/50 text-sm">
-              Certificate ID: <code className="font-mono">{certificateId}</code>
+              Certificate ID: <code className="font-mono">{lookupKey}</code>
             </p>
           </div>
         )}
@@ -158,7 +168,7 @@ const CertificateVerification = () => {
             <p className="text-white font-semibold text-lg">Certificate Not Found</p>
             <p className="text-white/50 text-sm">
               No certificate found with ID:{' '}
-              <code className="font-mono text-white/70">{certificateId}</code>
+              <code className="font-mono text-white/70">{lookupKey}</code>
             </p>
             <p className="text-white/40 text-xs">
               Double-check the ID or use the search below.
@@ -192,7 +202,7 @@ const CertificateVerification = () => {
                 </div>
                 <div>
                   <p className="text-white/40 text-xs uppercase tracking-wider mb-0.5">Issued On</p>
-                  <p className="text-white/80">{formatDate(certificate.issuedAt)}</p>
+                  <p className="text-white/80">{formatDate(certificate.issueDate ?? certificate.issuedAt)}</p>
                 </div>
                 {certificate.duration && (
                   <div>
@@ -248,7 +258,7 @@ const CertificateVerification = () => {
                 <p className="text-white/40 text-xs mt-0.5">
                   Certificate ID:{' '}
                   <code className="font-mono text-white/60">
-                    {certificate.certificateId ?? certificateId}
+                    {certificate.certificateId ?? lookupKey}
                   </code>
                 </p>
               </div>

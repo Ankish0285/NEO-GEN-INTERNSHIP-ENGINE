@@ -158,7 +158,9 @@ const AppRoutes = () => {
         <Route path="learning-resources" element={<PartnerLearningResources />} />
       </Route>
 
-      {/* Certificate Verification */}
+      {/* Certificate Verification — UUID-based (new) */}
+      <Route path="/verify/:verificationId" element={<CertificateVerification />} />
+      {/* Certificate Verification — legacy cert-ID-based (backward compat) */}
       <Route path="/certificate/verify/:certificateId" element={<CertificateVerification />} />
 
       {/* Catch all — 404 with noindex */}

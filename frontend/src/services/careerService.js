@@ -30,17 +30,25 @@ export const getInterviewLearning = () => api.get('/outcomes/interview-learning'
 // --- Certificates ---
 export const getMyCertificates = () => api.get('/certificates/my');
 export const verifyCertificate = (id) => api.get('/certificates/verify/' + id);
+export const verifyByVerificationId = (vid) => api.get('/certificates/verify/' + vid);
 export const issueCertificate = (data) => api.post('/certificates', data);
 export const verifyCertificateAdmin = (id) => api.put('/certificates/' + id + '/verify', {});
-export const revokeCertificate = (id) => api.put('/certificates/' + id + '/revoke', {});
-export const revokeCertificateAdmin = (certificateId, reason) => api.put(`/certificates/${certificateId}/revoke`, { reason });
-export const getAllCertificates = (params) => api.get('/certificates', { params });
+export const revokeCertificate = (id) => api.patch('/certificates/' + id + '/revoke', {});
+export const revokeCertificateAdmin = (certId, reason) => api.patch(`/certificates/${certId}/revoke`, { reason });
+export const getAllCertificates = (params) => api.get('/certificates/admin/all', { params });
 export const getAdminCertificates = (params) => api.get('/certificates/admin/all', { params });
 export const getPartnerCertificates = () => api.get('/certificates/partner');
 export const getPublicCertificate = (certificateId) => api.get(`/certificates/verify/${certificateId}`);
 export const adminIssueCertificate = (data) => api.post('/certificates/admin/issue', data);
 export const searchStudentsForCert = (q) => api.get(`/certificates/admin/students/search?q=${encodeURIComponent(q)}`);
 export const getPartnerAcceptedApplications = () => api.get('/certificates/partner/accepted-applications');
+export const uploadCertificateAdmin = (formData) => api.upload('/certificates/upload', formData);
+export const generateCertificateAdmin = (data) => api.post('/certificates/generate', data);
+export const uploadCertificatePartner = (formData) => api.upload('/certificates/upload', formData);
+export const generateCertificatePartner = (data) => api.post('/certificates/generate', data);
+export const searchStudentsForPartner = (q) => api.get(`/certificates/partner/students/search?q=${encodeURIComponent(q)}`);
+export const getCertificateById = (id) => api.get('/certificates/' + id);
+export const deleteCertificate = (id) => api.delete('/certificates/' + id);
 
 
 // --- Admin ---
@@ -100,6 +108,7 @@ export default {
   // Certificates
   getMyCertificates,
   verifyCertificate,
+  verifyByVerificationId,
   issueCertificate,
   verifyCertificateAdmin,
   revokeCertificate,
@@ -108,6 +117,16 @@ export default {
   getAdminCertificates,
   getPartnerCertificates,
   getPublicCertificate,
+  adminIssueCertificate,
+  searchStudentsForCert,
+  getPartnerAcceptedApplications,
+  uploadCertificateAdmin,
+  generateCertificateAdmin,
+  uploadCertificatePartner,
+  generateCertificatePartner,
+  searchStudentsForPartner,
+  getCertificateById,
+  deleteCertificate,
   // Admin
   getCareerInsights,
   getAdminPlatformIntelligence,
