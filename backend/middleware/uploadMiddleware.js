@@ -34,15 +34,16 @@ const fileFilter = (req, file, cb) => {
         'image/jpg',
         'image/png',
         'image/gif',
-        'image/webp'
+        'image/webp',
+        'image/svg+xml'
     ];
     const ext = path.extname(file.originalname).toLowerCase();
-    const allowedExts = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const allowedExts = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
 
     if (allowed.includes(file.mimetype) || allowedExts.includes(ext)) {
         cb(null, true);
     } else {
-        cb(new Error('Invalid file type. Only PDF, DOC, DOCX, and images are allowed.'), false);
+        cb(new Error('Invalid file type. Only PDF, DOC, DOCX, and images (including SVG) are allowed.'), false);
     }
 };
 
