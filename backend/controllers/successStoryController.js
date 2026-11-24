@@ -68,8 +68,9 @@ const createStory = asyncHandler(async (req, res) => {
     const story = await SuccessStory.create(storyData);
     await story.populate('studentId', 'name course');
 
-    // Email registered students about the new success story (fire-and-forget)
-    setImmediate(() => emailService.notifySuccessStory(story).catch((err) => console.error('[Email]', err.message)));
+    // Note: email is not sent here because createStory auto-approves stories submitted
+    // by students without an admin review gate. The notification fires only in updateStory
+    // when an admin explicitly transitions a story to 'approved'.
 
     res.status(201).json({ success: true, data: story });
 });

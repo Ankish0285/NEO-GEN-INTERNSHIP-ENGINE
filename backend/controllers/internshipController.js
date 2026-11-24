@@ -205,9 +205,6 @@ const createInternship = asyncHandler(async (req, res) => {
         link: `/internships/${internship._id}`
     });
 
-    // Email eligible students about the new internship (fire-and-forget)
-    setImmediate(() => emailService.notifyNewInternship(internship).catch((err) => console.error('[Email]', err.message)));
-
     res.status(201).json(internship);
 });
 

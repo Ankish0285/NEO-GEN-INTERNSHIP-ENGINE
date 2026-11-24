@@ -312,10 +312,13 @@ const notifyCertificateIssued = async (cert) => {
 const notifyCertificateStatus = async (cert, statusLabel) => {
   const student = await _getCertStudent(cert);
   if (!student || !student.email) return { skipped: 'no-student' };
+  // Use a composite eventRefId so each status transition (active, revoked, …) is a
+  // distinct idempotency key. Without this, verify then revoke on the same cert would
+  // share the same key and the second notification would be silently skipped.
   return _sendOne({
     eventType: 'certificate_status',
     categoryKey: 'certificateStatus',
-    eventRefId: String(cert._id),
+    eventRefId: `${cert._id}:${statusLabel}`,
     recipient: { _id: student._id, email: student.email },
     buildMail: () => certificateStatusEmail({ name: student.name, email: student.email }, cert, statusLabel),
   });

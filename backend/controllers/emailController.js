@@ -61,6 +61,12 @@ const retryEmailLog = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Email log not found');
   }
+  // Trade-off: the stored bodyHtml from the original send is reused on retry rather than
+  // re-rendering from the event type and ref ID. This avoids needing to reload the original
+  // source document (internship, certificate, etc.) and keeps retry fast. The HTML
+  // originates from our own templates, and this route is admin-only, so the attack surface
+  // is limited. If a future migration changes templates, stale HTML may be retried until
+  // the log entry is replaced by a fresh send.
   try {
     const result = await emailService.sendWithRetry({
       to: log.recipientEmail,
@@ -117,17 +123,22 @@ const sendAnnouncement = asyncHandler(async (req, res) => {
   else if (audienceKey === 'partners') query = { role: 'partner' };
   else query = {}; // all
 
-  const recipients = await User.find(query).select('email name');
   const announcementId = uuidv4();
 
-  // Send in the background so the admin response is not delayed for large audiences.
+  // User query is deferred into setImmediate so it does not block the HTTP response
+  // path on large user bases. recipientCount returns 0 at response time; the caller
+  // should treat it as an estimate (announcement dispatch is fully async).
   setImmediate(() => {
-    emailService
-      .sendAnnouncementToAudience({ announcementId, subject, title, body, cta, ctaUrl, recipients })
-      .catch((err) => console.error('[Email]', err.message));
+    User.find(query)
+      .select('email name')
+      .lean()
+      .then((recipients) =>
+        emailService.sendAnnouncementToAudience({ announcementId, subject, title, body, cta, ctaUrl, recipients })
+      )
+      .catch((err) => console.error('[Email] announcement:', err.message));
   });
 
-  res.status(202).json({ success: true, announcementId, recipientCount: recipients.length });
+  res.status(202).json({ success: true, announcementId, recipientCount: 0 });
 });
 
 // @desc    Get email notification category settings (merged with defaults)
