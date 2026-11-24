@@ -38,8 +38,8 @@ const STATUS_FILTERS = [
 ];
 
 const TEMPLATES = [
-  { id: 'classic', label: 'Classic', desc: 'Cream/gold formal layout' },
-  { id: 'modern',  label: 'Modern',  desc: 'Dark gradient, clean sans-serif' },
+  { id: 'classic', label: 'Classic', desc: 'Indian flag formal layout' },
+  { id: 'modern',  label: 'Modern',  desc: 'Indian flag modern layout' },
 ];
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -48,6 +48,9 @@ const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'a
 const EMPTY_FORM = {
   role: '', organization: '', duration: '', skills: '', notes: '',
   title: '', description: '', templateId: 'classic',
+  // Company (right-side) branding fields
+  companyHrName: '', companyHrDesignation: 'HR Manager',
+  companyCeoName: '', companyCeoDesignation: 'Chief Executive Officer',
 };
 
 // ─── StudentSearchInput ────────────────────────────────────────────────────────
@@ -122,9 +125,41 @@ const StudentSearchInput = ({ selectedStudent, onSelect, onClear, fetchStudents 
   );
 };
 
+// ─── ImageUploadField ──────────────────────────────────────────────────────────
+const ImageUploadField = ({ label, hint, previewUrl, onFile, accept = 'image/png,image/jpeg,image/jpg', maxMB = 2 }) => {
+  const inputRef = useRef(null);
+  const handleChange = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > maxMB * 1024 * 1024) { toast.error(`Max ${maxMB} MB.`); return; }
+    onFile(f);
+  };
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <input ref={inputRef} type="file" accept={accept} onChange={handleChange} className="hidden" />
+      {previewUrl ? (
+        <div className="flex items-center gap-3">
+          <img src={previewUrl} alt={label} className="h-12 object-contain border border-gray-200 rounded-lg p-1 bg-white" />
+          <button type="button" onClick={() => { onFile(null); if (inputRef.current) inputRef.current.value = ''; }}
+            className="text-xs text-red-500 hover:text-red-700 font-medium">Remove</button>
+        </div>
+      ) : (
+        <button type="button" onClick={() => inputRef.current?.click()}
+          className="flex items-center gap-2 px-4 py-2.5 w-full border-2 border-dashed border-gray-300 hover:border-[#FF9933] rounded-xl text-sm text-gray-500 hover:text-[#e68a2e] transition-colors">
+          <Upload size={15} />
+          <span>Click to upload {hint || label}</span>
+        </button>
+      )}
+      <p className="text-xs text-gray-400 mt-1">PNG or JPG, max {maxMB} MB</p>
+    </div>
+  );
+};
+
 // ─── CommonFields ──────────────────────────────────────────────────────────────
-const CommonFields = ({ form, setForm }) => (
-  <div className="space-y-3">
+const CommonFields = ({ form, setForm, companyLogoFile, setCompanyLogoFile, companyLogoPreview, hrSigFile, setHrSigFile, hrSigPreview, ceoSigFile, setCeoSigFile, ceoSigPreview }) => (
+  <div className="space-y-4">
+    {/* Basic internship info */}
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Role / Position <span className="text-red-500">*</span></label>
@@ -135,7 +170,7 @@ const CommonFields = ({ form, setForm }) => (
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Organization <span className="text-red-500">*</span></label>
         <input type="text" value={form.organization} onChange={(e) => setForm(p => ({ ...p, organization: e.target.value }))}
-          placeholder="e.g. NEO GEN"
+          placeholder="e.g. Tech Corp Pvt. Ltd."
           className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100" required />
       </div>
       <div>
@@ -162,6 +197,73 @@ const CommonFields = ({ form, setForm }) => (
       <textarea value={form.notes} onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))}
         placeholder="Internal notes…" rows={2}
         className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100 resize-none" />
+    </div>
+
+    {/* Company (right-side) branding section */}
+    <div className="border border-[#FF9933]/30 rounded-xl p-4 bg-[#FFF8F0] space-y-4">
+      <div className="flex items-center gap-2 mb-1">
+        <div className="w-5 h-5 rounded bg-[#FF9933] flex items-center justify-center">
+          <Award size={12} className="text-white" />
+        </div>
+        <h3 className="text-sm font-semibold text-gray-800">Company Branding (Right Side of Certificate)</h3>
+      </div>
+      <p className="text-xs text-gray-500 -mt-2">This appears on the right side of the certificate opposite NEO GEN branding.</p>
+
+      {/* Company Logo */}
+      <ImageUploadField
+        label="Company Logo"
+        hint="company logo (PNG/JPG)"
+        previewUrl={companyLogoPreview}
+        onFile={setCompanyLogoFile}
+        maxMB={5}
+        accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+      />
+
+      {/* HR Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">HR Name</label>
+          <input type="text" value={form.companyHrName} onChange={(e) => setForm(p => ({ ...p, companyHrName: e.target.value }))}
+            placeholder="e.g. Priya Sharma"
+            className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">HR Designation</label>
+          <input type="text" value={form.companyHrDesignation} onChange={(e) => setForm(p => ({ ...p, companyHrDesignation: e.target.value }))}
+            placeholder="e.g. HR Manager"
+            className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100" />
+        </div>
+      </div>
+      <ImageUploadField
+        label="HR Signature"
+        hint="HR signature image"
+        previewUrl={hrSigPreview}
+        onFile={setHrSigFile}
+        maxMB={2}
+      />
+
+      {/* CEO Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Company CEO / Director Name</label>
+          <input type="text" value={form.companyCeoName} onChange={(e) => setForm(p => ({ ...p, companyCeoName: e.target.value }))}
+            placeholder="e.g. Rajesh Kumar"
+            className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">CEO Designation</label>
+          <input type="text" value={form.companyCeoDesignation} onChange={(e) => setForm(p => ({ ...p, companyCeoDesignation: e.target.value }))}
+            placeholder="e.g. Chief Executive Officer"
+            className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-amber-100" />
+        </div>
+      </div>
+      <ImageUploadField
+        label="CEO Signature"
+        hint="CEO signature image"
+        previewUrl={ceoSigPreview}
+        onFile={setCeoSigFile}
+        maxMB={2}
+      />
     </div>
   </div>
 );
@@ -397,6 +499,13 @@ const CertificateManagement = () => {
   const [file, setFile] = useState(null);
   const [filePreviewUrl, setFilePreviewUrl] = useState(null);
   const fileInputRef = useRef(null);
+  // Company branding files (per-certificate, right side)
+  const [companyLogoFile, setCompanyLogoFile] = useState(null);
+  const [companyLogoPreview, setCompanyLogoPreview] = useState(null);
+  const [hrSigFile, setHrSigFile] = useState(null);
+  const [hrSigPreview, setHrSigPreview] = useState(null);
+  const [ceoSigFile, setCeoSigFile] = useState(null);
+  const [ceoSigPreview, setCeoSigPreview] = useState(null);
 
   const resetModal = () => {
     setForm(EMPTY_FORM);
@@ -404,6 +513,9 @@ const CertificateManagement = () => {
     setFile(null);
     setFilePreviewUrl(null);
     setIssueTab('generate');
+    setCompanyLogoFile(null); setCompanyLogoPreview(null);
+    setHrSigFile(null); setHrSigPreview(null);
+    setCeoSigFile(null); setCeoSigPreview(null);
   };
 
   const fetchCertificates = async () => {
@@ -452,6 +564,13 @@ const CertificateManagement = () => {
     }
   };
 
+  // helper: file → object URL
+  const toPreview = (f) => f ? URL.createObjectURL(f) : null;
+
+  const handleCompanyLogoFile = (f) => { setCompanyLogoFile(f); setCompanyLogoPreview(toPreview(f)); };
+  const handleHrSigFile       = (f) => { setHrSigFile(f);       setHrSigPreview(toPreview(f)); };
+  const handleCeoSigFile      = (f) => { setCeoSigFile(f);      setCeoSigPreview(toPreview(f)); };
+
   const handleFileChange = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -482,30 +601,36 @@ const CertificateManagement = () => {
     try {
       const skillsArr = form.skills.split(',').map(s => s.trim()).filter(Boolean);
 
-      if (issueTab === 'upload') {
+      // Build FormData for both paths (supports file uploads)
+      const buildCommonFd = () => {
         const fd = new FormData();
-        fd.append('certificate', file);
         fd.append('studentId', selectedStudent._id);
         fd.append('role', form.role.trim());
         fd.append('organization', form.organization.trim());
         fd.append('duration', form.duration.trim());
         skillsArr.forEach(s => fd.append('skills[]', s));
-        fd.append('internalNotes', form.notes.trim());
         fd.append('title', form.title.trim() || 'Internship Completion Certificate');
         fd.append('description', form.description?.trim() || '');
+        fd.append('companyHrName', form.companyHrName || '');
+        fd.append('companyHrDesignation', form.companyHrDesignation || '');
+        fd.append('companyCeoName', form.companyCeoName || '');
+        fd.append('companyCeoDesignation', form.companyCeoDesignation || '');
+        if (companyLogoFile) fd.append('companyLogo', companyLogoFile);
+        if (hrSigFile) fd.append('hrSignature', hrSigFile);
+        if (ceoSigFile) fd.append('ceoSignature', ceoSigFile);
+        return fd;
+      };
+
+      if (issueTab === 'upload') {
+        const fd = buildCommonFd();
+        fd.append('certificate', file);
+        fd.append('internalNotes', form.notes.trim());
         await uploadCertificateAdmin(fd);
       } else {
-        await generateCertificateAdmin({
-          studentId: selectedStudent._id,
-          role: form.role.trim(),
-          organization: form.organization.trim(),
-          duration: form.duration.trim(),
-          skills: skillsArr,
-          notes: form.notes.trim(),
-          title: form.title.trim() || 'Internship Completion Certificate',
-          description: form.description?.trim() || '',
-          templateId: form.templateId,
-        });
+        const fd = buildCommonFd();
+        fd.append('notes', form.notes.trim());
+        fd.append('templateId', form.templateId);
+        await generateCertificateAdmin(fd);
       }
 
       toast.success(`Certificate issued for ${selectedStudent.name}!`);
@@ -745,7 +870,12 @@ const CertificateManagement = () => {
           </div>
 
           {/* Common fields */}
-          <CommonFields form={form} setForm={setForm} />
+          <CommonFields
+            form={form} setForm={setForm}
+            companyLogoFile={companyLogoFile} setCompanyLogoFile={handleCompanyLogoFile} companyLogoPreview={companyLogoPreview}
+            hrSigFile={hrSigFile} setHrSigFile={handleHrSigFile} hrSigPreview={hrSigPreview}
+            ceoSigFile={ceoSigFile} setCeoSigFile={handleCeoSigFile} ceoSigPreview={ceoSigPreview}
+          />
 
           {/* Upload tab */}
           {issueTab === 'upload' && (
@@ -825,6 +955,15 @@ const CertificateManagement = () => {
                         description={form.description || ''}
                         qrCodeData="https://neogeninternshipengine.me/verify/preview"
                         neogenBranding={neogenBranding}
+                        partnerBranding={(form.companyCeoName || form.companyHrName || companyLogoPreview) ? {
+                          logoUrl: companyLogoPreview || '',
+                          signatoryName: form.companyCeoName || form.companyHrName || '',
+                          signatoryDesignation: form.companyCeoDesignation || form.companyHrDesignation || '',
+                          signatureUrl: ceoSigPreview || hrSigPreview || '',
+                          hrName: form.companyHrName || '',
+                          hrDesignation: form.companyHrDesignation || '',
+                          hrSignatureUrl: hrSigPreview || '',
+                        } : null}
                       />
                     </div>
                   </div>
