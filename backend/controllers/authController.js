@@ -5,6 +5,7 @@ const LoginOtp = require('../models/LoginOtp');
 const ActivityLog = require('../models/ActivityLog');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/sendEmail');
+const emailService = require('../services/emailService');
 const crypto = require('crypto');
 
 // Generate JWT
@@ -307,6 +308,9 @@ const verifyOtp = asyncHandler(async (req, res) => {
         } catch (err) {
             console.error('[Auth] Activity log error:', err);
         }
+
+        // Send welcome email (fire-and-forget, never blocks registration)
+        setImmediate(() => emailService.sendWelcomeEmail(user).catch((err) => console.error('[Email]', err.message)));
 
         console.log(`[Auth] User ${user.email} successfully registered and verified`);
 
@@ -968,6 +972,9 @@ const googleLogin = asyncHandler(async (req, res) => {
                 userAgent: req.get('User-Agent'),
             });
         } catch (_) {}
+
+        // Send welcome email (fire-and-forget, never blocks Google login)
+        setImmediate(() => emailService.sendWelcomeEmail(user).catch((err) => console.error('[Email]', err.message)));
     }
 
     // ── Send OTP for login (same as email/password flow) ──

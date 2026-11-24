@@ -27,6 +27,7 @@ import {
     MessageSquare,
     GraduationCap,
     Video,
+    Mail,
 } from 'lucide-react';
 
 export const roleConfig = {
@@ -139,6 +140,7 @@ export const roleConfig = {
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/admin/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
+            { path: '/admin/dashboard/email-notifications', label: 'Email Notifications', icon: Mail },
         ],
         sections: [
             {
@@ -183,6 +185,12 @@ export const roleConfig = {
                 items: [
                     { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
                     { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
+                ],
+            },
+            {
+                label: 'NOTIFICATIONS',
+                items: [
+                    { path: '/admin/dashboard/email-notifications', label: 'Email Notifications', icon: Mail },
                 ],
             },
         ],
@@ -209,6 +217,7 @@ export const roleConfig = {
             { path: '/admin/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
             { path: '/admin/dashboard/learning-resources', label: 'Learning Resources', icon: GraduationCap },
             { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
+            { path: '/admin/dashboard/email-notifications', label: 'Email Notifications', icon: Mail },
         ],
         sections: [
             {
@@ -253,6 +262,12 @@ export const roleConfig = {
                 items: [
                     { path: '/admin/dashboard/support-inbox', label: 'Support Inbox', icon: Headphones, supportMenu: true },
                     { path: '/admin/dashboard/settings', label: 'Settings', icon: Settings },
+                ],
+            },
+            {
+                label: 'NOTIFICATIONS',
+                items: [
+                    { path: '/admin/dashboard/email-notifications', label: 'Email Notifications', icon: Mail },
                 ],
             },
         ],

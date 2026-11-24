@@ -101,6 +101,14 @@ const defaultSiteSettings = {
       body: 'We use essential cookies for login, session security, and analytics to improve performance. No tracking for advertising.\n\nYou can control cookies in your browser. Disabling essential cookies may affect core features like authentication.',
     },
   },
+  emailNotifications: {
+    welcomeEmail: { enabled: true },
+    newInternship: { enabled: true },
+    successStory: { enabled: true },
+    certificateIssued: { enabled: true },
+    certificateStatus: { enabled: true },
+    announcements: { enabled: true },
+  },
 };
 
 module.exports = { defaultSiteSettings, DEFAULT_HERO_IMAGE };

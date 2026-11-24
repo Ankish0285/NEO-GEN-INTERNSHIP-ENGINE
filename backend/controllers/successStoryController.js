@@ -4,6 +4,7 @@ const StoryRating = require('../models/StoryRating');
 const { deleteCloudinaryAsset } = require('../utils/cloudinaryCleanup');
 const { releaseCloudinaryAsset } = require('../utils/cloudinaryUpload');
 const path = require('path');
+const emailService = require('../services/emailService');
 
 /**
  * Normalize an image value before writing to the database.
@@ -66,6 +67,10 @@ const createStory = asyncHandler(async (req, res) => {
 
     const story = await SuccessStory.create(storyData);
     await story.populate('studentId', 'name course');
+
+    // Email registered students about the new success story (fire-and-forget)
+    setImmediate(() => emailService.notifySuccessStory(story).catch((err) => console.error('[Email]', err.message)));
+
     res.status(201).json({ success: true, data: story });
 });
 
@@ -185,9 +190,10 @@ const updateStory = asyncHandler(async (req, res) => {
         updateData.image = normalizeStoryImageForStorage(updateData.image);
     }
 
-    // Capture old image BEFORE update
-    const existing = await SuccessStory.findById(req.params.id).select('image');
+    // Capture old image + status BEFORE update
+    const existing = await SuccessStory.findById(req.params.id).select('image status');
     const oldImage = existing?.image || null;
+    const oldStatus = existing?.status || null;
 
     const story = await SuccessStory.findByIdAndUpdate(
         req.params.id,
@@ -203,6 +209,11 @@ const updateStory = asyncHandler(async (req, res) => {
     // Release old image after successful DB update, only if it changed
     if (oldImage && oldImage !== story.image) {
         await releaseCloudinaryAsset(oldImage);
+    }
+
+    // Email students when the story transitions to approved (published)
+    if (oldStatus !== 'approved' && story.status === 'approved') {
+        setImmediate(() => emailService.notifySuccessStory(story).catch((err) => console.error('[Email]', err.message)));
     }
 
     res.status(200).json({ success: true, data: story });

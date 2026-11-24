@@ -118,6 +118,14 @@ const siteSettingsSchema = new mongoose.Schema(
       ceoSignaturePublicId: { type: String, default: '' },
       updatedAt: { type: Date },
     },
+    emailNotifications: {
+      welcomeEmail: { enabled: { type: Boolean, default: true } },
+      newInternship: { enabled: { type: Boolean, default: true } },
+      successStory: { enabled: { type: Boolean, default: true } },
+      certificateIssued: { enabled: { type: Boolean, default: true } },
+      certificateStatus: { enabled: { type: Boolean, default: true } },
+      announcements: { enabled: { type: Boolean, default: true } },
+    },
   },
   { timestamps: true }
 );

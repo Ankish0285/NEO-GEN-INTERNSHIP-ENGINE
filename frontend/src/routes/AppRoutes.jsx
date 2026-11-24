@@ -71,6 +71,7 @@ import CertificateWorkflow from '../components/dashboard/partner/CertificateWork
 // Admin Career Intelligence Components
 import CertificateManagement from '../components/dashboard/admin/CertificateManagement';
 import CareerIntelligenceInsights from '../components/dashboard/admin/CareerIntelligenceInsights';
+import EmailNotifications from '../components/dashboard/admin/EmailNotifications';
 
 // Public Pages
 import CertificateVerification from '../pages/CertificateVerification';
@@ -141,6 +142,7 @@ const AppRoutes = () => {
         <Route path="certificates" element={<CertificateManagement />} />
         <Route path="career-insights" element={<CareerIntelligenceInsights />} />
         <Route path="learning-resources" element={<AdminLearningResources />} />
+        <Route path="email-notifications" element={<EmailNotifications />} />
       </Route>
 
       {/* Partner Routes */}

@@ -3,6 +3,7 @@ const Internship = require('../models/Internship');
 const User = require('../models/User');
 const Resume = require('../models/Resume');
 const { createAndNotify } = require('../utils/notificationHelper');
+const emailService = require('../services/emailService');
 
 // @desc    Get recommended internships based on user profile/resume
 // @route   GET /api/internships/recommended
@@ -204,6 +205,9 @@ const createInternship = asyncHandler(async (req, res) => {
         link: `/internships/${internship._id}`
     });
 
+    // Email eligible students about the new internship (fire-and-forget)
+    setImmediate(() => emailService.notifyNewInternship(internship).catch((err) => console.error('[Email]', err.message)));
+
     res.status(201).json(internship);
 });
 
@@ -282,6 +286,9 @@ const updateInternship = asyncHandler(async (req, res) => {
         }
     }
 
+    // Capture status before update so we only email on a transition to published.
+    const oldStatus = internship.status;
+
     const updatedInternship = await Internship.findByIdAndUpdate(
         req.params.id,
         sanitized,
@@ -303,6 +310,11 @@ const updateInternship = asyncHandler(async (req, res) => {
         });
     } catch (notifyErr) {
         console.warn('[Internship] Notification skipped:', notifyErr.message);
+    }
+
+    // Email eligible students only when the internship transitions to published (active).
+    if (!['active', 'published'].includes(oldStatus) && ['active', 'published'].includes(updatedInternship.status)) {
+        setImmediate(() => emailService.notifyNewInternship(updatedInternship).catch((err) => console.error('[Email]', err.message)));
     }
 
     res.status(200).json({
@@ -358,6 +370,9 @@ const approveInternship = asyncHandler(async (req, res) => {
         priority: 'high',
         link: `/internships/${internship._id}`
     });
+
+    // Email eligible students about the approved internship (fire-and-forget)
+    setImmediate(() => emailService.notifyNewInternship(internship).catch((err) => console.error('[Email]', err.message)));
 
     res.status(200).json({ message: 'Internship approved successfully', internship });
 });

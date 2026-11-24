@@ -4,6 +4,7 @@ const Certificate = require('../models/Certificate');
 const Application = require('../models/Application');
 const ActivityLog = require('../models/ActivityLog');
 const { createAndNotify } = require('../utils/notificationHelper');
+const emailService = require('../services/emailService');
 const { smartCloudinaryUpload, releaseCloudinaryAsset } = require('../utils/cloudinaryUpload');
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -69,6 +70,9 @@ const postIssueSideEffects = async (app, cert, studentId, issuerUserId) => {
     ip: null,
     userAgent: null,
   });
+
+  // Email the student about the issued certificate (fire-and-forget)
+  setImmediate(() => emailService.notifyCertificateIssued(cert).catch((err) => console.error('[Email]', err.message)));
 };
 
 // ─── controllers ──────────────────────────────────────────────────────────────
@@ -643,6 +647,9 @@ const verifyCertificate = asyncHandler(async (req, res) => {
     link: '/dashboard/passport',
   });
 
+  // Email the student about the status change (fire-and-forget)
+  setImmediate(() => emailService.notifyCertificateStatus(cert, 'active').catch((err) => console.error('[Email]', err.message)));
+
   res.json({ success: true, data: cert });
 });
 
@@ -678,6 +685,9 @@ const revokeCertificate = asyncHandler(async (req, res) => {
     ip: null,
     userAgent: null,
   });
+
+  // Email the student about the revocation (fire-and-forget)
+  setImmediate(() => emailService.notifyCertificateStatus(cert, 'revoked').catch((err) => console.error('[Email]', err.message)));
 
   res.json({ success: true, data: cert });
 });
