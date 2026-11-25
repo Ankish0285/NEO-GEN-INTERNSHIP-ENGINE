@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 const certificateSchema = new mongoose.Schema(
   {
@@ -106,7 +106,7 @@ certificateSchema.pre('save', function (next) {
       crypto.randomBytes(4).toString('hex').toUpperCase();
   }
   if (!this.verificationId) {
-    this.verificationId = uuidv4();
+    this.verificationId = randomUUID();
   }
   next();
 });

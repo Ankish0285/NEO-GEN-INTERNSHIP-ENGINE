@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const EmailLog = require('../models/EmailLog');
 const User = require('../models/User');
 const SiteSettings = require('../models/SiteSettings');
@@ -131,7 +131,7 @@ const sendAnnouncement = asyncHandler(async (req, res) => {
   else if (audienceKey === 'partners') query = { role: 'partner' };
   else query = {}; // all
 
-  const announcementId = uuidv4();
+  const announcementId = randomUUID();
 
   const recipientCount = await User.countDocuments(query);
 
