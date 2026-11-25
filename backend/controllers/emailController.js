@@ -29,7 +29,12 @@ const getEmailLogs = asyncHandler(async (req, res) => {
   if (req.query.status && VALID_STATUSES.includes(req.query.status)) {
     filter.status = req.query.status;
   }
+  const VALID_EVENT_TYPES = ['welcome', 'new_internship', 'success_story', 'certificate_issued', 'certificate_status', 'announcement'];
   if (req.query.eventType) {
+    if (!VALID_EVENT_TYPES.includes(req.query.eventType)) {
+      res.status(400);
+      throw new Error('Invalid eventType');
+    }
     filter.eventType = req.query.eventType;
   }
   if (req.query.search) {
@@ -67,6 +72,10 @@ const retryEmailLog = asyncHandler(async (req, res) => {
   // originates from our own templates, and this route is admin-only, so the attack surface
   // is limited. If a future migration changes templates, stale HTML may be retried until
   // the log entry is replaced by a fresh send.
+  const categoryKey = emailService.EVENT_CATEGORY_MAP[log.eventType];
+  if (!(await emailService.isCategoryEnabled(categoryKey))) {
+    return res.json({ skipped: true, reason: 'category disabled' });
+  }
   try {
     const result = await emailService.sendWithRetry({
       to: log.recipientEmail,
@@ -75,7 +84,6 @@ const retryEmailLog = asyncHandler(async (req, res) => {
       text: log.subject,
     });
     if (result && result.skipped) {
-      await emailService.recordResult(log._id, false, result.reason);
       res.status(503);
       throw new Error(`Retry failed: ${result.reason}`);
     }
@@ -125,9 +133,8 @@ const sendAnnouncement = asyncHandler(async (req, res) => {
 
   const announcementId = uuidv4();
 
-  // User query is deferred into setImmediate so it does not block the HTTP response
-  // path on large user bases. recipientCount returns 0 at response time; the caller
-  // should treat it as an estimate (announcement dispatch is fully async).
+  const recipientCount = await User.countDocuments(query);
+
   setImmediate(() => {
     User.find(query)
       .select('email name')
@@ -138,7 +145,7 @@ const sendAnnouncement = asyncHandler(async (req, res) => {
       .catch((err) => console.error('[Email] announcement:', err.message));
   });
 
-  res.status(202).json({ success: true, announcementId, recipientCount: 0 });
+  res.status(202).json({ success: true, announcementId, recipientCount });
 });
 
 // @desc    Get email notification category settings (merged with defaults)
